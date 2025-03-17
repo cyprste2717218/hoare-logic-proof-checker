@@ -48,7 +48,7 @@
     },
     "ignores": [
       "**/*.d.ts",
-      "src/main.tsx"
+      "./src/main.tsx"
     ]
   }
   
