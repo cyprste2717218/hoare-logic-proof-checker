@@ -47,7 +47,8 @@
       "unicorn/filename-case": "off"
     },
     "ignores": [
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "src/main.tsx"
     ]
   }
   
