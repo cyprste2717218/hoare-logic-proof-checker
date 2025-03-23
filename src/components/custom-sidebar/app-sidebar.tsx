@@ -41,8 +41,11 @@ export function AppSidebar({
 }) {
 	return (
 		<Sidebar collapsible="icon" {...properties}>
-			<SidebarHeader>
-				<HeaderDetails description={data.description} />
+			<SidebarHeader handlePageContentChange={handlePageContentChange}>
+				<HeaderDetails
+					description={data.description}
+					handlePageContentChange={handlePageContentChange}
+				/>
 			</SidebarHeader>
 			<SidebarContent handlePageContentChange={handlePageContentChange}>
 				<NavMain

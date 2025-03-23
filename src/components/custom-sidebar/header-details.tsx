@@ -5,18 +5,29 @@ import {
 	SidebarMenuItem,
 } from '@/components/base-ui/sidebar.js';
 
+type AllowedPages =
+	| 'Hoare Logic Proof Validator'
+	| 'Reference Guide'
+	| 'Settings';
+
 export function HeaderDetails({
 	description,
+	handlePageContentChange,
 }: {
 	description: {
 		name: string;
 		logo: React.ElementType;
 		plan: string;
 	};
+	handlePageContentChange: (pageContent: AllowedPages) => void;
 }) {
 	return (
-		<SidebarMenu>
-			<SidebarMenuItem>
+		<SidebarMenu handlePageContentChange={handlePageContentChange}>
+			<SidebarMenuItem
+				onClick={() => {
+					handlePageContentChange('Hoare Logic Proof Validator');
+				}}
+			>
 				<SidebarMenuButton
 					size="lg"
 					className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
