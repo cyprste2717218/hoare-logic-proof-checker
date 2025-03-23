@@ -358,8 +358,13 @@ function SidebarHeader({
 
 function SidebarFooter({
 	className,
+	handlePageContentChange,
 	...properties
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<'div'> & {
+	handlePageContentChange: (
+		pageContent: 'Hoare Logic Proof Validator' | 'Reference Guide' | 'Settings',
+	) => void;
+}) {
 	return (
 		<div
 			data-slot="sidebar-footer"

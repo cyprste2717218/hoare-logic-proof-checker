@@ -50,8 +50,11 @@ export function AppSidebar({
 					items={data.navMain}
 				/>
 			</SidebarContent>
-			<SidebarFooter>
-				<Settings data={data.footerData} />
+			<SidebarFooter handlePageContentChange={handlePageContentChange}>
+				<Settings
+					handlePageContentChange={handlePageContentChange}
+					data={data.footerData}
+				/>
 			</SidebarFooter>
 			<SidebarRail />
 		</Sidebar>
