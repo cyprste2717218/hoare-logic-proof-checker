@@ -46,16 +46,21 @@ const nonLawsData: LawReferenceComponentType[] = [
 function ReferenceGuide() {
 	return (
 		<>
+			{' '}
+			<br></br>
 			<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-left">
 				Hoare Logic Laws:
 			</h3>
-			<div>
+			<br></br>
+			<div className="grid grid-cols-2 gap-4">
 				<AllLawReferenceComponents inputData={lawsData} />
 			</div>
+			<br></br>
+			<br></br>
 			<h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-left">
 				Other:
 			</h3>
-			<div>
+			<div className="grid grid-cols-2 gap-4">
 				<AllLawReferenceComponents inputData={nonLawsData} />
 			</div>
 		</>
@@ -79,16 +84,18 @@ function AllLawReferenceComponents({
 
 function LawReferenceComponent({name, usageSyntax}: LawReferenceComponentType) {
 	return (
-		<div>
+		<div className="w-[200px] m-[20px]">
 			<h4 className="scroll-m-20 text-xl font-semibold tracking-tight text-left">
 				{name}
 			</h4>
 			<p className="leading-7 [&:not(:first-child)]:mt-6 text-left">
 				Usage Syntax:
 			</p>
-			<code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold text-left">
-				{usageSyntax}
-			</code>
+			<div style={{display: 'flex', justifyContent: 'left'}}>
+				<code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold text-left">
+					{usageSyntax}
+				</code>
+			</div>
 		</div>
 	);
 }
