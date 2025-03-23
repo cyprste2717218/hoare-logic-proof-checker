@@ -1,7 +1,6 @@
 'use client';
 
 import {ChevronRight, type LucideIcon} from 'lucide-react';
-import {Collapsible, CollapsibleTrigger} from '../base-ui/collapsible.js';
 import {
 	SidebarGroup,
 	SidebarMenu,
