@@ -29,26 +29,17 @@ export function Settings({
 	return (
 		<SidebarGroup>
 			<SidebarMenu>
-				<Collapsible
-					key={data.title}
-					asChild
-					defaultOpen={data.isActive}
-					className="group/collapsible"
+				<SidebarMenuItem
+					onClick={() => {
+						handlePageContentChange(data.title as AllowedPages);
+					}}
 				>
-					<SidebarMenuItem
-						onClick={() => {
-							handlePageContentChange(data.title as AllowedPages);
-						}}
-					>
-						<CollapsibleTrigger asChild>
-							<SidebarMenuButton tooltip={data.title}>
-								{data.icon && <data.icon />}
-								<span>{data.title}</span>
-								<ChevronRight className="ml-auto" />
-							</SidebarMenuButton>
-						</CollapsibleTrigger>
-					</SidebarMenuItem>
-				</Collapsible>
+					<SidebarMenuButton tooltip={data.title}>
+						{data.icon && <data.icon />}
+						<span>{data.title}</span>
+						<ChevronRight className="ml-auto" />
+					</SidebarMenuButton>
+				</SidebarMenuItem>
 			</SidebarMenu>
 		</SidebarGroup>
 	);
