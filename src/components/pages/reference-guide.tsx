@@ -84,14 +84,14 @@ function AllLawReferenceComponents({
 
 function LawReferenceComponent({name, usageSyntax}: LawReferenceComponentType) {
 	return (
-		<div className="w-[200px] m-[20px]">
+		<div className="w-[250px] m-[20px]">
 			<h4 className="scroll-m-20 text-xl font-semibold tracking-tight text-left">
 				{name}
 			</h4>
 			<p className="leading-7 [&:not(:first-child)]:mt-6 text-left">
 				Usage Syntax:
 			</p>
-			<div style={{display: 'flex', justifyContent: 'left'}}>
+			<div style={{display: 'flex', justifyContent: 'left', marginTop: '10px'}}>
 				<code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold text-left">
 					{usageSyntax}
 				</code>
