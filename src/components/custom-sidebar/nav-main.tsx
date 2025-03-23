@@ -2,11 +2,6 @@
 
 import {ChevronRight, type LucideIcon} from 'lucide-react';
 import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@/components/base-ui/collapsible.js';
-import {
 	SidebarGroup,
 	SidebarGroupLabel,
 	SidebarMenu,
