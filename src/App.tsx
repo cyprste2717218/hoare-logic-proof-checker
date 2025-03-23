@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import './App.css';
 import AppSettings from './components/pages/settings-page';
-import {AppSidebar} from '@/components/app-sidebar.js';
+import {AppSidebar} from '@/components/custom-sidebar/app-sidebar.js';
 import {Separator} from '@/components/ui/separator.js';
 import {
 	SidebarInset,

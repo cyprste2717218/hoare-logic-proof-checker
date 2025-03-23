@@ -1,8 +1,8 @@
 import * as React from 'react';
 import {BookOpen, GalleryVerticalEnd, Settings2} from 'lucide-react';
-import {NavMain} from '@/components/nav-main.js';
-import {Settings} from '@/components/settings.js';
-import {HeaderDetails} from '@/components/header-details.js';
+import {NavMain} from '@/components/custom-sidebar/nav-main.js';
+import {Settings} from '@/components/custom-sidebar/settings.js';
+import {HeaderDetails} from '@/components/custom-sidebar/header-details.js';
 import {
 	Sidebar,
 	SidebarContent,
