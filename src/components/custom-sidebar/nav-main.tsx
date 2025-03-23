@@ -5,14 +5,14 @@ import {
 	Collapsible,
 	CollapsibleContent,
 	CollapsibleTrigger,
-} from '@/components/ui/collapsible.js';
+} from '@/components/base-ui/collapsible.js';
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-} from '@/components/ui/sidebar.js';
+} from '@/components/base-ui/sidebar.js';
 
 type AllowedPages =
 	| 'Hoare Logic Proof Validator'

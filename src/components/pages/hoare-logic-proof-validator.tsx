@@ -1,5 +1,5 @@
-import {Button} from '@/components/ui/button.js';
-import {Input} from '@/components/ui/input.js';
+import {Button} from '@/components/base-ui/button.js';
+import {Input} from '@/components/base-ui/input.js';
 
 function HoareLogicProofValidator() {
 	return (

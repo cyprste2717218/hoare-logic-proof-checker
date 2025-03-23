@@ -3,7 +3,7 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-} from '@/components/ui/sidebar.js';
+} from '@/components/base-ui/sidebar.js';
 
 export function HeaderDetails({
 	description,

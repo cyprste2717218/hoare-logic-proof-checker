@@ -9,7 +9,7 @@ import {
 	SidebarFooter,
 	SidebarHeader,
 	SidebarRail,
-} from '@/components/ui/sidebar.js';
+} from '@/components/base-ui/sidebar.js';
 
 const data = {
 	footerData: {

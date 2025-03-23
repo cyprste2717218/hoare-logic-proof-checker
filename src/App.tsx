@@ -2,12 +2,12 @@ import {useState} from 'react';
 import './App.css';
 import AppSettings from './components/pages/settings-page';
 import {AppSidebar} from '@/components/custom-sidebar/app-sidebar.js';
-import {Separator} from '@/components/ui/separator.js';
+import {Separator} from '@/components/base-ui/separator.js';
 import {
 	SidebarInset,
 	SidebarProvider,
 	SidebarTrigger,
-} from '@/components/ui/sidebar.js';
+} from '@/components/base-ui/sidebar.js';
 import HoareLogicProofValidator from '@/components/pages/hoare-logic-proof-validator';
 import ReferenceGuide from '@/components/pages/reference-guide';
 
