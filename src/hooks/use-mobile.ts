@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 const MOBILE_BREAKPOINT = 768;
 
 export function useIsMobile() {
@@ -24,3 +25,4 @@ export function useIsMobile() {
 
 	return Boolean(isMobile);
 }
+/* eslint-enable @typescript-eslint/naming-convention */

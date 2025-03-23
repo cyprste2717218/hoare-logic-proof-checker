@@ -1,7 +1,5 @@
-'use client';
-
 import * as React from 'react';
-import {Slot} from '@radix-ui/react-slot.mjs';
+import {Slot} from '@radix-ui/react-slot';
 import {type VariantProps, cva} from 'class-variance-authority';
 import {PanelLeftIcon} from 'lucide-react';
 import {useIsMobile} from '@/hooks/use-mobile.js';
@@ -24,12 +22,14 @@ import {
 	TooltipTrigger,
 } from '@/components/ui/tooltip.js';
 
+/* eslint-disable @typescript-eslint/naming-convention */
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 const SIDEBAR_WIDTH = '16rem';
 const SIDEBAR_WIDTH_MOBILE = '18rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
+/* eslint-enable @typescript-eslint/naming-convention */
 
 type SidebarContextProperties = {
 	state: 'expanded' | 'collapsed';
@@ -43,7 +43,7 @@ type SidebarContextProperties = {
 
 const SidebarContext = React.createContext<
 	SidebarContextProperties | undefined
->(null);
+>(undefined);
 
 function useSidebar() {
 	const context = React.useContext(SidebarContext);
@@ -91,6 +91,7 @@ function SidebarProvider({
 
 	// Helper to toggle the sidebar.
 	const toggleSidebar = React.useCallback(() => {
+		// eslint-disable-next-line @typescript-eslint/no-unused-expressions
 		isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
 	}, [isMobile, setOpen, setOpenMobile]);
 

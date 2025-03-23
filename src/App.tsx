@@ -1,3 +1,4 @@
+import './App.css';
 import {Button} from '@/components/ui/button.js';
 import {Input} from '@/components/ui/input.js';
 import {AppSidebar} from '@/components/app-sidebar.js';
@@ -7,7 +8,6 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from '@/components/ui/sidebar.js';
-import './App.css';
 
 function App() {
 	return (

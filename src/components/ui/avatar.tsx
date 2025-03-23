@@ -1,7 +1,5 @@
-'use client';
-
 import * as React from 'react';
-import * as AvatarPrimitive from '@radix-ui/react-avatar.mjs';
+import * as AvatarPrimitive from '@radix-ui/react-avatar';
 import {cn} from '@/lib/utils.js';
 
 function Avatar({
