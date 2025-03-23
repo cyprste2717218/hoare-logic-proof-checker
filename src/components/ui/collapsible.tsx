@@ -1,8 +1,11 @@
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible';
 
 function Collapsible({
+	handlePageContentChange,
 	...properties
-}: React.ComponentProps<typeof CollapsiblePrimitive.Root>) {
+}: React.ComponentProps<typeof CollapsiblePrimitive.Root> & {
+	handlePageContentChange?: any;
+}) {
 	return <CollapsiblePrimitive.Root data-slot="collapsible" {...properties} />;
 }
 

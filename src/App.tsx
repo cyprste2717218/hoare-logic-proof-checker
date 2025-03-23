@@ -20,10 +20,29 @@ function App() {
 	const [currentPageContent, setCurrentPageContent] =
 		useState<CurrentPageContentType>('Hoare Logic Proof Validator');
 
+	function handlePageContentChange(newPageContent: CurrentPageContentType) {
+		switch (newPageContent) {
+			case 'Hoare Logic Proof Validator': {
+				setCurrentPageContent('Hoare Logic Proof Validator');
+				break;
+			}
+
+			case 'Reference Guide': {
+				setCurrentPageContent('Reference Guide');
+				break;
+			}
+
+			case 'Settings': {
+				setCurrentPageContent('Settings');
+				break;
+			}
+		}
+	}
+
 	return (
 		<>
 			<SidebarProvider>
-				<AppSidebar />
+				<AppSidebar handlePageContentChange={handlePageContentChange} />
 				<SidebarInset>
 					<HeaderComponent currentPageContent={currentPageContent} />
 					<Separator orientation="horizontal" />

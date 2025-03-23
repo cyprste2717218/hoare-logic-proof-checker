@@ -14,8 +14,14 @@ import {
 	SidebarMenuItem,
 } from '@/components/ui/sidebar.js';
 
+type AllowedPages =
+	| 'Hoare Logic Proof Validator'
+	| 'Reference Guide'
+	| 'Settings';
+
 export function NavMain({
 	items,
+	handlePageContentChange,
 }: {
 	items: Array<{
 		title: string;
@@ -27,19 +33,25 @@ export function NavMain({
 			url: string;
 		};
 	}>;
+	handlePageContentChange: (title: AllowedPages) => void;
 }) {
 	return (
-		<SidebarGroup>
+		<SidebarGroup handlePageContentChange={handlePageContentChange}>
 			<SidebarGroupLabel>Options</SidebarGroupLabel>
-			<SidebarMenu>
+			<SidebarMenu handlePageContentChange={handlePageContentChange}>
 				{items.map((item) => (
 					<Collapsible
 						key={item.title}
 						asChild
 						defaultOpen={item.isActive}
 						className="group/collapsible"
+						handlePageContentChange={handlePageContentChange}
 					>
-						<SidebarMenuItem>
+						<SidebarMenuItem
+							onClick={() => {
+								handlePageContentChange(item.title as AllowedPages);
+							}}
+						>
 							<CollapsibleTrigger asChild>
 								<SidebarMenuButton tooltip={item.title}>
 									{item.icon && <item.icon />}

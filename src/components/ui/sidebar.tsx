@@ -386,8 +386,13 @@ function SidebarSeparator({
 
 function SidebarContent({
 	className,
+	handlePageContentChange,
 	...properties
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<'div'> & {
+	handlePageContentChange?: (
+		pageContent: 'Hoare Logic Proof Validator' | 'Reference Guide' | 'Settings',
+	) => void;
+}) {
 	return (
 		<div
 			data-slot="sidebar-content"
@@ -401,7 +406,11 @@ function SidebarContent({
 	);
 }
 
-function SidebarGroup({className, ...properties}: React.ComponentProps<'div'>) {
+function SidebarGroup({
+	className,
+	handlePageContentChange,
+	...properties
+}: React.ComponentProps<'div'> & {handlePageContentChange?: any}) {
 	return (
 		<div
 			data-slot="sidebar-group"
@@ -470,7 +479,11 @@ function SidebarGroupContent({
 	);
 }
 
-function SidebarMenu({className, ...properties}: React.ComponentProps<'ul'>) {
+function SidebarMenu({
+	className,
+	handlePageContentChange,
+	...properties
+}: React.ComponentProps<'ul'> & {handlePageContentChange?: any}) {
 	return (
 		<ul
 			data-slot="sidebar-menu"

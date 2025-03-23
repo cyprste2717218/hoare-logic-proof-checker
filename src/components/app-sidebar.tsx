@@ -32,15 +32,23 @@ const data = {
 };
 
 export function AppSidebar({
+	handlePageContentChange,
 	...properties
-}: React.ComponentProps<typeof Sidebar>) {
+}: React.ComponentProps<typeof Sidebar> & {
+	handlePageContentChange: (
+		pageContent: 'Hoare Logic Proof Validator' | 'Reference Guide' | 'Settings',
+	) => void;
+}) {
 	return (
 		<Sidebar collapsible="icon" {...properties}>
 			<SidebarHeader>
 				<HeaderDetails description={data.description} />
 			</SidebarHeader>
-			<SidebarContent>
-				<NavMain items={data.navMain} />
+			<SidebarContent handlePageContentChange={handlePageContentChange}>
+				<NavMain
+					handlePageContentChange={handlePageContentChange}
+					items={data.navMain}
+				/>
 			</SidebarContent>
 			<SidebarFooter>
 				<Settings data={data.footerData} />
