@@ -1,5 +1,6 @@
+import {ProofEntryInput} from '../proof-entry-input/proof-entry-input';
+import {HoareTripleInput} from '../hoare-triple-input/hoare-triple-input';
 import {Button} from '@/components/base-ui/button.js';
-import {Input} from '@/components/base-ui/input.js';
 
 function HoareLogicProofValidator() {
 	return (
@@ -11,7 +12,7 @@ function HoareLogicProofValidator() {
 				>
 					Enter Your Hoare Triple:
 				</p>
-				<Input />
+				<HoareTripleInput />
 			</div>
 			<br></br>
 			<div>
@@ -21,7 +22,7 @@ function HoareLogicProofValidator() {
 				>
 					Enter Your Proof:
 				</p>
-				<Input />
+				<ProofEntryInput />
 			</div>
 
 			<Button variant="outline">Check Proof Validity</Button>
