@@ -51,6 +51,7 @@ export function ProofEntryInput({
 		<TextArea
 			name="proof-entry-input-textarea"
 			value={value}
+			currentProofState={currentProofState}
 			onValueChange={(value: string) => {
 				setValue(value);
 			}}

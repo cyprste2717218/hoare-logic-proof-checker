@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {useMemo, useRef} from 'react';
 import {cn} from '@/lib/utils';
+import {type CurrentProofStateType} from '@/models/misc';
 
 type WrapperTextAreaProps = {
 	children: React.ReactNode;
@@ -18,6 +19,7 @@ type TextAreaProps = {
 	onValueChange: (value: string) => void;
 	placeholder?: string;
 	name?: string;
+	currentProofState: CurrentProofStateType;
 } & React.ComponentProps<'textarea'>;
 
 type LineNumbersProps = {
@@ -29,6 +31,10 @@ type LineNumberElemProps = {
 	count: number;
 };
 
+type ProofOutcomeTextProps = {
+	currentProofState: CurrentProofStateType;
+};
+
 function TextArea({
 	className,
 	value,
@@ -36,6 +42,7 @@ function TextArea({
 	onValueChange,
 	placeholder = 'Enter Your Proof Here',
 	name,
+	currentProofState,
 	...props
 }: TextAreaProps) {
 	const lineCount = useMemo(() => value.split('\n').length, [value]);
@@ -77,6 +84,9 @@ function TextArea({
 				className={cn(className)}
 				{...props}
 			/>
+			<div className="">
+				<ProofOutcomeText currentProofState={currentProofState} />
+			</div>
 		</WrapperTextArea>
 	);
 }
@@ -131,6 +141,35 @@ function CustomTextArea({
 			style={{lineHeight: '28px', height: 'auto', minHeight: '28px'}}
 			{...props}
 		/>
+	);
+}
+
+function ProofOutcomeText({currentProofState}: ProofOutcomeTextProps) {
+	let message = '';
+
+	switch (currentProofState) {
+		case 'Valid': {
+			message = 'Provided Proof is Valid!';
+			break;
+		}
+
+		case 'Invalid - Syntax Error':
+		case 'Invalid - Proof Error': {
+			message = 'Provided Proof is not valid';
+			break;
+		}
+
+		case 'Unchecked': {
+			message =
+				'Detected change to proof body,  run checker again to assure validity';
+			break;
+		}
+	}
+
+	return (
+		<>
+			<p className={cn('text-sm')}>{message}</p>
+		</>
 	);
 }
 
