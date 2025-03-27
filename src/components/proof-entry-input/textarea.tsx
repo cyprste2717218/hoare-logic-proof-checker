@@ -88,7 +88,7 @@ function WrapperTextArea({children}: WrapperTextAreaProps) {
 
 function LineNumbers({children}: LineNumbersProps) {
 	return (
-		<div className="py-2 px-2" style={{marginTop: '1px'}}>
+		<div className="py-2 px-2 text-slate-400" style={{marginTop: '1px'}}>
 			{children}
 		</div>
 	);
