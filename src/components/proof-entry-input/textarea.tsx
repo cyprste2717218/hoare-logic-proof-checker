@@ -33,7 +33,7 @@ function TextArea({
 	value,
 	numOfLines,
 	onValueChange,
-	placeholder = 'Enter Message',
+	placeholder = 'Enter Your Proof Here',
 	name,
 	...props
 }: TextAreaProps) {
