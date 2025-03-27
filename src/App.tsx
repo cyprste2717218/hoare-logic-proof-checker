@@ -30,6 +30,7 @@ function App() {
 		useState<CurrentProofStateType>('Unchecked');
 
 	function handlePageContentChange(newPageContent: CurrentPageContentType) {
+		setCurrentProofState('Unchecked'); // To-do: delete this line, just to pass build ts requirements temporarily
 		switch (newPageContent) {
 			case 'Hoare Logic Proof Validator': {
 				setCurrentPageContent('Hoare Logic Proof Validator');
