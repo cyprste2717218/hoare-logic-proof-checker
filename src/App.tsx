@@ -10,6 +10,12 @@ import {
 } from '@/components/base-ui/sidebar.js';
 import HoareLogicProofValidator from '@/components/pages/hoare-logic-proof-validator';
 import ReferenceGuide from '@/components/pages/reference-guide';
+import type {CurrentProofStateType} from '@/models/misc';
+
+type PageContentProps = {
+	currentPageContent: CurrentPageContentType;
+	currentProofState: CurrentProofStateType;
+};
 
 type CurrentPageContentType =
 	| 'Hoare Logic Proof Validator'
@@ -19,6 +25,9 @@ type CurrentPageContentType =
 function App() {
 	const [currentPageContent, setCurrentPageContent] =
 		useState<CurrentPageContentType>('Hoare Logic Proof Validator');
+
+	const [currentProofState, setCurrentProofState] =
+		useState<CurrentProofStateType>('Unchecked');
 
 	function handlePageContentChange(newPageContent: CurrentPageContentType) {
 		switch (newPageContent) {
@@ -48,7 +57,10 @@ function App() {
 					<div style={{marginTop: '20px', marginBottom: '10px'}}>
 						<Separator orientation="horizontal" />
 					</div>
-					<PageContent currentPageContent={currentPageContent} />
+					<PageContent
+						currentProofState={currentProofState}
+						currentPageContent={currentPageContent}
+					/>
 				</SidebarInset>
 			</SidebarProvider>
 		</>
@@ -76,12 +88,11 @@ function HeaderComponent({
 
 function PageContent({
 	currentPageContent,
-}: {
-	currentPageContent: CurrentPageContentType;
-}) {
+	currentProofState,
+}: PageContentProps) {
 	switch (currentPageContent) {
 		case 'Hoare Logic Proof Validator': {
-			return <HoareLogicProofValidator />;
+			return <HoareLogicProofValidator currentProofState={currentProofState} />;
 		}
 
 		case 'Reference Guide': {

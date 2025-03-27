@@ -1,8 +1,13 @@
 import {ProofEntryInput} from '../proof-entry-input/proof-entry-input';
 import {HoareTripleInput} from '../hoare-triple-input/hoare-triple-input';
 import {Button} from '@/components/base-ui/button.js';
+import type {CurrentProofStateType} from '@/models/misc';
 
-function HoareLogicProofValidator() {
+function HoareLogicProofValidator({
+	currentProofState,
+}: {
+	currentProofState: CurrentProofStateType;
+}) {
 	return (
 		<>
 			<div>
@@ -28,7 +33,7 @@ function HoareLogicProofValidator() {
 					</p>
 				</div>
 
-				<ProofEntryInput />
+				<ProofEntryInput currentProofState={currentProofState} />
 			</div>
 
 			<div style={{marginTop: '30px'}}>

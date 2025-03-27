@@ -21,6 +21,7 @@ type TextAreaProps = {
 } & React.ComponentProps<'textarea'>;
 
 type LineNumbersProps = {
+	className: string;
 	children: React.ReactNode;
 } & React.ComponentProps<'div'>;
 
@@ -61,7 +62,7 @@ function TextArea({
 
 	return (
 		<WrapperTextArea>
-			<LineNumbers ref={lineCounterRef}>
+			<LineNumbers className={cn(className)} ref={lineCounterRef}>
 				{linesArr.map((count) => (
 					<LineNumber key={count} count={count} />
 				))}
@@ -86,9 +87,11 @@ function WrapperTextArea({children}: WrapperTextAreaProps) {
 	);
 }
 
-function LineNumbers({children}: LineNumbersProps) {
+function LineNumbers({children, className}: LineNumbersProps) {
 	return (
-		<div className="py-2 px-2 text-slate-400 resize-none text-sm leading-7 border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 field-sizing-content rounded-l-md border border-r-0 bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm">
+		<div
+			className={`${className} ${cn('py-2 px-2 text-slate-400 resize-none text-sm leading-7 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 field-sizing-content rounded-l-md border-r-0 bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm')}`}
+		>
 			{children}
 		</div>
 	);
@@ -122,10 +125,9 @@ function CustomTextArea({
 			value={value}
 			wrap="off"
 			data-slot="textarea"
-			className={cn(
-				'resize-none text-sm leading-7 border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content w-full rounded-r-md border border-l-0 bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-				className,
-			)}
+			className={`${className} ${cn(
+				'resize-none text-sm leading-7 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content w-full rounded-r-md border-l-0 bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+			)}`}
 			style={{lineHeight: '28px', height: 'auto', minHeight: '28px'}}
 			{...props}
 		/>
