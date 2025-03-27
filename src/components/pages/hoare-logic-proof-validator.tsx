@@ -6,22 +6,28 @@ function HoareLogicProofValidator() {
 	return (
 		<>
 			<div>
-				<p
-					style={{textAlign: 'left'}}
-					className="leading-7 [&:not(:first-child)]:mt-6"
-				>
-					Enter Your Hoare Triple:
-				</p>
+				<div style={{marginTop: '30px', marginBottom: '10px'}}>
+					<p
+						style={{textAlign: 'left'}}
+						className="leading-7 [&:not(:first-child)]:mt-6"
+					>
+						Enter Your Hoare Triple:
+					</p>
+				</div>
+
 				<HoareTripleInput />
 			</div>
 			<br></br>
 			<div>
-				<p
-					style={{textAlign: 'left'}}
-					className="leading-7 [&:not(:first-child)]:mt-6"
-				>
-					Enter Your Proof:
-				</p>
+				<div style={{marginTop: '10px', marginBottom: '20px'}}>
+					<p
+						style={{textAlign: 'left'}}
+						className="leading-7 [&:not(:first-child)]:mt-6"
+					>
+						Enter Your Proof:
+					</p>
+				</div>
+
 				<ProofEntryInput />
 			</div>
 

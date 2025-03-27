@@ -45,7 +45,9 @@ function App() {
 				<AppSidebar handlePageContentChange={handlePageContentChange} />
 				<SidebarInset>
 					<HeaderComponent currentPageContent={currentPageContent} />
-					<Separator orientation="horizontal" />
+					<div style={{marginTop: '20px', marginBottom: '10px'}}>
+						<Separator orientation="horizontal" />
+					</div>
 					<PageContent currentPageContent={currentPageContent} />
 				</SidebarInset>
 			</SidebarProvider>
