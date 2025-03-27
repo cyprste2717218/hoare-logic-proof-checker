@@ -31,7 +31,9 @@ function HoareLogicProofValidator() {
 				<ProofEntryInput />
 			</div>
 
-			<Button variant="outline">Check Proof Validity</Button>
+			<div style={{marginTop: '30px'}}>
+				<Button variant="outline">Check Proof Validity</Button>
+			</div>
 		</>
 	);
 }
