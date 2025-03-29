@@ -15,6 +15,11 @@ import type {CurrentProofStateType} from '@/models/misc';
 type PageContentProps = {
 	currentPageContent: CurrentPageContentType;
 	currentProofState: CurrentProofStateType;
+	proofContent: string;
+	setCurrentProofState: React.Dispatch<
+		React.SetStateAction<CurrentProofStateType>
+	>;
+	setProofContent: React.Dispatch<React.SetStateAction<string>>;
 };
 
 type CurrentPageContentType =
@@ -28,6 +33,8 @@ function App() {
 
 	const [currentProofState, setCurrentProofState] =
 		useState<CurrentProofStateType>('Unchecked');
+
+	const [proofContent, setProofContent] = useState('');
 
 	function handlePageContentChange(newPageContent: CurrentPageContentType) {
 		setCurrentProofState('Unchecked'); // To-do: delete this line, just to pass build ts requirements temporarily
@@ -61,6 +68,9 @@ function App() {
 					<PageContent
 						currentProofState={currentProofState}
 						currentPageContent={currentPageContent}
+						proofContent={proofContent}
+						setCurrentProofState={setCurrentProofState}
+						setProofContent={setProofContent}
 					/>
 				</SidebarInset>
 			</SidebarProvider>
@@ -90,10 +100,20 @@ function HeaderComponent({
 function PageContent({
 	currentPageContent,
 	currentProofState,
+	proofContent,
+	setCurrentProofState,
+	setProofContent,
 }: PageContentProps) {
 	switch (currentPageContent) {
 		case 'Hoare Logic Proof Validator': {
-			return <HoareLogicProofValidator currentProofState={currentProofState} />;
+			return (
+				<HoareLogicProofValidator
+					currentProofState={currentProofState}
+					proofContent={proofContent}
+					setCurrentProofState={setCurrentProofState}
+					setProofContent={setProofContent}
+				/>
+			);
 		}
 
 		case 'Reference Guide': {

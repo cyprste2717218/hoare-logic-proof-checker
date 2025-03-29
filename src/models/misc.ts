@@ -2,6 +2,7 @@ type CurrentProofStateType =
 	| 'Valid'
 	| 'Invalid - Syntax Error'
 	| 'Invalid - Proof Error'
-	| 'Unchecked';
+	| 'Unchecked'
+	| 'Unchecked - Change Present';
 
 export type {CurrentProofStateType};

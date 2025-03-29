@@ -1,7 +1,11 @@
 import * as React from 'react';
-import {useMemo, useRef} from 'react';
+import {useMemo, useRef, useEffect, useState} from 'react';
 import {cn} from '@/lib/utils';
 import {type CurrentProofStateType} from '@/models/misc';
+import {
+	options,
+	type CommonProps as BorderStylesType,
+} from '@/lib/proof-entry-config-options';
 
 type WrapperTextAreaProps = {
 	children: React.ReactNode;
@@ -10,16 +14,20 @@ type WrapperTextAreaProps = {
 type CustomTextAreaProps = {
 	handleTextAreaChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void; // eslint-disable-next-line @typescript-eslint/ban-types
 	textAreaRef: React.RefObject<HTMLTextAreaElement | null>;
+	proofContent: string;
 	handleTextAreaScroll: () => void;
 } & React.ComponentProps<'textarea'>;
 
 type TextAreaProps = {
-	value: string;
 	numOfLines: number;
-	onValueChange: (value: string) => void;
 	placeholder?: string;
 	name?: string;
 	currentProofState: CurrentProofStateType;
+	proofContent: string;
+	setCurrentProofState: React.Dispatch<
+		React.SetStateAction<CurrentProofStateType>
+	>;
+	setProofContent: React.Dispatch<React.SetStateAction<string>>;
 } & React.ComponentProps<'textarea'>;
 
 type LineNumbersProps = {
@@ -37,15 +45,52 @@ type ProofOutcomeTextProps = {
 
 function TextArea({
 	className,
-	value,
 	numOfLines,
-	onValueChange,
 	placeholder = 'Enter Your Proof Here',
 	name,
 	currentProofState,
+	proofContent,
+	setCurrentProofState,
+	setProofContent,
 	...props
 }: TextAreaProps) {
-	const lineCount = useMemo(() => value.split('\n').length, [value]);
+	useEffect(() => {
+		switch (currentProofState) {
+			case 'Valid': {
+				setCustomBorderStyles(handleStylesFormat(options.valid));
+				break;
+			}
+
+			case 'Invalid - Syntax Error': {
+				setCustomBorderStyles(handleStylesFormat(options.invalidSyntax));
+				break;
+			}
+
+			case 'Invalid - Proof Error': {
+				setCustomBorderStyles(handleStylesFormat(options.invalidProof));
+				break;
+			}
+
+			case 'Unchecked': {
+				setCustomBorderStyles(handleStylesFormat(options.unchecked));
+				break;
+			}
+
+			case 'Unchecked - Change Present': {
+				setCustomBorderStyles(handleStylesFormat(options.unchecked));
+				break;
+			}
+		}
+	}, [currentProofState]);
+
+	const [customBorderStyles, setCustomBorderStyles] = useState<string>(
+		handleStylesFormat(options.unchecked),
+	);
+
+	const lineCount = useMemo(
+		() => proofContent.split('\n').length,
+		[proofContent],
+	);
 	const linesArr = useMemo(
 		() =>
 			Array.from({length: Math.max(numOfLines, lineCount)}, (_, i) => i + 1),
@@ -54,6 +99,11 @@ function TextArea({
 
 	const lineCounterRef = useRef<HTMLDivElement>(null);
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+	const onValueChange = (value: string) => {
+		setProofContent(value);
+		setCurrentProofState('Unchecked - Change Present');
+	};
 
 	const handleTextAreaChange = (
 		event: React.ChangeEvent<HTMLTextAreaElement>,
@@ -67,22 +117,29 @@ function TextArea({
 		}
 	};
 
+	// Utility function to make styles parsable for new proof entry box state depending on if checked proof is valid or not
+	function handleStylesFormat(obj: BorderStylesType) {
+		const styles = Object.values(obj).join(' ');
+
+		return styles;
+	}
+
 	return (
 		<WrapperTextArea>
 			<div className="flex flex-row">
-				<LineNumbers className={cn(className)} ref={lineCounterRef}>
+				<LineNumbers className={cn(customBorderStyles)} ref={lineCounterRef}>
 					{linesArr.map((count) => (
 						<LineNumber key={count} count={count} />
 					))}
 				</LineNumbers>
 				<CustomTextArea
 					name={name}
+					proofContent={proofContent}
 					handleTextAreaChange={handleTextAreaChange}
 					textAreaRef={textAreaRef}
 					handleTextAreaScroll={handleTextAreaScroll}
 					placeholder={placeholder}
-					value={value}
-					className={cn(className)}
+					className={cn(customBorderStyles)}
 					{...props}
 				/>
 			</div>
@@ -129,7 +186,7 @@ function CustomTextArea({
 	textAreaRef,
 	handleTextAreaScroll,
 	placeholder,
-	value,
+	proofContent,
 	className,
 	...props
 }: CustomTextAreaProps) {
@@ -140,7 +197,7 @@ function CustomTextArea({
 			ref={textAreaRef}
 			onScroll={handleTextAreaScroll}
 			placeholder={placeholder}
-			value={value}
+			value={proofContent}
 			wrap="off"
 			data-slot="textarea"
 			className={`${className} ${cn(
@@ -168,6 +225,11 @@ function ProofOutcomeText({currentProofState}: ProofOutcomeTextProps) {
 		}
 
 		case 'Unchecked': {
+			message = '';
+			break;
+		}
+
+		case 'Unchecked - Change Present': {
 			message =
 				'Detected change to proof body,  run checker again to assure validity';
 			break;

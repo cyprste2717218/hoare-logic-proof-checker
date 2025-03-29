@@ -1,13 +1,23 @@
-import {ProofEntryInput} from '../proof-entry-input/proof-entry-input';
+import ProofEntryInput from '../proof-entry-input/proof-entry-input';
 import {HoareTripleInput} from '../hoare-triple-input/hoare-triple-input';
 import {Button} from '@/components/base-ui/button.js';
 import type {CurrentProofStateType} from '@/models/misc';
 
+type HoareLogicProofValidatorProps = {
+	currentProofState: CurrentProofStateType;
+	proofContent: string;
+	setCurrentProofState: React.Dispatch<
+		React.SetStateAction<CurrentProofStateType>
+	>;
+	setProofContent: React.Dispatch<React.SetStateAction<string>>;
+};
+
 function HoareLogicProofValidator({
 	currentProofState,
-}: {
-	currentProofState: CurrentProofStateType;
-}) {
+	proofContent,
+	setCurrentProofState,
+	setProofContent,
+}: HoareLogicProofValidatorProps) {
 	return (
 		<>
 			<div>
@@ -33,7 +43,12 @@ function HoareLogicProofValidator({
 					</p>
 				</div>
 
-				<ProofEntryInput currentProofState={currentProofState} />
+				<ProofEntryInput
+					currentProofState={currentProofState}
+					setCurrentProofState={setCurrentProofState}
+					proofContent={proofContent}
+					setProofContent={setProofContent}
+				/>
 			</div>
 
 			<div style={{marginTop: '20px'}}>
