@@ -11,7 +11,7 @@ function HoareLogicProofValidator({
 	return (
 		<>
 			<div>
-				<div style={{marginTop: '30px', marginBottom: '10px'}}>
+				<div style={{marginTop: '10px', marginBottom: '10px'}}>
 					<p
 						style={{textAlign: 'left'}}
 						className="leading-7 [&:not(:first-child)]:mt-6"
@@ -24,7 +24,7 @@ function HoareLogicProofValidator({
 			</div>
 			<br></br>
 			<div>
-				<div style={{marginTop: '10px', marginBottom: '20px'}}>
+				<div style={{marginTop: '0px', marginBottom: '10px'}}>
 					<p
 						style={{textAlign: 'left'}}
 						className="leading-7 [&:not(:first-child)]:mt-6"
@@ -36,7 +36,7 @@ function HoareLogicProofValidator({
 				<ProofEntryInput currentProofState={currentProofState} />
 			</div>
 
-			<div style={{marginTop: '30px'}}>
+			<div style={{marginTop: '20px'}}>
 				<Button variant="outline">Check Proof Validity</Button>
 			</div>
 		</>

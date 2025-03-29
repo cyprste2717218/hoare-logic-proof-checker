@@ -69,31 +69,39 @@ function TextArea({
 
 	return (
 		<WrapperTextArea>
-			<LineNumbers className={cn(className)} ref={lineCounterRef}>
-				{linesArr.map((count) => (
-					<LineNumber key={count} count={count} />
-				))}
-			</LineNumbers>
-			<CustomTextArea
-				name={name}
-				handleTextAreaChange={handleTextAreaChange}
-				textAreaRef={textAreaRef}
-				handleTextAreaScroll={handleTextAreaScroll}
-				placeholder={placeholder}
-				value={value}
-				className={cn(className)}
-				{...props}
-			/>
-			<div className="">
-				<ProofOutcomeText currentProofState={currentProofState} />
+			<div className="flex flex-row">
+				<LineNumbers className={cn(className)} ref={lineCounterRef}>
+					{linesArr.map((count) => (
+						<LineNumber key={count} count={count} />
+					))}
+				</LineNumbers>
+				<CustomTextArea
+					name={name}
+					handleTextAreaChange={handleTextAreaChange}
+					textAreaRef={textAreaRef}
+					handleTextAreaScroll={handleTextAreaScroll}
+					placeholder={placeholder}
+					value={value}
+					className={cn(className)}
+					{...props}
+				/>
 			</div>
+			<ProofOutcomeText currentProofState={currentProofState} />
 		</WrapperTextArea>
 	);
 }
 
 function WrapperTextArea({children}: WrapperTextAreaProps) {
 	return (
-		<div style={{display: 'flex', justifyContent: 'center'}}>{children}</div>
+		<div
+			style={{
+				display: 'flex',
+				justifyContent: 'center',
+				flexDirection: 'column',
+			}}
+		>
+			{children}
+		</div>
 	);
 }
 
@@ -167,9 +175,9 @@ function ProofOutcomeText({currentProofState}: ProofOutcomeTextProps) {
 	}
 
 	return (
-		<>
-			<p className={cn('text-sm')}>{message}</p>
-		</>
+		<div className="text-left m-3 ml-2">
+			<p className={cn('text-sm text-slate-500')}>{message}</p>
+		</div>
 	);
 }
 
