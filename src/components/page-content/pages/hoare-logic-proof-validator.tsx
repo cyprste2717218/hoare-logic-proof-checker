@@ -1,6 +1,6 @@
-import ProofEntryInput from '../proof-entry-input/proof-entry-input';
-import {HoareTripleInput} from '../hoare-triple-input/hoare-triple-input';
-import {Button} from '@/components/base-ui/button.js';
+import ProofEntryInput from '../../proof-entry-input/proof-entry-input';
+import {HoareTripleInput} from '../../hoare-triple-input/hoare-triple-input';
+import {Button} from '@/components/base/button.js';
 import type {CurrentProofStateType} from '@/models/misc';
 
 type HoareLogicProofValidatorProps = {

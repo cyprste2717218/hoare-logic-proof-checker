@@ -5,4 +5,10 @@ type CurrentProofStateType =
 	| 'Unchecked'
 	| 'Unchecked - Change Present';
 
-export type {CurrentProofStateType};
+
+type CurrentPageContentType =
+	| 'Hoare Logic Proof Validator'
+	| 'Reference Guide'
+	| 'Settings';
+
+export type {CurrentProofStateType, CurrentPageContentType};

@@ -3,7 +3,7 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-} from '@/components/base-ui/sidebar.js';
+} from '@/components/base/sidebar.js';
 
 type AllowedPages =
 	| 'Hoare Logic Proof Validator'
