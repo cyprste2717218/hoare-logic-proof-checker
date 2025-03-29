@@ -1,4 +1,4 @@
-import {TextArea} from './textarea';
+import {TextAreaWrapper} from '@/components/proof-entry-input/children/textarea-wrapper';
 import {type CurrentProofStateType} from '@/models/misc';
 
 type ProofEntryInputProps = {
@@ -10,14 +10,14 @@ type ProofEntryInputProps = {
 	setProofContent: React.Dispatch<React.SetStateAction<string>>;
 };
 
-export default function ProofEntryInput({
+function ProofEntryInput({
 	currentProofState,
 	proofContent,
 	setCurrentProofState,
 	setProofContent,
 }: ProofEntryInputProps) {
 	return (
-		<TextArea
+		<TextAreaWrapper
 			name="proof-entry-input-textarea"
 			currentProofState={currentProofState}
 			numOfLines={10}
@@ -27,3 +27,5 @@ export default function ProofEntryInput({
 		/>
 	);
 }
+
+export default ProofEntryInput;

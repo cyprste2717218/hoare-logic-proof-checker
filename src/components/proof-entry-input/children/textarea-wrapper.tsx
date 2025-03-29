@@ -6,17 +6,16 @@ import {
 	options,
 	type CommonProps as BorderStylesType,
 } from '@/lib/proof-entry-config-options';
+import {ProofOutcomeText} from '@/components/proof-entry-input/children/proof-outcome-text';
+import {
+	LineNumbers,
+	LineNumber,
+} from '@/components/proof-entry-input/children/line-numbers';
+import {CustomTextArea} from '@/components/proof-entry-input/children/custom-textarea';
 
 type WrapperTextAreaProps = {
 	children: React.ReactNode;
 };
-
-type CustomTextAreaProps = {
-	handleTextAreaChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void; // eslint-disable-next-line @typescript-eslint/ban-types
-	textAreaRef: React.RefObject<HTMLTextAreaElement | null>;
-	proofContent: string;
-	handleTextAreaScroll: () => void;
-} & React.ComponentProps<'textarea'>;
 
 type TextAreaProps = {
 	numOfLines: number;
@@ -30,20 +29,7 @@ type TextAreaProps = {
 	setProofContent: React.Dispatch<React.SetStateAction<string>>;
 } & React.ComponentProps<'textarea'>;
 
-type LineNumbersProps = {
-	className: string;
-	children: React.ReactNode;
-} & React.ComponentProps<'div'>;
-
-type LineNumberElemProps = {
-	count: number;
-};
-
-type ProofOutcomeTextProps = {
-	currentProofState: CurrentProofStateType;
-};
-
-function TextArea({
+function TextAreaWrapper({
 	className,
 	numOfLines,
 	placeholder = 'Enter Your Proof Here',
@@ -162,85 +148,4 @@ function WrapperTextArea({children}: WrapperTextAreaProps) {
 	);
 }
 
-function LineNumbers({children, className}: LineNumbersProps) {
-	return (
-		<div
-			className={`${className} ${cn('py-2 px-2 text-slate-400 resize-none text-sm leading-7 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 field-sizing-content rounded-l-md border-r-0 bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm')}`}
-		>
-			{children}
-		</div>
-	);
-}
-
-function LineNumber({count}: LineNumberElemProps) {
-	return (
-		<div key={count}>
-			<p className="text-sm leading-7 [&:not(:first-child)]:mt-6">{count}</p>
-		</div>
-	);
-}
-
-function CustomTextArea({
-	name,
-	handleTextAreaChange,
-	textAreaRef,
-	handleTextAreaScroll,
-	placeholder,
-	proofContent,
-	className,
-	...props
-}: CustomTextAreaProps) {
-	return (
-		<textarea
-			name={name}
-			onChange={handleTextAreaChange}
-			ref={textAreaRef}
-			onScroll={handleTextAreaScroll}
-			placeholder={placeholder}
-			value={proofContent}
-			wrap="off"
-			data-slot="textarea"
-			className={`${className} ${cn(
-				'resize-none text-sm leading-7 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 flex field-sizing-content w-full rounded-r-md border-l-0 bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-			)}`}
-			style={{lineHeight: '28px', height: 'auto', minHeight: '28px'}}
-			{...props}
-		/>
-	);
-}
-
-function ProofOutcomeText({currentProofState}: ProofOutcomeTextProps) {
-	let message = '';
-
-	switch (currentProofState) {
-		case 'Valid': {
-			message = 'Provided Proof is Valid!';
-			break;
-		}
-
-		case 'Invalid - Syntax Error':
-		case 'Invalid - Proof Error': {
-			message = 'Provided Proof is not valid';
-			break;
-		}
-
-		case 'Unchecked': {
-			message = '';
-			break;
-		}
-
-		case 'Unchecked - Change Present': {
-			message =
-				'Detected change to proof body,  run checker again to assure validity';
-			break;
-		}
-	}
-
-	return (
-		<div className="text-left m-3 ml-2">
-			<p className={cn('text-sm text-slate-500')}>{message}</p>
-		</div>
-	);
-}
-
-export {TextArea};
+export {TextAreaWrapper};
