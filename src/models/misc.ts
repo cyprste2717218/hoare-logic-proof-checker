@@ -5,7 +5,6 @@ type CurrentProofStateType =
 	| 'Unchecked'
 	| 'Unchecked - Change Present';
 
-
 type CurrentPageContentType =
 	| 'Hoare Logic Proof Validator'
 	| 'Reference Guide'
