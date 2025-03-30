@@ -4,23 +4,23 @@ import {type VariantProps, cva} from 'class-variance-authority';
 import {PanelLeftIcon} from 'lucide-react';
 import {useIsMobile} from '@/hooks/use-mobile.js';
 import {cn} from '@/lib/utils.js';
-import {Button} from '@/components/base-ui/button.js';
-import {Input} from '@/components/base-ui/input.js';
-import {Separator} from '@/components/base-ui/separator.js';
+import {Button} from '@/components/base/button.js';
+import {Input} from '@/components/base/input.js';
+import {Separator} from '@/components/base/separator.js';
 import {
 	Sheet,
 	SheetContent,
 	SheetDescription,
 	SheetHeader,
 	SheetTitle,
-} from '@/components/base-ui/sheet.js';
-import {Skeleton} from '@/components/base-ui/skeleton.js';
+} from '@/components/base/sheet.js';
+import {Skeleton} from '@/components/base/skeleton.js';
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from '@/components/base-ui/tooltip.js';
+} from '@/components/base/tooltip.js';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';

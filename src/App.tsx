@@ -1,15 +1,10 @@
 import {useState} from 'react';
 import './App.css';
-import AppSettings from './components/pages/settings-page';
-import {AppSidebar} from '@/components/custom-sidebar/app-sidebar.js';
-import {Separator} from '@/components/base-ui/separator.js';
-import {
-	SidebarInset,
-	SidebarProvider,
-	SidebarTrigger,
-} from '@/components/base-ui/sidebar.js';
-import HoareLogicProofValidator from '@/components/pages/hoare-logic-proof-validator';
-import ReferenceGuide from '@/components/pages/reference-guide';
+import {Separator} from '@/components/base/separator.js';
+import type {CurrentProofStateType} from '@/models/misc';
+import CustomSidebar from '@/components/custom-sidebar/custom-sidebar';
+import PageContent from '@/components/page-content/page-content';
+import HeaderComponent from '@/components/header-component/header-component';
 
 type CurrentPageContentType =
 	| 'Hoare Logic Proof Validator'
@@ -20,7 +15,13 @@ function App() {
 	const [currentPageContent, setCurrentPageContent] =
 		useState<CurrentPageContentType>('Hoare Logic Proof Validator');
 
+	const [currentProofState, setCurrentProofState] =
+		useState<CurrentProofStateType>('Unchecked');
+
+	const [proofContent, setProofContent] = useState('');
+
 	function handlePageContentChange(newPageContent: CurrentPageContentType) {
+		setCurrentProofState('Unchecked'); // To-do: delete this line, just to pass build ts requirements temporarily
 		switch (newPageContent) {
 			case 'Hoare Logic Proof Validator': {
 				setCurrentPageContent('Hoare Logic Proof Validator');
@@ -41,55 +42,21 @@ function App() {
 
 	return (
 		<>
-			<SidebarProvider>
-				<AppSidebar handlePageContentChange={handlePageContentChange} />
-				<SidebarInset>
-					<HeaderComponent currentPageContent={currentPageContent} />
+			<CustomSidebar handlePageContentChange={handlePageContentChange}>
+				<HeaderComponent currentPageContent={currentPageContent} />
+				<div style={{marginTop: '20px', marginBottom: '10px'}}>
 					<Separator orientation="horizontal" />
-					<PageContent currentPageContent={currentPageContent} />
-				</SidebarInset>
-			</SidebarProvider>
+				</div>
+				<PageContent
+					currentProofState={currentProofState}
+					currentPageContent={currentPageContent}
+					proofContent={proofContent}
+					setCurrentProofState={setCurrentProofState}
+					setProofContent={setProofContent}
+				/>
+			</CustomSidebar>
 		</>
 	);
-}
-
-function HeaderComponent({
-	currentPageContent,
-}: {
-	currentPageContent: CurrentPageContentType;
-}) {
-	return (
-		<header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-			<div className="flex items-center gap-2 px-4">
-				<SidebarTrigger className="-ml-1" />
-				<Separator orientation="vertical" className="mr-2 h-4" />
-				<h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-					{' '}
-					{currentPageContent}{' '}
-				</h1>
-			</div>
-		</header>
-	);
-}
-
-function PageContent({
-	currentPageContent,
-}: {
-	currentPageContent: CurrentPageContentType;
-}) {
-	switch (currentPageContent) {
-		case 'Hoare Logic Proof Validator': {
-			return <HoareLogicProofValidator />;
-		}
-
-		case 'Reference Guide': {
-			return <ReferenceGuide />;
-		}
-
-		case 'Settings': {
-			return <AppSettings />;
-		}
-	}
 }
 
 export default App;

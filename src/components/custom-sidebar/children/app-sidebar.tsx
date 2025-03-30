@@ -1,15 +1,15 @@
 import * as React from 'react';
 import {BookOpen, GalleryVerticalEnd, Settings2} from 'lucide-react';
-import {NavMain} from '@/components/custom-sidebar/nav-main.js';
-import {Settings} from '@/components/custom-sidebar/settings.js';
-import {HeaderDetails} from '@/components/custom-sidebar/header-details.js';
+import {NavMain} from '@/components/custom-sidebar/children/nav-main.js';
+import {Settings} from '@/components/custom-sidebar/children/settings.js';
+import {HeaderDetails} from '@/components/custom-sidebar/children/header-details.js';
 import {
 	Sidebar,
 	SidebarContent,
 	SidebarFooter,
 	SidebarHeader,
 	SidebarRail,
-} from '@/components/base-ui/sidebar.js';
+} from '@/components/base/sidebar.js';
 
 const data = {
 	footerData: {
