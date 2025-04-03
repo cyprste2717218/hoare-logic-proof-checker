@@ -19,34 +19,72 @@ type HoverCardArray = ReactElement[];
 
 type ErrorHoverCardProps = ErrorMsg;
 
-function AllErrorHoverCards({
-	className,
+type GenerateHoverCardsProps = {
+	errorMessages: ErrorMsg[];
+	totalNumLines: number;
+};
+
+// To-do: move this function to utilities dir
+function generateHoverCards({
 	errorMessages,
 	totalNumLines,
-}: AllErrorHoverCardProps) {
+}: GenerateHoverCardsProps): HoverCardArray {
 	const errorLines: number[] = [];
-	const hoverCards: HoverCardArray = [];
+	const returnedHoverCards: HoverCardArray = [];
 
 	for (const message of errorMessages) {
 		errorLines.push(message.lineNumber);
 	}
 
 	let i = 1;
-
 	while (i <= totalNumLines) {
-		let item = <div></div>;
+		let item = <div key={`empty-error-item-line-${i}`}></div>;
 
 		if (errorLines.includes(i)) {
-			item = (
-				<ErrorHoverCard
-					messages={errorMessages[i - 1].messages}
-					lineNumber={errorMessages[i - 1].lineNumber}
-				/>
-			);
+			const findErrorByLine = (
+				lineNumber: number,
+				errorMessages: ErrorMsg[],
+			): ErrorMsg | undefined => {
+				return errorMessages.find((error) => error.lineNumber === lineNumber);
+			};
+
+			const result = findErrorByLine(i, errorMessages);
+
+			if (result) {
+				const {messages, lineNumber} = result;
+				item = (
+					<ErrorHoverCard
+						messages={messages}
+						lineNumber={lineNumber}
+						key={`error-item-line-${i}`}
+					/>
+				);
+			} else {
+				throw new Error(
+					'Error: unable to find Error object for given line number',
+				);
+			}
 		}
 
-		hoverCards.push(item);
+		returnedHoverCards.push(item);
 		i++;
+	}
+
+	return returnedHoverCards;
+}
+
+function AllErrorHoverCards({
+	className,
+	errorMessages,
+	totalNumLines,
+}: AllErrorHoverCardProps) {
+	let hoverCards: HoverCardArray = [];
+
+	// Handling any errors encountered generating hover cards to render, in which case not rendering elements
+	try {
+		hoverCards = generateHoverCards({errorMessages, totalNumLines});
+	} catch {
+		console.error('Error encountered genereating error hover cards');
 	}
 
 	return (
@@ -60,17 +98,17 @@ function AllErrorHoverCards({
 
 function ErrorHoverCard({messages, lineNumber}: ErrorHoverCardProps) {
 	const allErrorMessages = messages.map((message) => {
-		return <div>{`-` + message + `\n`}</div>;
+		return <div key={`error-message-${message}`}>{`-` + message + `\n`}</div>;
 	});
 
 	return (
 		<HoverCard>
-			<HoverCardTrigger asChild>
+			<HoverCardTrigger>
 				<Button variant="link">
-					<TriangleAlert />
+					<TriangleAlert color="#ca1b00" />
 				</Button>
 			</HoverCardTrigger>
-			<HoverCardContent className="w-80">
+			<HoverCardContent>
 				<b>Error:</b> Syntax Error:
 				{allErrorMessages}
 				Line: {lineNumber}

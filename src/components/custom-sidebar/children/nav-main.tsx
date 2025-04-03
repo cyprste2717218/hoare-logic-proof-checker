@@ -27,6 +27,7 @@ export function NavMain({
 			title: string;
 			url: string;
 		};
+		key?: string;
 	}>;
 	handlePageContentChange: (title: AllowedPages) => void;
 }) {
@@ -39,6 +40,7 @@ export function NavMain({
 						onClick={() => {
 							handlePageContentChange(item.title as AllowedPages);
 						}}
+						key={item.key}
 					>
 						<SidebarMenuButton tooltip={item.title}>
 							{item.icon && <item.icon />}

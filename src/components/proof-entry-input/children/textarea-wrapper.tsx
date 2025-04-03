@@ -125,7 +125,7 @@ function TextAreaWrapper({
 					name={name}
 					proofContent={proofContent}
 					handleTextAreaChange={handleTextAreaChange}
-					textAreaRef={textAreaRef}
+					ref={textAreaRef}
 					handleTextAreaScroll={handleTextAreaScroll}
 					placeholder={placeholder}
 					className={cn(customBorderStyles)}

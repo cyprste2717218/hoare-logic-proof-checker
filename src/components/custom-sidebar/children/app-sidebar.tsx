@@ -27,6 +27,7 @@ const data = {
 			title: 'Reference Guide',
 			url: '#',
 			icon: BookOpen,
+			key: 'reference-guide-key',
 		},
 	],
 };
