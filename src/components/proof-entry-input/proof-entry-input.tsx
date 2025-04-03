@@ -9,6 +9,7 @@ type ProofEntryInputProps = {
 		React.SetStateAction<CurrentProofStateType>
 	>;
 	setProofContent: React.Dispatch<React.SetStateAction<string>>;
+	setProofErrors: React.Dispatch<React.SetStateAction<ErrorMsg[]>>;
 };
 
 function ProofEntryInput({
@@ -17,6 +18,7 @@ function ProofEntryInput({
 	proofErrors,
 	setCurrentProofState,
 	setProofContent,
+	setProofErrors,
 }: ProofEntryInputProps) {
 	// Test to see if proof error hover cards render as expected by supplying static data
 	/* const testErrorMsgs: ErrorMsg[] = [
@@ -47,6 +49,7 @@ function ProofEntryInput({
 			proofErrors={proofErrors}
 			setProofContent={setProofContent}
 			setCurrentProofState={setCurrentProofState}
+			setProofErrors={setProofErrors}
 		/>
 	);
 }

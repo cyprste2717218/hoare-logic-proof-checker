@@ -28,6 +28,8 @@ function handleProofSyntaxCheck({
 
 	// Format the proof into array of proof lines and check for syntax errors
 	const formattedProofLines = formatProof(proofContent);
+
+	console.log('formatted proof lines:', formattedProofLines);
 	const syntaxErrors: ErrorMsg[] = hasFormatErrors(
 		formattedProofLines,
 		lawSuffixs,
@@ -93,12 +95,7 @@ function parseProofLineFormat(
 
 	// Checks if line ends with a particular law suffix
 	function checkLawIsPassed(textLine: string, suffix: LawType): boolean {
-		if (!textLine.endsWith(suffix)) {
-			return false;
-		}
-
-		const pattern = `/\s+\d+\s*:${suffix}$/`;
-		const regExPattern = new RegExp(pattern);
+		const regExPattern = new RegExp(`^.*:${suffix}\\s+\\d+(?:\\s+\\d+)?$`);
 		return regExPattern.test(textLine);
 	}
 
@@ -219,14 +216,23 @@ function parseProofLineFormat(
 	};
 
 	for (const law of lawSuffixs) {
+		console.log('Checking each law suffix, currently checking:', law);
 		if (checkLawIsPassed(textLine, law)) {
 			// Pass law suffix to method to check against specific regex for expression using that law
-
+			console.log('law:', law, 'is present in textline:', textLine);
 			const {isValid, errors} = checkSpecificLawRegex(textLine, law);
 			retrievedDiagnostics.isValid = isValid;
 			retrievedDiagnostics.errors = errors;
+			break;
+		} else {
+			retrievedDiagnostics.isValid = false;
+			retrievedDiagnostics.errors = [
+				"Line does not end with a recognised law suffix, e.g. ':hskip <int>'",
+			];
 		}
 	}
+
+	// Setting retrievedDiagnostics to state no rule is recognised after doing initial regex parse with all applicable law suffixes
 
 	return retrievedDiagnostics;
 }

@@ -29,6 +29,7 @@ type TextAreaProps = {
 		React.SetStateAction<CurrentProofStateType>
 	>;
 	setProofContent: React.Dispatch<React.SetStateAction<string>>;
+	setProofErrors: React.Dispatch<React.SetStateAction<ErrorMsg[]>>;
 } & React.ComponentProps<'textarea'>;
 
 function TextAreaWrapper({
@@ -41,6 +42,7 @@ function TextAreaWrapper({
 	proofErrors,
 	setCurrentProofState,
 	setProofContent,
+	setProofErrors,
 	...props
 }: TextAreaProps) {
 	useEffect(() => {
@@ -91,6 +93,7 @@ function TextAreaWrapper({
 
 	const onValueChange = (value: string) => {
 		setProofContent(value);
+		setProofErrors([]);
 		setCurrentProofState('Unchecked - Change Present');
 	};
 

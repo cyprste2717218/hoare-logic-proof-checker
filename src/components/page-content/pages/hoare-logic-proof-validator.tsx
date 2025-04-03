@@ -61,6 +61,7 @@ function HoareLogicProofValidator({
 					setCurrentProofState={setCurrentProofState}
 					proofContent={proofContent}
 					setProofContent={setProofContent}
+					setProofErrors={setProofErrors}
 					proofErrors={proofErrors}
 				/>
 			</div>
