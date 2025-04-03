@@ -1,9 +1,13 @@
+import {type RefObject} from 'react';
 import {cn} from '@/lib/utils';
 
 type LineNumbersProps = {
 	className: string;
 	children: React.ReactNode;
-} & React.ComponentProps<'div'>;
+	// Note: Disabling ban-types rule for next line below only as can't allow for ref to be undefined due to how react handles mount/unmount of refs, i.e. requires possible null type
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	ref: RefObject<HTMLDivElement | null>;
+};
 
 type LineNumberElemProps = {
 	count: number;

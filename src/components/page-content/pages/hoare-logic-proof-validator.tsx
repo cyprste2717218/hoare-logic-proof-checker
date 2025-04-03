@@ -18,7 +18,7 @@ type HoareLogicProofValidatorProps = {
 function HoareLogicProofValidator({
 	currentProofState,
 	proofContent,
-	// TO-DO: instantiate proofErrors state here,
+	proofErrors,
 	setCurrentProofState,
 	setProofContent,
 	setProofErrors,
@@ -61,6 +61,7 @@ function HoareLogicProofValidator({
 					setCurrentProofState={setCurrentProofState}
 					proofContent={proofContent}
 					setProofContent={setProofContent}
+					proofErrors={proofErrors}
 				/>
 			</div>
 
