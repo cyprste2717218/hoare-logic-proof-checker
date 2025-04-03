@@ -38,7 +38,12 @@ function generateHoverCards({
 
 	let i = 1;
 	while (i <= totalNumLines) {
-		let item = <div key={`empty-error-item-line-${i}`}></div>;
+		let item = (
+			<div
+				className="text-sm leading-7 [&:not(:first-child)]:mt-6"
+				key={`empty-error-item-line-${i}`}
+			></div>
+		);
 
 		if (errorLines.includes(i)) {
 			const findErrorByLine = (
@@ -53,11 +58,13 @@ function generateHoverCards({
 			if (result) {
 				const {messages, lineNumber} = result;
 				item = (
-					<ErrorHoverCard
-						messages={messages}
-						lineNumber={lineNumber}
-						key={`error-item-line-${i}`}
-					/>
+					<div className="h-5">
+						<ErrorHoverCard
+							messages={messages}
+							lineNumber={lineNumber}
+							key={`error-item-line-${i}`}
+						/>
+					</div>
 				);
 			} else {
 				throw new Error(
@@ -89,7 +96,7 @@ function AllErrorHoverCards({
 
 	return (
 		<div
-			className={`${className} ${cn('py-2 px-2 text-slate-400 resize-none text-sm leading-7 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 field-sizing-content rounded-l-md border-r-0 bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm')}`}
+			className={`${className} ${cn('py-2 px-2 w-20 text-slate-400 resize-none text-sm leading-7 placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:bg-input/30 field-sizing-content rounded-r-md border-l-0 bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 md:text-sm')}`}
 		>
 			{hoverCards}
 		</div>

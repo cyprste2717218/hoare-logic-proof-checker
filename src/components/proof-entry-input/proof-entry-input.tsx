@@ -19,14 +19,14 @@ function ProofEntryInput({
 	setProofContent,
 }: ProofEntryInputProps) {
 	// Test to see if proof error hover cards render as expected by supplying static data
-	/* const testErrorMsgs: ErrorMsg[] = [
+	const testErrorMsgs: ErrorMsg[] = [
 		{
-			lineNumber: 1,
+			lineNumber: 8,
 			messages: ['This is an error message example', 'and another example'],
 		},
 		{
-			lineNumber: 2,
-			messages: ['Invalid - Proof Error'],
+			lineNumber: 3,
+			messages: ['Invalid - Proof Error', 'test'],
 		},
 		{
 			lineNumber: 4,
@@ -36,7 +36,7 @@ function ProofEntryInput({
 			lineNumber: 26,
 			messages: ['Invalid - Proof Error'],
 		},
-	]; */
+	];
 
 	return (
 		<TextAreaWrapper
@@ -44,7 +44,7 @@ function ProofEntryInput({
 			currentProofState={currentProofState}
 			numOfLines={10}
 			proofContent={proofContent}
-			proofErrors={proofErrors}
+			proofErrors={testErrorMsgs}
 			setProofContent={setProofContent}
 			setCurrentProofState={setCurrentProofState}
 		/>
