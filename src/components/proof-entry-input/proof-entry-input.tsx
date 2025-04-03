@@ -25,15 +25,15 @@ function ProofEntryInput({
 			messages: ['This is an error message example', 'and another example'],
 		},
 		{
-			lineNumber: 3,
-			messages: ['Invalid - Proof Error', 'test'],
+			lineNumber: 2,
+			messages: ['Invalid - Proof Error'],
 		},
 		{
 			lineNumber: 4,
 			messages: ['Invalid - Proof Error'],
 		},
 		{
-			lineNumber: 26,
+			lineNumber: 10,
 			messages: ['Invalid - Proof Error'],
 		},
 	]; */
