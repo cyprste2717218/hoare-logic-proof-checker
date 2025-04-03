@@ -1,13 +1,16 @@
-type ErrorMsg = {
-	messages: string[];
-	lineNumber: number;
-};
+/* eslint-disable no-useless-escape */
+
+import type {ErrorMsg} from '@/models/misc';
 
 type LawType = keyof typeof validRegexFormats;
 
 type RegexFormats = {
 	arith: string;
 	hskip: string;
+};
+
+type HandleProofCheckProps = {
+	proofContent: string;
 };
 
 const validRegexFormats: RegexFormats = {
@@ -17,11 +20,14 @@ const validRegexFormats: RegexFormats = {
 	hskip: '/^\{([^{}]+)\}\s*([^{}]+)\s*\{([^{}]+)\}\s*:hskip\s+\d+$/',
 };
 
-function handleProofCheck(proof: string) {
+function handleProofSyntaxCheck({
+	proofContent,
+}: HandleProofCheckProps): ErrorMsg[] {
 	const lawSuffixs: LawType[] = ['arith', 'hskip'];
+	const errors: ErrorMsg[] = [];
 
 	// Format the proof into array of proof lines and check for syntax errors
-	const formattedProofLines = formatProof(proof);
+	const formattedProofLines = formatProof(proofContent);
 	const syntaxErrors: ErrorMsg[] = hasFormatErrors(
 		formattedProofLines,
 		lawSuffixs,
@@ -32,11 +38,13 @@ function handleProofCheck(proof: string) {
 		// If the above yields an error then do the following to-dos:
 		// to-do: pass up error message objects to new state for error msgs in App.tsx
 		// to-do: set currentProofState to 'Invalid - Syntax Error'
+		errors.push(...syntaxErrors);
 		console.log('Proof does not adhere to syntax');
 	} else {
-		// --------------------------
-		// check validity of overall proof
+		console.log('Proof adheres to syntax');
 	}
+
+	return errors;
 }
 
 function formatProof(text: string): string[] {
@@ -53,7 +61,7 @@ function hasFormatErrors(
 	// Check each lines syntax matches up to expected format, if not set the errorMessage
 	const errorMessages: ErrorMsg[] = [];
 
-	trimmedLines.some((line) => {
+	for (const line of trimmedLines) {
 		const lineFormatResult = parseProofLineFormat(line, lawSuffixes);
 		if (!lineFormatResult.isValid) {
 			const allErrorMessagesForLine: ErrorMsg = {
@@ -62,7 +70,7 @@ function hasFormatErrors(
 			};
 			errorMessages.push(allErrorMessagesForLine);
 		}
-	});
+	}
 
 	return errorMessages;
 }
@@ -177,12 +185,12 @@ function parseProofLineFormat(
 
 			// Check for presence of syntax errors, 'reading' proof line from left to right
 
-			checkKeys.map((checkName) => {
+			for (const checkName of checkKeys) {
 				if (!checks[checkName].expression.test(textLine)) {
 					diagnostics.errors.push(checks[checkName].message);
 					diagnostics.isValid = false;
 				}
-			});
+			}
 
 			return diagnostics;
 		}
@@ -210,11 +218,11 @@ function parseProofLineFormat(
 		errors: [],
 	};
 
-	for (const law in lawSuffixs) {
-		if (checkLawIsPassed(textLine, law as LawType)) {
+	for (const law of lawSuffixs) {
+		if (checkLawIsPassed(textLine, law)) {
 			// Pass law suffix to method to check against specific regex for expression using that law
 
-			const {isValid, errors} = checkSpecificLawRegex(textLine, law as LawType);
+			const {isValid, errors} = checkSpecificLawRegex(textLine, law);
 			retrievedDiagnostics.isValid = isValid;
 			retrievedDiagnostics.errors = errors;
 		}
@@ -223,4 +231,4 @@ function parseProofLineFormat(
 	return retrievedDiagnostics;
 }
 
-export default handleProofCheck;
+export default handleProofSyntaxCheck;

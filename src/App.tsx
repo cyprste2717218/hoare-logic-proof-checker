@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import './App.css';
 import {Separator} from '@/components/base/separator.js';
-import type {CurrentProofStateType} from '@/models/misc';
+import type {CurrentProofStateType, ErrorMsg} from '@/models/misc';
 import CustomSidebar from '@/components/custom-sidebar/custom-sidebar';
 import PageContent from '@/components/page-content/page-content';
 import HeaderComponent from '@/components/header-component/header-component';
@@ -19,6 +19,8 @@ function App() {
 		useState<CurrentProofStateType>('Unchecked');
 
 	const [proofContent, setProofContent] = useState('');
+
+	const [proofErrors, setProofErrors] = useState<ErrorMsg[]>([]);
 
 	function handlePageContentChange(newPageContent: CurrentPageContentType) {
 		setCurrentProofState('Unchecked'); // To-do: delete this line, just to pass build ts requirements temporarily
@@ -51,8 +53,10 @@ function App() {
 					currentProofState={currentProofState}
 					currentPageContent={currentPageContent}
 					proofContent={proofContent}
+					proofErrors={proofErrors}
 					setCurrentProofState={setCurrentProofState}
 					setProofContent={setProofContent}
+					setProofErrors={setProofErrors}
 				/>
 			</CustomSidebar>
 		</>

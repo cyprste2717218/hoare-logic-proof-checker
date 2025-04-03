@@ -10,4 +10,9 @@ type CurrentPageContentType =
 	| 'Reference Guide'
 	| 'Settings';
 
-export type {CurrentProofStateType, CurrentPageContentType};
+type ErrorMsg = {
+	messages: string[];
+	lineNumber: number;
+};
+
+export type {CurrentProofStateType, CurrentPageContentType, ErrorMsg};
