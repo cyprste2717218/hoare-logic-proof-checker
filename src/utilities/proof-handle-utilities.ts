@@ -1,29 +1,41 @@
 /* eslint-disable no-useless-escape */
 
+
 import type {ErrorMsg} from '@/models/misc';
 
-type LawType = keyof typeof validRegexFormats;
-
-type RegexFormats = {
-	arith: string;
-	hskip: string;
+type LawType = {
+	hoareLaws: {
+		hskip: string;
+	};
+	other: {
+		arith: string;
+	};
 };
+
+type LawTypeKeys = keyof LawType['hoareLaws'] | keyof LawType['other'];
 
 type HandleProofCheckProps = {
 	proofContent: string;
 };
 
-const validRegexFormats: RegexFormats = {
-	// Pattern matches: expr1 :arith <int>
-	arith: '/^[a-z]=[0-9]+\s*→\s*[a-z]=[0-9]+\s*:arith$/',
-	// Pattern matches {expr1} expr2 {expr3} :hskip <int>
-	hskip: '/^\{([^{}]+)\}\s*([^{}]+)\s*\{([^{}]+)\}\s*:hskip\s+\d+$/',
+const validRegexFormats: LawType = {
+	hoareLaws: {
+		// Pattern matches {expr1} expr2 {expr3} :hskip <int>
+		hskip: '/^\{([^{}]+)\}\s*([^{}]+)\s*\{([^{}]+)\}\s*:hskip\s+\d+$/',
+	},
+	other: {
+		// Pattern matches: expr1 :arith <int>
+		arith: '/^[a-z]=[0-9]+\s*→\s*[a-z]=[0-9]+\s*:arith$/',
+	},
 };
 
 function handleProofSyntaxCheck({
 	proofContent,
 }: HandleProofCheckProps): ErrorMsg[] {
-	const lawSuffixs: LawType[] = ['arith', 'hskip'];
+	const lawSuffixs: LawTypeKeys[] = [
+		...(Object.keys(validRegexFormats.hoareLaws) as LawTypeKeys[]),
+		...(Object.keys(validRegexFormats.other) as LawTypeKeys[]),
+	];
 	const errors: ErrorMsg[] = [];
 
 	// Format the proof into array of proof lines and check for syntax errors
@@ -58,7 +70,7 @@ function formatProof(text: string): string[] {
 
 function hasFormatErrors(
 	trimmedLines: string[],
-	lawSuffixes: LawType[],
+	lawSuffixes: LawTypeKeys[],
 ): ErrorMsg[] {
 	// Check each lines syntax matches up to expected format, if not set the errorMessage
 	const errorMessages: ErrorMsg[] = [];
@@ -84,7 +96,7 @@ type DiagnosticsType = {
 
 function parseProofLineFormat(
 	textLine: string,
-	lawSuffixs: LawType[],
+	lawSuffixs: LawTypeKeys[],
 ): DiagnosticsType {
 	type RegexCheckItem = {
 		expression: RegExp;
@@ -94,7 +106,7 @@ function parseProofLineFormat(
 	type AllRegexChecks = Record<string, RegexCheckItem>;
 
 	// Checks if line ends with a particular law suffix
-	function checkLawIsPassed(textLine: string, suffix: LawType): boolean {
+	function checkLawIsPassed(textLine: string, suffix: LawTypeKeys): boolean {
 		const regExPattern = new RegExp(`^.*:${suffix}\\s+\\d+(?:\\s+\\d+)?$`);
 		return regExPattern.test(textLine);
 	}
@@ -102,21 +114,50 @@ function parseProofLineFormat(
 	// Checks line adheres to spec for a proof line containing that law
 	function checkSpecificLawRegex(
 		textLine: string,
-		law: LawType,
+		law: LawTypeKeys,
 	): DiagnosticsType {
+		function checkLawGroup(key: LawTypeKeys): keyof LawType {
+			if (key in validRegexFormats.hoareLaws) {
+				return 'hoareLaws';
+			}
+
+			return 'other';
+		}
+
 		function doLawSpecificChecks(
 			textLine: string,
-			law: LawType,
+			lawGroup: keyof LawType,
+			law: LawTypeKeys,
 		): DiagnosticsType {
-			function getRelevantChecks(law: string): AllRegexChecks {
+			function getRelevantChecks(law: LawTypeKeys): AllRegexChecks {
 				const allChecks: AllRegexChecks = {
-					startsBrace: {
-						expression: /^{/,
-						message: "Must start with '{'",
+					preConditionOpenCloseBraces: {
+						expression: /^{[^{}]*}/,
+						message:
+							"Precondition does not contain both closing and opening braces, '{}'",
 					},
-					firstExpression: {
-						expression: /^{([^{}]+)}/,
-						message: 'Invalid first expression format',
+					preConditionBody: {
+						expression:
+							/^(?:[a-zA-Z]+(?:[<>]=?|=)[a-zA-Z\d](?:\s*\/\\\s*[a-zA-Z]+(?:[<>]=?|=)[a-zA-Z\d])*|T)$/,
+						message:
+							'Precondition body is incorrectly formatted, should be singular/list of expressions of form <expr><operator><expr> delimited by /\\, e.g. x=2 /\\ y>=3',
+					},
+					postConditionOpenCloseBraces: {
+						expression: /^{[^{}]*}[^{}]*{[^{}]*}$/,
+						message:
+							"Postcondition does not contain both closing and opening braces, '{}'",
+					},
+					postConditionBody: {
+						expression:
+							/^[a-zA-Z]+(?:[<>]=?|=)[a-zA-Z\d](?:\s*\/\\\s*[a-zA-Z]+(?:[<>]=?|=)[a-zA-Z\d])*$/,
+						message:
+							'Postcondition body is incorrectly formatted, should be singular/list of expressions of form <expr><operator><expr> delimited by /\\, e.g. x=2 /\\ y>=3',
+					},
+					programBody: {
+						expression:
+							/^[a-zA-Z]+(?:[<>]=?|=|:=)[a-zA-Z\d](?:\s*\/\\\s*[a-zA-Z]+(?:[<>]=?|=|:=)[a-zA-Z\d])*$/,
+						message:
+							'Program supplied to triple is incorrectly formatted, should be a single expression or a list of expressions of the form <expr><operator><expr> delimited by /\\, e.g. x:=3',
 					},
 					middleExpression: {
 						expression: /^{[^{}]+}\s*([^{}]+)\s*{/,
@@ -142,12 +183,11 @@ function parseProofLineFormat(
 				switch (law) {
 					case 'hskip': {
 						lawChecksList = [
-							'startsBrace',
-							'firstExpression',
-							'middleExpression',
-							'secondBrace',
-							'endsWithHskip',
-							'hasNumber',
+							'preConditionOpenCloseBraces',
+							'preConditionBody',
+							'programBody',
+							'postConditionOpenCloseBraces',
+							'postConditionBody',
 						];
 						break;
 					}
@@ -157,9 +197,6 @@ function parseProofLineFormat(
 						break;
 					}
 
-					default: {
-						lawChecksList = [];
-					}
 				}
 
 				for (const check of lawChecksList) {
@@ -170,22 +207,116 @@ function parseProofLineFormat(
 				return returnChecks;
 			}
 
+			// Methods for extracting specific sections of proof lines
+			function extractBeforeSuffix(
+				text: string,
+				suffix: string,
+			): string | undefined {
+				const regex = new RegExp(`^(.*?)\s*:${suffix}\s(\d+(?:\s\d+)?)$`);
+				const match = text.match(regex);
+				return match ? match[1] : undefined;
+			}
+
+			function extractPreConditionBody(text: string): string | undefined {
+				const match = /{([^{}]+)}/.exec(text);
+				return match ? match[1] : undefined;
+			}
+
+			/* function extractProgramBody(text: string): string | undefined {
+				const match = text.match(/{([^{}]+)}/g);
+				return match ? match[1] : undefined;
+			}
+
+			function extractPostConditionBody(text: string): string | undefined {
+				const match = /{[^{}]+}\s*{([^{}]+)}/.exec(text);
+				return match ? match[1] : undefined;
+			} */
+
 			const diagnostics: DiagnosticsType = {
 				isValid: true,
 				errors: [] as string[],
 			};
 
-			const checks: AllRegexChecks = getRelevantChecks(law);
+			const checks: AllRegexChecks = getRelevantChecks(
+				law as unknown as LawTypeKeys,
+			);
 
 			type CheckKeys = keyof typeof checks;
 			const checkKeys: CheckKeys[] = [];
 
-			// Check for presence of syntax errors, 'reading' proof line from left to right
+			// To-do: refactor this into functions to pass functions etc.
+			if (lawGroup === 'hoareLaws') {
+				console.log(
+					'this is the textLine and the law just before running extractBeforeHSuffix:',
+					textLine,
+					law,
+				);
+				// Extract string with law suffix removed for syntax parsing
+				const removedLawSuffix = extractBeforeSuffix(textLine, law);
 
-			for (const checkName of checkKeys) {
-				if (!checks[checkName].expression.test(textLine)) {
-					diagnostics.errors.push(checks[checkName].message);
-					diagnostics.isValid = false;
+				if (removedLawSuffix) {
+					textLine = removedLawSuffix;
+				} else {
+					console.error('Unable to extract textLine without law suffix');
+				}
+
+				// Check pre-condition opening and closing braces present
+				if (checks.preConditionOpenCloseBraces.expression.test(textLine)) {
+					console.log('precondition has both opening and closing braces');
+
+					// Retrieve expression between precondition braces and check expression in pre-condition matches expected syntax
+					const preConditionBody = extractPreConditionBody(textLine);
+					console.log('precondition body:', preConditionBody);
+
+					if (preConditionBody) {
+						if (checks.preConditionBody.expression.test(preConditionBody)) {
+							console.log('precondition body matches expected syntax');
+							console.log('textLine is:', textLine);
+
+							// Check postcondition opening and closing braces present
+							if (
+								checks.postConditionOpenCloseBraces.expression.test(textLine)
+							) {
+								console.log(
+									'postcondition has both opening and closing braces',
+								);
+							} else {
+								console.log(
+									'postcondition does not have both opening and closing braces',
+								);
+								diagnostics.errors.push(
+									checks.postConditionOpenCloseBraces.message,
+								);
+							}
+						} else {
+							console.log('precondition body does not match expected syntax');
+							diagnostics.errors.push(checks.preConditionBody.message);
+						}
+					} else {
+						console.error(
+							`Error: Attempt to extract precondition body failed:${preConditionBody}`,
+						);
+					}
+				} else {
+					// If opening and closing braces are not present
+					console.log(
+						'precondition does not have both opening and closing braces',
+					);
+
+					diagnostics.errors.push(checks.preConditionOpenCloseBraces.message);
+				}
+
+				// Check expression matches expected format
+
+				diagnostics.isValid = false;
+			} else {
+				// Check for presence of syntax errors, 'reading' proof line from left to right
+
+				for (const checkName of checkKeys) {
+					if (!checks[checkName].expression.test(textLine)) {
+						diagnostics.errors.push(checks[checkName].message);
+						diagnostics.isValid = false;
+					}
 				}
 			}
 
@@ -196,11 +327,18 @@ function parseProofLineFormat(
 			isValid: true,
 			errors: [],
 		};
-		const lawRegex = new RegExp(validRegexFormats[law]);
+
+		const lawGroup = checkLawGroup(law);
+
+		const lawRegex = new RegExp(
+			validRegexFormats[lawGroup][
+				law as keyof (typeof validRegexFormats)[typeof lawGroup]
+			],
+		);
 
 		if (!lawRegex.test(textLine)) {
 			// Do law specific checks
-			const {isValid, errors} = doLawSpecificChecks(textLine, law);
+			const {isValid, errors} = doLawSpecificChecks(textLine, lawGroup, law);
 
 			// Set new values for validity and syntax errors discovered
 			retrievedDiagnostics.isValid = isValid;
