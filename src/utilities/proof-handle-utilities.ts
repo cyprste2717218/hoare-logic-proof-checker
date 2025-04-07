@@ -1,6 +1,5 @@
 /* eslint-disable no-useless-escape */
 
-
 import type {ErrorMsg} from '@/models/misc';
 
 type LawType = {
@@ -129,6 +128,255 @@ function parseProofLineFormat(
 			lawGroup: keyof LawType,
 			law: LawTypeKeys,
 		): DiagnosticsType {
+			function doHoareLawChecks(textLine: string): DiagnosticsType {
+				// Methods for checking different parts of proof line, i.e. pre-condition, program body and post-condition
+
+				function doPreConditionChecks(textLine: string): DiagnosticsType {
+					function extractPreConditionBody(text: string): string | undefined {
+						const match = /{([^{}]+)}/.exec(text);
+						return match ? match[1] : undefined;
+					}
+
+					const diagnostics: DiagnosticsType = {
+						isValid: true,
+						errors: [] as string[],
+					};
+
+					// Check pre-condition opening and closing braces present
+					if (!checks.preConditionOpenCloseBraces.expression.test(textLine)) {
+						// If opening and closing braces are not present
+						console.log(
+							'precondition does not have both opening and closing braces',
+						);
+
+						diagnostics.errors.push(checks.preConditionOpenCloseBraces.message);
+						diagnostics.isValid = false;
+
+						return diagnostics;
+					}
+
+					console.log('precondition has both opening and closing braces');
+
+					// Retrieve expression between precondition braces and then check expression in pre-condition matches expected syntax
+					const preConditionBody = extractPreConditionBody(textLine);
+					console.log('precondition body:', preConditionBody);
+
+					if (!preConditionBody) {
+						console.error(
+							`Error: Attempt to extract precondition body failed:${preConditionBody}`,
+						);
+						diagnostics.isValid = false;
+						return diagnostics;
+					}
+
+					if (!checks.preConditionBody.expression.test(preConditionBody)) {
+						console.log('precondition body does not match expected syntax');
+
+						diagnostics.errors.push(checks.preConditionBody.message);
+						diagnostics.isValid = false;
+
+						return diagnostics;
+					}
+
+					console.log('precondition body matches expected syntax');
+					console.log('textLine is:', textLine);
+
+					// No errors in precondition checks so return unchanged diagnostics object
+
+					return diagnostics;
+				}
+
+				function doProgramBodyChecks(textLine: string): DiagnosticsType {
+					function extractProgramBody(text: string): string | undefined {
+						const match = /{[^{}]*}([^{]*){/.exec(text);
+						return match ? match[1].trim() : undefined;
+					}
+
+					// Retrieve program expression between pre-condition and post-condition and then check it matches expected syntax
+
+					const diagnostics: DiagnosticsType = {
+						isValid: true,
+						errors: [] as string[],
+					};
+
+					const programBody = extractProgramBody(textLine);
+					console.log('program body:', programBody);
+
+					if (!programBody) {
+						console.error(
+							`Error: Attempt to extract program body failed:${programBody}`,
+						);
+						diagnostics.errors.push(
+							'Unable to retrieve location of program from hoare triple, ensure the program is enclosed between the precondition and postcondition',
+						);
+						diagnostics.isValid = false;
+
+						return diagnostics;
+					}
+
+					if (!checks.programBody.expression.test(programBody)) {
+						console.log('program body does not match expected syntax');
+
+						diagnostics.errors.push(checks.programBody.message);
+						diagnostics.isValid = false;
+
+						return diagnostics;
+					}
+
+					console.log('program body matches expected syntax');
+
+					return diagnostics;
+				}
+
+				function doPostConditionChecks(textLine: string): DiagnosticsType {
+					function extractFromSecondOpenBraceRegex(
+						text: string,
+					): string | undefined {
+						const match = /{[^{]*{(.*$)/.exec(text);
+						return match ? `{${match[1]}` : undefined;
+					}
+
+					function extractPostConditionBody(text: string): string | undefined {
+						const match = /{([^{}]+)}/.exec(text);
+						return match ? match[1] : undefined;
+					}
+
+					const diagnostics: DiagnosticsType = {
+						isValid: true,
+						errors: [] as string[],
+					};
+
+					const startOfPostConditionString =
+						extractFromSecondOpenBraceRegex(textLine);
+
+					if (!startOfPostConditionString) {
+						console.error(
+							`Error: Attempt to extract string from start of postcondition failed:${startOfPostConditionString}`,
+						);
+						diagnostics.isValid = false;
+						return diagnostics;
+					}
+
+					console.log(
+						'string starting with postcondition:',
+						startOfPostConditionString,
+					);
+
+					if (
+						!checks.postConditionOpenCloseBraces.expression.test(
+							startOfPostConditionString,
+						)
+					) {
+						// If opening and closing braces are not present
+						console.log(
+							'postcondition does not have both opening and closing braces',
+						);
+
+						diagnostics.errors.push(
+							checks.postConditionOpenCloseBraces.message,
+						);
+						diagnostics.isValid = false;
+
+						return diagnostics;
+					}
+
+					console.log('postcondition has both opening and closing braces');
+
+					// Retrieve expression between postcondition braces and then check expression in post-condition matches expected syntax
+					const postConditionBody = extractPostConditionBody(
+						startOfPostConditionString,
+					);
+					console.log('postcondition body:', postConditionBody);
+
+					if (!postConditionBody) {
+						console.error(
+							`Error: Attempt to extract postcondition body failed:${postConditionBody}`,
+						);
+						diagnostics.isValid = false;
+						return diagnostics;
+					}
+
+					if (!checks.postConditionBody.expression.test(postConditionBody)) {
+						console.log('postcondition body does not match expected syntax');
+
+						diagnostics.errors.push(checks.postConditionBody.message);
+						diagnostics.isValid = false;
+
+						return diagnostics;
+					}
+
+					console.log('postcondition body matches expected syntax');
+					console.log('textLine is:', textLine);
+
+					// No errors in postcondition checks so return unchanged diagnostics object
+					return diagnostics;
+				}
+
+				// Perform checks for match up against each part of syntax in sequential order, i.e. precondition, program body, postcondition
+
+				// 1). gather any pre-condition check errors
+				const preConditionDiagnostics: DiagnosticsType =
+					doPreConditionChecks(textLine);
+
+				if (
+					preConditionDiagnostics.errors.length > 0 &&
+					!preConditionDiagnostics.isValid
+				) {
+					// Early return if errors present in precondition checks
+					return preConditionDiagnostics;
+				}
+
+				// 2). gather any program body check errors
+				const programBodyDiagnostics: DiagnosticsType =
+					doProgramBodyChecks(textLine);
+
+				if (
+					programBodyDiagnostics.errors.length > 0 &&
+					!programBodyDiagnostics.isValid
+				) {
+					// Early return if errors present in program body checks
+					return programBodyDiagnostics;
+				}
+
+				// 3). gather any postcondition check errors
+				const postConditionDiagnostics: DiagnosticsType =
+					doPostConditionChecks(textLine);
+
+				if (
+					postConditionDiagnostics.errors.length > 0 &&
+					!postConditionDiagnostics.isValid
+				) {
+					// Early return if errors present in program body checks
+					return postConditionDiagnostics;
+				}
+
+				// No errors detected on proof line for hoare law call so return unchanged diagnostics object
+
+				return {
+					isValid: true,
+					errors: [] as string[],
+				};
+			}
+
+			function doOtherLawChecks(textLine: string): DiagnosticsType {
+				// To-do: to be further instantiated
+				console.log(textLine);
+
+				// Check for presence of syntax errors, 'reading' proof line from left to right
+
+				/* 	for (const checkName of checkKeys) {
+					if (!checks[checkName].expression.test(textLine)) {
+						diagnostics.errors.push(checks[checkName].message);
+						diagnostics.isValid = false;
+					}
+				}
+ 				*/
+				return {
+					isValid: true,
+					errors: [] as string[],
+				};
+			}
+
 			function getRelevantChecks(law: LawTypeKeys): AllRegexChecks {
 				const allChecks: AllRegexChecks = {
 					preConditionOpenCloseBraces: {
@@ -143,7 +391,7 @@ function parseProofLineFormat(
 							'Precondition body is incorrectly formatted, should be singular/list of expressions of form <expr><operator><expr> delimited by /\\, e.g. x=2 /\\ y>=3',
 					},
 					postConditionOpenCloseBraces: {
-						expression: /^{[^{}]*}[^{}]*{[^{}]*}$/,
+						expression: /^{[^{}]*}.*$/,
 						message:
 							"Postcondition does not contain both closing and opening braces, '{}'",
 					},
@@ -159,24 +407,8 @@ function parseProofLineFormat(
 						message:
 							'Program supplied to triple is incorrectly formatted, should be a single expression or a list of expressions of the form <expr><operator><expr> delimited by /\\, e.g. x:=3',
 					},
-					middleExpression: {
-						expression: /^{[^{}]+}\s*([^{}]+)\s*{/,
-						message: 'Invalid middle expression format',
-					},
-					secondBrace: {
-						expression: /{[^{}]*}$/,
-						message: 'Must end with properly closed expression in braces',
-					},
-					endsWithHskip: {
-						expression: /:hskip\s+\d+$/,
-						message: "Must end with ':hskip' followed by a number",
-					},
-					hasNumber: {
-						expression: /\d+$/,
-						message: '',
-					},
 				};
-				type CheckKeys = keyof typeof allChecks;
+				// Type CheckKeys = keyof typeof allChecks;
 
 				let lawChecksList: CheckKeys[] = [];
 				const returnChecks: AllRegexChecks = {};
@@ -196,7 +428,6 @@ function parseProofLineFormat(
 						lawChecksList = [];
 						break;
 					}
-
 				}
 
 				for (const check of lawChecksList) {
@@ -207,119 +438,20 @@ function parseProofLineFormat(
 				return returnChecks;
 			}
 
-			// Methods for extracting specific sections of proof lines
-			function extractBeforeSuffix(
-				text: string,
-				suffix: string,
-			): string | undefined {
-				const regex = new RegExp(`^(.*?)\s*:${suffix}\s(\d+(?:\s\d+)?)$`);
-				const match = text.match(regex);
-				return match ? match[1] : undefined;
-			}
-
-			function extractPreConditionBody(text: string): string | undefined {
-				const match = /{([^{}]+)}/.exec(text);
-				return match ? match[1] : undefined;
-			}
-
-			/* function extractProgramBody(text: string): string | undefined {
-				const match = text.match(/{([^{}]+)}/g);
-				return match ? match[1] : undefined;
-			}
-
-			function extractPostConditionBody(text: string): string | undefined {
-				const match = /{[^{}]+}\s*{([^{}]+)}/.exec(text);
-				return match ? match[1] : undefined;
-			} */
-
-			const diagnostics: DiagnosticsType = {
-				isValid: true,
-				errors: [] as string[],
-			};
-
 			const checks: AllRegexChecks = getRelevantChecks(
 				law as unknown as LawTypeKeys,
 			);
 
 			type CheckKeys = keyof typeof checks;
-			const checkKeys: CheckKeys[] = [];
+			// Const checkKeys: CheckKeys[] = [];
 
-			// To-do: refactor this into functions to pass functions etc.
+			// Retrieving detected errors depending on parsing as instantiation of hoare law, e.g. hskip, or other law, e.g. arith, subst
 			if (lawGroup === 'hoareLaws') {
-				console.log(
-					'this is the textLine and the law just before running extractBeforeHSuffix:',
-					textLine,
-					law,
-				);
-				// Extract string with law suffix removed for syntax parsing
-				const removedLawSuffix = extractBeforeSuffix(textLine, law);
-
-				if (removedLawSuffix) {
-					textLine = removedLawSuffix;
-				} else {
-					console.error('Unable to extract textLine without law suffix');
-				}
-
-				// Check pre-condition opening and closing braces present
-				if (checks.preConditionOpenCloseBraces.expression.test(textLine)) {
-					console.log('precondition has both opening and closing braces');
-
-					// Retrieve expression between precondition braces and check expression in pre-condition matches expected syntax
-					const preConditionBody = extractPreConditionBody(textLine);
-					console.log('precondition body:', preConditionBody);
-
-					if (preConditionBody) {
-						if (checks.preConditionBody.expression.test(preConditionBody)) {
-							console.log('precondition body matches expected syntax');
-							console.log('textLine is:', textLine);
-
-							// Check postcondition opening and closing braces present
-							if (
-								checks.postConditionOpenCloseBraces.expression.test(textLine)
-							) {
-								console.log(
-									'postcondition has both opening and closing braces',
-								);
-							} else {
-								console.log(
-									'postcondition does not have both opening and closing braces',
-								);
-								diagnostics.errors.push(
-									checks.postConditionOpenCloseBraces.message,
-								);
-							}
-						} else {
-							console.log('precondition body does not match expected syntax');
-							diagnostics.errors.push(checks.preConditionBody.message);
-						}
-					} else {
-						console.error(
-							`Error: Attempt to extract precondition body failed:${preConditionBody}`,
-						);
-					}
-				} else {
-					// If opening and closing braces are not present
-					console.log(
-						'precondition does not have both opening and closing braces',
-					);
-
-					diagnostics.errors.push(checks.preConditionOpenCloseBraces.message);
-				}
-
-				// Check expression matches expected format
-
-				diagnostics.isValid = false;
-			} else {
-				// Check for presence of syntax errors, 'reading' proof line from left to right
-
-				for (const checkName of checkKeys) {
-					if (!checks[checkName].expression.test(textLine)) {
-						diagnostics.errors.push(checks[checkName].message);
-						diagnostics.isValid = false;
-					}
-				}
+				const diagnostics: DiagnosticsType = doHoareLawChecks(textLine);
+				return diagnostics;
 			}
 
+			const diagnostics: DiagnosticsType = doOtherLawChecks(textLine);
 			return diagnostics;
 		}
 
