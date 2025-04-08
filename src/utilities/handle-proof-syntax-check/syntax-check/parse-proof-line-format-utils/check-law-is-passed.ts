@@ -3,9 +3,16 @@ import type {LawTypeKeys} from '@/models/misc';
 function isValidSuffix(suffix: unknown): suffix is LawTypeKeys {
 	return (
 		typeof suffix === 'string' &&
-		['hskip', 'hwhile', 'harith' /* other valid keys */].includes(
-			suffix as LawTypeKeys,
-		)
+		[
+			'hskip',
+			'hassign',
+			'hwhile',
+			'hcond',
+			'hseq',
+			'arith',
+			'subst',
+			'simpf',
+		].includes(suffix as LawTypeKeys)
 	);
 }
 

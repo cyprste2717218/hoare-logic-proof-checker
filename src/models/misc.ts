@@ -18,9 +18,15 @@ type ErrorMsg = {
 type LawType = {
 	hoareLaws: {
 		hskip: string;
+		hassign: string;
+		hcond: string;
+		hseq: string;
+		hwhile: string;
 	};
 	other: {
 		arith: string;
+		subst: string;
+		simpf: string;
 	};
 };
 

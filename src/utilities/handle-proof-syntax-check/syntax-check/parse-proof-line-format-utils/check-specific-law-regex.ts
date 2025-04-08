@@ -22,20 +22,12 @@ function checkSpecificLawRegex(
 
 	const lawGroup = checkLawGroup(law);
 
-	const lawRegex = new RegExp(
-		validRegexFormats[lawGroup][
-			law as keyof (typeof validRegexFormats)[typeof lawGroup]
-		],
-	);
+	// Do law specific checks
+	const {isValid, errors} = doLawSpecificChecks(textLine, lawGroup, law);
 
-	if (!lawRegex.test(textLine)) {
-		// Do law specific checks
-		const {isValid, errors} = doLawSpecificChecks(textLine, lawGroup, law);
-
-		// Set new values for validity and syntax errors discovered
-		retrievedDiagnostics.isValid = isValid;
-		retrievedDiagnostics.errors = errors;
-	}
+	// Set new values for validity and syntax errors discovered
+	retrievedDiagnostics.isValid = isValid;
+	retrievedDiagnostics.errors = errors;
 
 	return retrievedDiagnostics;
 }
