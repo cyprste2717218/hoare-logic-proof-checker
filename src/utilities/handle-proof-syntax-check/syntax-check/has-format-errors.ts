@@ -1,4 +1,4 @@
-import {parseProofLineFormat} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format/parse-proof-line-format';
+import {parseProofLineFormat} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format';
 import {type LawTypeKeys, type ErrorMsg} from '@/models/misc';
 
 function hasFormatErrors(

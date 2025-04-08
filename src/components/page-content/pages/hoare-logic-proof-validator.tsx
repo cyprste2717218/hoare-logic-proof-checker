@@ -2,7 +2,7 @@ import ProofEntryInput from '../../proof-entry-input/proof-entry-input';
 import {HoareTripleInput} from '../../hoare-triple-input/hoare-triple-input';
 import {Button} from '@/components/base/button.js';
 import type {CurrentProofStateType, ErrorMsg} from '@/models/misc';
-import handleProofSyntaxCheck from '@/utilities/proof-handle-utilities';
+import {handleProofSyntaxCheck} from '@/utilities/proof-handle-utilities';
 
 type HoareLogicProofValidatorProps = {
 	currentProofState: CurrentProofStateType;
