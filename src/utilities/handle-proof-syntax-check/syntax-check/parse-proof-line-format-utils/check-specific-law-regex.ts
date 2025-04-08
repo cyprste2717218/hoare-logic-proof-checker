@@ -1,7 +1,6 @@
-import {validRegexFormats} from '@/lib/regex-formats';
 import {doLawSpecificChecks} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format-utils/do-law-specific-checks';
 import {checkLawGroup} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format';
-import type {LawTypeKeys, LawType, DiagnosticsType} from '@/models/misc';
+import type {LawTypeKeys, DiagnosticsType} from '@/models/misc';
 
 // Checks line adheres to spec for a proof line containing that law
 function checkSpecificLawRegex(
