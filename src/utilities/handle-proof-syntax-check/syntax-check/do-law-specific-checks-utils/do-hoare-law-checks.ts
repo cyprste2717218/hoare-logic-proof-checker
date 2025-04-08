@@ -106,7 +106,7 @@ function doHoareLawChecks(
 
 	function doPostConditionChecks(textLine: string): DiagnosticsType {
 		function extractFromSecondOpenBraceRegex(text: string): string | undefined {
-			const match = /{[^{]*{(.*$)/.exec(text);
+			const match = /{[^{]*({.*$)/.exec(text);
 
 			return match?.[1];
 		}
