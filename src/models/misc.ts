@@ -15,4 +15,35 @@ type ErrorMsg = {
 	lineNumber: number;
 };
 
-export type {CurrentProofStateType, CurrentPageContentType, ErrorMsg};
+type LawType = {
+	hoareLaws: {
+		hskip: string;
+	};
+	other: {
+		arith: string;
+	};
+};
+
+type LawTypeKeys = keyof LawType['hoareLaws'] | keyof LawType['other'];
+
+type DiagnosticsType = {
+	isValid: boolean;
+	errors: string[];
+};
+
+type RegexCheckItem = {
+	expression: RegExp;
+	message: string;
+};
+type AllRegexChecks = Record<string, RegexCheckItem>;
+
+export type {
+	CurrentProofStateType,
+	CurrentPageContentType,
+	ErrorMsg,
+	LawType,
+	LawTypeKeys,
+	DiagnosticsType,
+	RegexCheckItem,
+	AllRegexChecks,
+};
