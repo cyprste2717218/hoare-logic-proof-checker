@@ -1,4 +1,6 @@
 import type {LawTypeKeys} from '@/models/misc';
+import {validRegexFormats} from '@/lib/regex-formats';
+import {checkLawGroup} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format';
 
 function isValidSuffix(suffix: unknown): suffix is LawTypeKeys {
 	return (
@@ -22,8 +24,17 @@ function checkLawIsPassed(textLine: string, suffix: LawTypeKeys): boolean {
 		return false;
 	}
 
+	console.log('gets to here');
+
 	try {
-		const regExPattern = new RegExp(`^.*:${suffix}\\s+\\d+(?:\\s+\\d+)?$`);
+		console.log('gets to here as well');
+		const lawGroup = checkLawGroup(suffix);
+		const regexFormat = (validRegexFormats[lawGroup] as Record<string, string>)[
+			suffix
+		];
+		const regExPattern = new RegExp(regexFormat);
+		console.log('this is the regExPattern:', regExPattern);
+		console.log(regExPattern.test(textLine));
 		return regExPattern.test(textLine);
 	} catch {
 		return false;

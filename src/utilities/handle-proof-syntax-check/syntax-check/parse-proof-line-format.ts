@@ -1,6 +1,19 @@
-import {type LawTypeKeys, type DiagnosticsType} from '@/models/misc';
+import {
+	type LawTypeKeys,
+	type LawType,
+	type DiagnosticsType,
+} from '@/models/misc';
 import {checkSpecificLawRegex} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format-utils/check-specific-law-regex';
 import {checkLawIsPassed} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format-utils/check-law-is-passed';
+import {validRegexFormats} from '@/lib/regex-formats';
+
+function checkLawGroup(key: LawTypeKeys): keyof LawType {
+	if (key in validRegexFormats.hoareLaws) {
+		return 'hoareLaws';
+	}
+
+	return 'other';
+}
 
 function parseProofLineFormat(
 	textLine: string,
@@ -37,4 +50,4 @@ function parseProofLineFormat(
 	return retrievedDiagnostics;
 }
 
-export {parseProofLineFormat};
+export {parseProofLineFormat, checkLawGroup};

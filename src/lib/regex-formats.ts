@@ -3,24 +3,24 @@ import type {LawType, AllRegexChecks} from '@/models/misc';
 
 const validRegexFormats: LawType = {
 	hoareLaws: {
-		// Pattern matches {expr1} expr2 {expr3} :hskip <int>
-		hskip: '/^\{([^{}]+)\}\s*([^{}]+)\s*\{([^{}]+)\}\s*:hskip\s+\d+$/',
-		// Pattern matches {expr1} expr2 {expr3} :hseq <int>
-		hseq: '/^\{([^{}]+)\}\s*([^{}]+)\s*\{([^{}]+)\}\s*:hseq\s+\d+$/',
-		// Pattern matches {expr1} expr2 {expr3} :hassign <int>
-		hassign: '/^\{([^{}]+)\}\s*([^{}]+)\s*\{([^{}]+)\}\s*:hassign\s+\d+$/',
-		// Pattern matches {expr1} expr2 {expr3} :hcond <int> <int>
-		hcond: '/.*:hcond\s*[0-9]{1,2}\s*[0-9]{1,2}$/',
-		// Pattern matches {expr1} expr2 {expr3} :hwhile <int>
-		hwhile: '/^\{([^{}]+)\}\s*([^{}]+)\s*\{([^{}]+)\}\s*:hskip\s+\d+$/',
+		// Pattern matches: expr1 :hskip <int>
+		hskip: '.*:hskip\\s*[0-9]{1,2}$',
+		// Pattern matches: expr1 :hseq <int>
+		hseq: '.*:hseq\\s*[0-9]{1,2}$',
+		// Pattern matches: expr1 :hassign <int>
+		hassign: '.*:hassign\\s*[0-9]{1,2}$',
+		// Pattern matches: expr1 :hcond <int> <int>
+		hcond: '.*:hcond\\s*[0-9]{1,2}\s*[0-9]{1,2}$',
+		// Pattern matches: expr1 :hwhile <int>
+		hwhile: '.*:hwhile\\s*[0-9]{1,2}$',
 	},
 	other: {
 		// Pattern matches: expr1 :arith
-		arith: '/.*:arith$/',
+		arith: '.*:arith$',
 		// Pattern matches: expr1 :subst <int>
-		subst: '/.*:subst\s*[0-9]{1,2}$/',
+		subst: '.*:subst\\s*[0-9]{1,2}$',
 		// Pattern matches: expr1 :simpf <int>
-		simpf: '/.*:simpf\s*[0-9]{1,2}$/',
+		simpf: '.*:simpf\\s*[0-9]{1,2}$',
 	},
 };
 
