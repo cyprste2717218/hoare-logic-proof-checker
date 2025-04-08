@@ -25,6 +25,36 @@ function getRelevantChecks(law: LawTypeKeys): AllRegexChecks {
 			break;
 		}
 
+		case 'hassign': {
+			lawChecksList = [''];
+			break;
+		}
+
+		case 'hcond': {
+			lawChecksList = [''];
+			break;
+		}
+
+		case 'hseq': {
+			lawChecksList = [''];
+			break;
+		}
+
+		case 'hwhile': {
+			lawChecksList = [''];
+			break;
+		}
+
+		case 'subst': {
+			lawChecksList = [''];
+			break;
+		}
+
+		case 'simpf': {
+			lawChecksList = [''];
+			break;
+		}
+
 		case 'arith': {
 			lawChecksList = [];
 			break;
@@ -57,7 +87,7 @@ function doLawSpecificChecks(
 	}
 
 	// Note: will likely need to add, checks param to this call as with doHoareLawChecks func
-	const diagnostics: DiagnosticsType = doOtherLawChecks(textLine);
+	const diagnostics: DiagnosticsType = doOtherLawChecks(textLine, law);
 	return diagnostics;
 }
 
