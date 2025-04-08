@@ -10,4 +10,46 @@ type CurrentPageContentType =
 	| 'Reference Guide'
 	| 'Settings';
 
-export type {CurrentProofStateType, CurrentPageContentType};
+type ErrorMsg = {
+	messages: string[];
+	lineNumber: number;
+};
+
+type LawType = {
+	hoareLaws: {
+		hskip: string;
+		hassign: string;
+		hcond: string;
+		hseq: string;
+		hwhile: string;
+	};
+	other: {
+		arith: string;
+		subst: string;
+		simpf: string;
+	};
+};
+
+type LawTypeKeys = keyof LawType['hoareLaws'] | keyof LawType['other'];
+
+type DiagnosticsType = {
+	isValid: boolean;
+	errors: string[];
+};
+
+type RegexCheckItem = {
+	expression: RegExp;
+	message: string;
+};
+type AllRegexChecks = Record<string, RegexCheckItem>;
+
+export type {
+	CurrentProofStateType,
+	CurrentPageContentType,
+	ErrorMsg,
+	LawType,
+	LawTypeKeys,
+	DiagnosticsType,
+	RegexCheckItem,
+	AllRegexChecks,
+};

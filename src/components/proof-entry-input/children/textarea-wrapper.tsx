@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useMemo, useRef, useEffect, useState} from 'react';
 import {cn} from '@/lib/utils';
-import {type CurrentProofStateType} from '@/models/misc';
+import {type CurrentProofStateType, type ErrorMsg} from '@/models/misc';
 import {
 	options,
 	type CommonProps as BorderStylesType,
@@ -11,6 +11,7 @@ import {
 	LineNumbers,
 	LineNumber,
 } from '@/components/proof-entry-input/children/line-numbers';
+import {AllErrorHoverCards} from '@/components/proof-entry-input/children/error-hovercard';
 import {CustomTextArea} from '@/components/proof-entry-input/children/custom-textarea';
 
 type WrapperTextAreaProps = {
@@ -23,10 +24,12 @@ type TextAreaProps = {
 	name?: string;
 	currentProofState: CurrentProofStateType;
 	proofContent: string;
+	proofErrors: ErrorMsg[];
 	setCurrentProofState: React.Dispatch<
 		React.SetStateAction<CurrentProofStateType>
 	>;
 	setProofContent: React.Dispatch<React.SetStateAction<string>>;
+	setProofErrors: React.Dispatch<React.SetStateAction<ErrorMsg[]>>;
 } & React.ComponentProps<'textarea'>;
 
 function TextAreaWrapper({
@@ -36,8 +39,10 @@ function TextAreaWrapper({
 	name,
 	currentProofState,
 	proofContent,
+	proofErrors,
 	setCurrentProofState,
 	setProofContent,
+	setProofErrors,
 	...props
 }: TextAreaProps) {
 	useEffect(() => {
@@ -88,6 +93,7 @@ function TextAreaWrapper({
 
 	const onValueChange = (value: string) => {
 		setProofContent(value);
+		setProofErrors([]);
 		setCurrentProofState('Unchecked - Change Present');
 	};
 
@@ -122,11 +128,16 @@ function TextAreaWrapper({
 					name={name}
 					proofContent={proofContent}
 					handleTextAreaChange={handleTextAreaChange}
-					textAreaRef={textAreaRef}
+					ref={textAreaRef}
 					handleTextAreaScroll={handleTextAreaScroll}
 					placeholder={placeholder}
 					className={cn(customBorderStyles)}
 					{...props}
+				/>
+				<AllErrorHoverCards
+					className={cn(customBorderStyles)}
+					errorMessages={proofErrors}
+					totalNumLines={lineCount}
 				/>
 			</div>
 			<ProofOutcomeText currentProofState={currentProofState} />
