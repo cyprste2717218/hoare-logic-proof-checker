@@ -8,9 +8,9 @@ type HandleProofCheckProps = {
 };
 
 type HandleProofSyntaxCheckProps = {
-	formattedProofLines: string[]
-	syntaxErrors: ErrorMsg[]
-}
+	formattedProofLines: string[];
+	syntaxErrors: ErrorMsg[];
+};
 
 function handleProofSyntaxCheck({
 	proofContent,
@@ -41,7 +41,7 @@ function handleProofSyntaxCheck({
 		console.log('Proof adheres to syntax');
 	}
 
-	return { syntaxErrors: errors, formattedProofLines: formattedProofLines};
+	return {syntaxErrors: errors, formattedProofLines};
 }
 
 export {handleProofSyntaxCheck};

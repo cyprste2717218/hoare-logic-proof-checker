@@ -2,7 +2,10 @@ import ProofEntryInput from '../../proof-entry-input/proof-entry-input';
 import {HoareTripleInput} from '../../hoare-triple-input/hoare-triple-input';
 import {Button} from '@/components/base/button.js';
 import type {CurrentProofStateType, ErrorMsg} from '@/models/misc';
-import {handleCheckProofValidity, handleProofSyntaxCheck} from '@/utilities/proof-handle-utilities';
+import {
+	handleCheckProofValidity,
+	handleProofSyntaxCheck,
+} from '@/utilities/proof-handle-utilities';
 
 type HoareLogicProofValidatorProps = {
 	currentProofState: CurrentProofStateType;
@@ -24,18 +27,19 @@ function HoareLogicProofValidator({
 	setProofErrors,
 }: HoareLogicProofValidatorProps) {
 	const handleClick = () => {
-
-		// retrieve and set any syntax errors in proof
-		const {syntaxErrors, formattedProofLines} = handleProofSyntaxCheck({proofContent})
+		// Retrieve and set any syntax errors in proof
+		const {syntaxErrors, formattedProofLines} = handleProofSyntaxCheck({
+			proofContent,
+		});
 		if (syntaxErrors.length > 0) {
 			setCurrentProofState('Invalid - Syntax Error');
 			setProofErrors(syntaxErrors);
-			return
+			return;
 		}
 
-		// no syntax errors detected so passing formatted (i.e. whitespace trimmed) proof lines to overall proof validity checker func
+		// No syntax errors detected so passing formatted (i.e. whitespace trimmed) proof lines to overall proof validity checker func
 
-		handleCheckProofValidity(formattedProofLines)
+		handleCheckProofValidity(formattedProofLines);
 	};
 
 	return (

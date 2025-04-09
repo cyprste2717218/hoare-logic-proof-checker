@@ -34,7 +34,7 @@ type LawTypeHoare = keyof LawType['hoareLaws'];
 
 type LawTypeOther = keyof LawType['other'];
 
-type LawTypeKeys = LawTypeHoare | LawTypeOther
+type LawTypeKeys = LawTypeHoare | LawTypeOther;
 
 type DiagnosticsType = {
 	isValid: boolean;
