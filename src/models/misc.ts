@@ -30,7 +30,11 @@ type LawType = {
 	};
 };
 
-type LawTypeKeys = keyof LawType['hoareLaws'] | keyof LawType['other'];
+type LawTypeHoare = keyof LawType['hoareLaws'];
+
+type LawTypeOther = keyof LawType['other'];
+
+type LawTypeKeys = LawTypeHoare | LawTypeOther
 
 type DiagnosticsType = {
 	isValid: boolean;
@@ -48,6 +52,8 @@ export type {
 	CurrentPageContentType,
 	ErrorMsg,
 	LawType,
+	LawTypeHoare,
+	LawTypeOther,
 	LawTypeKeys,
 	DiagnosticsType,
 	RegexCheckItem,
