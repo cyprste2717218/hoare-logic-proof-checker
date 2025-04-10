@@ -1,4 +1,7 @@
-// Import {init} from 'z3-solver';
+import {init} from 'z3-solver';
+const { Context } = await init();
+// @ts-ignore
+const { Solver, Int } = new Context('main');
 import type {CollectedTripleProofLines} from '@/models/misc';
 import type {
 	HoareLawStructure,
@@ -13,7 +16,10 @@ function checkHskipLawProof(
 		expr1: string;
 		expr2: string;
 	}): boolean {
+		
+		
 		// Parsing expr1 and expr2 into individual characters
+
 
 		const {expr1, expr2} = arithObj;
 
@@ -24,12 +30,9 @@ function checkHskipLawProof(
 		console.log('expression2 chars:', expr2Chars);
 
 		// Revise below to make fit the function
-		/* 	const sort = Z3.Int.sort();
-		const x = Z3.Int.const('x');
-		const y = Z3.Int.const('y');
-		const g = Z3.Function.declare('g', sort, sort);
-		const conjecture = Z3.Implies(x.eq(y), g.call(x).eq(g.call(y)));
-		Z3.solve(Z3.Not(conjecture)); */
+		const x = Int.const('x');
+		const y = Int.const('y');
+		console.log('x:', x)
 
 		return false;
 	}

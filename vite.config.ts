@@ -6,6 +6,9 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  define: {
+    global: 'window'
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -23,17 +26,4 @@ export default defineConfig({
       'Cross-Origin-Embedder-Policy': 'require-corp'
     }
   },
-  build: {
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          // Preserve z3-built.js filename
-          if (assetInfo.name === 'z3-built.js') {
-            return 'z3-built.js';
-          }
-          return 'assets/[name]-[hash][extname]';
-        }
-      }
-    }
-  }
 })
