@@ -1,28 +1,9 @@
 import type {CollectedTripleProofLines} from '@/models/misc';
-
-type ProofLawDetails = {
-	arith: {
-		expr1: string;
-		expr2: string;
-	};
-	hskip: {
-		precondition: string;
-		program: string;
-		postcondition: string;
-	};
-};
-
-type HoareLawStructure = {
-	precondition: string;
-	program: string;
-	postcondition: string;
-};
-
-type OtherLawStructure = {
-	expr1: string;
-	operator: string;
-	expr2: string;
-};
+import type {
+	HoareLawStructure,
+	OtherLawStructure,
+	ProofLawDetails,
+} from '@/models/hoare-law-z3-models';
 
 function checkHskipLawProof(
 	collectedTripleProofDetails: CollectedTripleProofLines,
