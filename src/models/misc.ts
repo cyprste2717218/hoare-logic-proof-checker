@@ -45,7 +45,25 @@ type RegexCheckItem = {
 	expression: RegExp;
 	message: string;
 };
+
 type AllRegexChecks = Record<string, RegexCheckItem>;
+
+type GetHoareLawCallDetailsType = {
+	law: LawTypeHoare;
+	proofLine: string;
+	lineNum: number;
+};
+
+type CollectedTripleProofLines = {
+	hoareLaw: {
+		lawName: LawTypeHoare;
+		line: string;
+	};
+	supportingProofLine: {
+		lawName: LawTypeOther;
+		line: string;
+	};
+};
 
 export type {
 	CurrentProofStateType,
@@ -58,4 +76,6 @@ export type {
 	DiagnosticsType,
 	RegexCheckItem,
 	AllRegexChecks,
+	GetHoareLawCallDetailsType,
+	CollectedTripleProofLines,
 };

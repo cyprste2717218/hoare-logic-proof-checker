@@ -39,7 +39,16 @@ function HoareLogicProofValidator({
 
 		// No syntax errors detected so passing formatted (i.e. whitespace trimmed) proof lines to overall proof validity checker func
 
-		handleCheckProofValidity(formattedProofLines);
+		const proofValidityCheck: boolean =
+			handleCheckProofValidity(formattedProofLines);
+
+		// Checking if overall proof is valid or not, setting CurrentProofState state accordingly
+
+		if (proofValidityCheck) {
+			setCurrentProofState('Valid');
+		} else {
+			setCurrentProofState('Invalid - Proof Error');
+		}
 	};
 
 	return (
