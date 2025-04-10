@@ -33,6 +33,7 @@ function checkHskipLawProof(
 		const x = Int.const('x');
 		const y = Int.const('y');
 		console.log('x:', x)
+		console.log('y:', y)
 
 		return false;
 	}
