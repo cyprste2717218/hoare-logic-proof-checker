@@ -1,4 +1,4 @@
-import {init} from 'z3-solver';
+// Import {init} from 'z3-solver';
 import type {CollectedTripleProofLines} from '@/models/misc';
 import type {
 	HoareLawStructure,
