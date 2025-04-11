@@ -1,41 +1,123 @@
-import {init} from 'z3-solver';
-const { Context } = await init();
-// @ts-ignore
-const { Solver, Int } = new Context('main');
-import type {CollectedTripleProofLines} from '@/models/misc';
+// @ts-nocheck
+
+// @ts-expect-error
+import { init, sat } from 'z3-solver';
+import type { CollectedTripleProofLines } from '@/models/misc';
 import type {
 	HoareLawStructure,
 	OtherLawStructure,
 	ProofLawDetails,
 } from '@/models/hoare-law-z3-models';
 
-function checkHskipLawProof(
+
+// @ts-expect-error z3 package doesn't provide typing for these constructs at current v4.14.1
+const { Solver, Int, Not, Implies, And, Bool } = new Context('main');
+
+async function checkHskipLawProof(
 	collectedTripleProofDetails: CollectedTripleProofLines,
-): boolean {
-	function checkArithLawCallValidity(arithObj: {
+): Promise<boolean> {
+	async function checkArithLawCallValidity(arithObj: {
 		expr1: string;
 		expr2: string;
-	}): boolean {
-		
-		
-		// Parsing expr1 and expr2 into individual characters
+	}): Promise<boolean> {
+		async function waitforSolverRes(
+			rightExpr1: number,
+			rightExpr2: number,
+		): Promise<boolean> {
 
 
-		const {expr1, expr2} = arithObj;
+			const { Context } = await init();
 
-		const expr1Chars = expr1.split('');
-		const expr2Chars = expr2.split('');
+			const isTrue = Bool.const('isTrue');
+			const x = Int.const('x');
+			const y = Int.const('y');
 
-		console.log('expression1 chars:', expr1Chars);
-		console.log('expression2 chars:', expr2Chars);
+			const firstStatement = And(x.gt(rightExpr1 - 1), x.lt(rightExpr1 + 1));
+			const secondStatement = And(y.gt(rightExpr2 - 1), y.lt(rightExpr2 + 1));
+			const thirdStatement = isTrue.eq(true);
 
-		// Revise below to make fit the function
-		const x = Int.const('x');
-		const y = Int.const('y');
-		console.log('x:', x)
-		console.log('y:', y)
+			const solver = new Solver();
+			// Solver.add(firstImplies)
+			// solver.add(Implies(firstImplies, secondImplies));
+			// solver.add(Not(x.add(2).le(y.sub(10)))); // x + 2 <= y - 10
 
-		return false;
+			solver.add(firstStatement, secondStatement);
+			solver.add(
+				And(thirdStatement, Implies(firstStatement, secondStatement)).eq(true),
+			);
+
+			const result = await solver.check();
+
+			if (result === 'sat') {
+				const model = solver.model();
+				const xValue = model.get(x).toString();
+				const yValue = model.get(y).toString();
+				console.log('xValue:', xValue);
+				console.log('yValue:', yValue);
+
+				// Check xValue and yValue found to satisfy constraints are the same as rightExpr1 and rightExpr2
+
+				if (xValue === rightExpr1 && yValue === rightExpr2) {
+					return true;
+				}
+
+				console.error(
+					"Error: Values discovered to satisfy constraints for arith law call in skip law call proof don't match ones passed to method, hence not a display of validity in this instance",
+				);
+				return false;
+			}
+
+			return false;
+		}
+
+		function splitAroundEquals(text: string): {
+			leftSide: string;
+			rightSide: string;
+		} {
+			// Remove any whitespace from the beginning and end
+			const trimmedText = text.trim();
+
+			// Split the string at the '=' sign
+			const parts = trimmedText.split('=');
+
+			// If there's no '=' sign, return empty strings
+			if (parts.length < 2) {
+				return {
+					leftSide: '',
+					rightSide: '',
+				};
+			}
+
+			// Return an object with the left and right sides, trimmed of whitespace
+			return {
+				leftSide: parts[0].trim(),
+				rightSide: parts.slice(1).join('=').trim(), // Join remaining parts in case there are multiple '=' signs
+			};
+		}
+
+		// Parsing expr1 andn expr2 for number on right handside of respective equal statements
+
+		const { expr1, expr2 } = arithObj;
+
+		const rightExpr1 = Number(splitAroundEquals(expr1).rightSide);
+		const rightExpr2 = Number(splitAroundEquals(expr2).rightSide);
+
+		console.log('expression1 right expr:', rightExpr1);
+		console.log('expression2 right expr', rightExpr2);
+
+		// Dispatching to Z3 to check satisfiability of overall implication statement
+		const dispatchResult: boolean = await waitforSolverRes(
+			rightExpr1,
+			rightExpr2,
+		);
+
+		if (!dispatchResult) {
+			console.log('sat checker of arith law returned invalid result');
+			return false;
+		}
+
+		console.log('sat checker of arith law returned valid result');
+		return true;
 	}
 
 	function doSkipLawChecks(
@@ -91,11 +173,11 @@ function checkHskipLawProof(
 		const arithProofLine: string =
 			formattedProofContent.supportingProofLine.line;
 		console.log('arithProofLine before being sent:', arithProofLine);
-		const {expr1, expr2} = decomposeArithLawLine(arithProofLine);
+		const { expr1, expr2 } = decomposeArithLawLine(arithProofLine);
 
 		const skipLawProofLine: string = formattedProofContent.hoareLaw.line;
 		console.log('skipLawProofLine before being sent:', skipLawProofLine);
-		const {precondition, program, postcondition} =
+		const { precondition, program, postcondition } =
 			decomposeSkipLawLine(skipLawProofLine);
 
 		// Check arith law proof line has same expression before and after ->
@@ -159,10 +241,25 @@ function checkHskipLawProof(
 	}
 
 	// Given previous check passes, check if arith proof line is valid via discharge to Z3 SMT solver (i.e. checking validity of implies statement)
-	const arithLawCheckResult: boolean = checkArithLawCallValidity(
-		passedSkipLawChecks.arith,
-	);
 
+	let arithLawCheckResult: boolean;
+
+	try {
+		const pendingArithLawCheckResult: boolean = await checkArithLawCallValidity(
+			passedSkipLawChecks.arith,
+		);
+		arithLawCheckResult = pendingArithLawCheckResult;
+
+		if (!(arithLawCheckResult || !arithLawCheckResult)) {
+			// To-do: need to display a system error banner in UI with this error message in this situation
+			throw new Error(
+				'Error: Checking Arith law call validity function didnt return a boolean value',
+			);
+		}
+	} catch (error) {
+		console.error('arith law check failed:', error);
+		return false;
+	}
 	// Return proof as valid if arithLawCheckResult is true, otherwise proof is invalid
 
 	if (!arithLawCheckResult) {
@@ -173,4 +270,4 @@ function checkHskipLawProof(
 	return true;
 }
 
-export {checkHskipLawProof};
+export { checkHskipLawProof };

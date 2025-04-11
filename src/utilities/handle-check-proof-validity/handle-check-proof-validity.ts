@@ -1,7 +1,9 @@
 import {getTripleValidityArr} from '@/utilities/handle-check-proof-validity/validity-check-utils/get-triple-validity-arr';
 
-function handleCheckProofValidity(formattedProofContent: string[]): boolean {
-	const tripleValidityArr: boolean[] = getTripleValidityArr(
+async function handleCheckProofValidity(
+	formattedProofContent: string[],
+): Promise<boolean> {
+	const tripleValidityArr: boolean[] = await getTripleValidityArr(
 		formattedProofContent,
 	);
 

@@ -6,10 +6,10 @@ import type {
 	CollectedTripleProofLines,
 } from '@/models/misc';
 
-function validateHoareTripleProof(
+async function validateHoareTripleProof(
 	hoareLawCallDetails: GetHoareLawCallDetailsType | undefined,
 	formattedProofContent: string[],
-): boolean {
+): Promise<boolean> {
 	// Find line location of first hoare law call
 
 	console.log('hoareLawCallDetails:', hoareLawCallDetails);
@@ -47,7 +47,7 @@ function validateHoareTripleProof(
 		},
 	};
 
-	const checkProofTripleValidity: boolean = decomposeProofLines(
+	const checkProofTripleValidity: boolean = await decomposeProofLines(
 		collectedTripleProofDetails,
 	);
 

@@ -1,12 +1,12 @@
 import {checkHskipLawProof} from '@/utilities/handle-check-proof-validity/validity-check-utils/validate-hoare-triple-proof/hoare-law-z3-solver-funcs';
 import type {CollectedTripleProofLines} from '@/models/misc';
 
-function decomposeProofLines(
+async function decomposeProofLines(
 	collectedTripleProofDetails: CollectedTripleProofLines,
-): boolean {
-	function performLawSpecificSteps(
+): Promise<boolean> {
+	async function performLawSpecificSteps(
 		collectedTripleProofDetails: CollectedTripleProofLines,
-	): boolean {
+	): Promise<boolean> {
 		const passedHoareLawName = collectedTripleProofDetails.hoareLaw.lawName;
 
 		if (passedHoareLawName === 'hskip') {
@@ -14,7 +14,7 @@ function decomposeProofLines(
 				'gets to here in performLawSpecificSteps:',
 				passedHoareLawName,
 			);
-			const checkHskipProofOutcome: boolean = checkHskipLawProof(
+			const checkHskipProofOutcome: boolean = await checkHskipLawProof(
 				collectedTripleProofDetails,
 			);
 
@@ -25,7 +25,7 @@ function decomposeProofLines(
 		return false;
 	}
 
-	const checkTripleProofOutcome: boolean = performLawSpecificSteps(
+	const checkTripleProofOutcome: boolean = await performLawSpecificSteps(
 		collectedTripleProofDetails,
 	);
 

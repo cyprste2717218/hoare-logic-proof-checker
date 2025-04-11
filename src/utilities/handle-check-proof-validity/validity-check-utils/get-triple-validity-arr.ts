@@ -26,7 +26,9 @@ function getHoareLawCallDetails(
 	return undefined;
 }
 
-function getTripleValidityArr(formattedProofContent: string[]): boolean[] {
+async function getTripleValidityArr(
+	formattedProofContent: string[],
+): Promise<boolean[]> {
 	// Iterate through each hoare triple and check validity, if valid concatenate into boolean array
 
 	const tripleValidityArr: boolean[] = [];
@@ -39,7 +41,7 @@ function getTripleValidityArr(formattedProofContent: string[]): boolean[] {
 			);
 
 		if (checkHoareLawCallResult) {
-			const tripleValidResult: boolean = validateHoareTripleProof(
+			const tripleValidResult: boolean = await validateHoareTripleProof(
 				checkHoareLawCallResult,
 				formattedProofContent,
 			);

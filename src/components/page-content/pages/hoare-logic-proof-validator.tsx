@@ -26,7 +26,7 @@ function HoareLogicProofValidator({
 	setProofContent,
 	setProofErrors,
 }: HoareLogicProofValidatorProps) {
-	const handleClick = () => {
+	const handleClick = async () => {
 		// Retrieve and set any syntax errors in proof
 		const {syntaxErrors, formattedProofLines} = handleProofSyntaxCheck({
 			proofContent,
@@ -40,7 +40,7 @@ function HoareLogicProofValidator({
 		// No syntax errors detected so passing formatted (i.e. whitespace trimmed) proof lines to overall proof validity checker func
 
 		const proofValidityCheck: boolean =
-			handleCheckProofValidity(formattedProofLines);
+			await handleCheckProofValidity(formattedProofLines);
 
 		// Checking if overall proof is valid or not, setting CurrentProofState state accordingly
 
