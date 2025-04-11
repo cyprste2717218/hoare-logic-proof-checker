@@ -10,8 +10,6 @@ import type {
 } from '@/models/hoare-law-z3-models';
 
 
-// @ts-expect-error z3 package doesn't provide typing for these constructs at current v4.14.1
-const { Solver, Int, Not, Implies, And, Bool } = new Context('main');
 
 async function checkHskipLawProof(
 	collectedTripleProofDetails: CollectedTripleProofLines,
@@ -27,6 +25,10 @@ async function checkHskipLawProof(
 
 
 			const { Context } = await init();
+
+			// @ts-expect-error z3 package doesn't provide typing for these constructs at current v4.14.1
+			const { Solver, Int, Not, Implies, And, Bool } = new Context('main');
+
 
 			const isTrue = Bool.const('isTrue');
 			const x = Int.const('x');
