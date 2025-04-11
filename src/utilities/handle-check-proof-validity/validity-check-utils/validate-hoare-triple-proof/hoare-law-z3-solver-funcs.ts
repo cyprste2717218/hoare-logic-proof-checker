@@ -59,7 +59,7 @@ async function checkHskipLawProof(
 
 				// Check xValue and yValue found to satisfy constraints are the same as rightExpr1 and rightExpr2
 
-				if (xValue === rightExpr1 && yValue === rightExpr2) {
+				if (Number(xValue) === rightExpr1 && Number(yValue) === rightExpr2) {
 					return true;
 				}
 
