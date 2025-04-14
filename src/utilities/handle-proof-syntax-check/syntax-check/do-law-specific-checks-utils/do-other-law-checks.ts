@@ -11,8 +11,10 @@ function doOtherLawChecks(textLine: string, law: LawTypeKeys): DiagnosticsType {
 			return match ? match[1] : '';
 		}
 
+		// Checks that :arith call is of the form <char>=<int> /\ <char>=<int>... -> <char>=<int> /\ <char>=<int> ... e.g. x=1 => x=1, x=2 /\ y=2 -> x=2 /\ y=2
 		function checkArrowFormat(textLine: string): boolean {
-			const pattern = /^[a-zA-Z]=\d{1,2}\s*->\s*[a-zA-Z]=\d{1,2}\s*$/;
+			const pattern =
+				/^([a-zA-Z]=\d{1,2}(\s*\/\\\s*[a-zA-Z]=\d{1,2})*)\s*->\s*([a-zA-Z]=\d{1,2}(\s*\/\\\s*[a-zA-Z]=\d{1,2})*)\s*$/;
 			return pattern.test(textLine);
 		}
 
