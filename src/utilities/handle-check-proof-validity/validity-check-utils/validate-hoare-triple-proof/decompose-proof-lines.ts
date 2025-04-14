@@ -1,4 +1,4 @@
-import {checkHskipLawProof} from '@/utilities/handle-check-proof-validity/validity-check-utils/validate-hoare-triple-proof/hoare-law-z3-solver-funcs';
+import {checkHskipLawProof} from '@/utilities/handle-check-proof-validity/z3-logic/hoare-law-z3-solver-funcs';
 import type {CollectedTripleProofLines} from '@/models/misc';
 
 async function decomposeProofLines(
