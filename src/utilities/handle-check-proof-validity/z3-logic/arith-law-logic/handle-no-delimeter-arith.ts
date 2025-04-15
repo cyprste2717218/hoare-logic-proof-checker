@@ -16,20 +16,18 @@ async function handleNoDelimeterZ3Logic(
 
 	// @ts-expect-error z3 package doesn't provide typing for these constructs at current v4.14.1
 	const {Solver, Int, Not, Implies, And, Bool} = new Context('main');
-
-	const isTrue = Bool.const('isTrue');
 	const x = Int.const('x');
 
-	const firstStatement = And(x.gt(rightExpr1 - 1), x.lt(rightExpr1 + 1));
-	const secondStatement = And(x.gt(rightExpr2 - 1), x.lt(rightExpr2 + 1)); // Should be the exact same bounds as in firstStatement
-	const thirdStatement = isTrue.eq(true);
-
+	const firstStatement = And(x.gt(rightExpr1 - 1), x.lt(rightExpr1 + 1)).eq(
+		true,
+	);
+	const secondStatement = And(x.gt(rightExpr2 - 1), x.lt(rightExpr2 + 1)).eq(
+		true,
+	); // Should be the exact same bounds as in firstStatement
 	const solver = new Solver();
 
 	solver.add(firstStatement, secondStatement);
-	solver.add(
-		And(thirdStatement, Implies(firstStatement, secondStatement)).eq(true),
-	);
+	solver.add(Implies(firstStatement, secondStatement).eq(true));
 
 	const result = await solver.check();
 
