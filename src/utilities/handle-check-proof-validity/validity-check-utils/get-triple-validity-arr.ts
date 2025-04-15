@@ -51,6 +51,14 @@ async function getTripleValidityArr(
 		}
 	}
 
+	/* No hoare triple calls detected but getting here means syntax check passed, so expression is likely made up of otherLaw calls, i.e. arith, simf, subst statements only, hence tripleValidityArr should be empty. Need to return false as not a valid proof for a hoare triple. 
+	Note: May want to alter the action taken here to describe the issue as described to the user, leaving for now however
+	*/
+	if (tripleValidityArr.length === 0) {
+		console.log('no hoare triple calls detected so sending invalid response');
+		return [false];
+	}
+
 	return tripleValidityArr;
 }
 

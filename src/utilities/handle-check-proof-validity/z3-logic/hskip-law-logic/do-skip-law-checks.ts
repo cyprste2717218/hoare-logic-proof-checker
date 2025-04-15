@@ -66,6 +66,9 @@ function doSkipLawChecks(
 
 	// Check arith law proof line has same expression before and after ->
 	if (expr1 !== expr2) {
+		console.error(
+			`${expr1} does not match ${expr2}: first equality check failed - expression before -> does not match expression after`,
+		);
 		return;
 	}
 
@@ -75,6 +78,9 @@ function doSkipLawChecks(
 
 	// Check precondition is same as postcondition
 	if (precondition !== postcondition) {
+		console.error(
+			`${precondition} does not match ${postcondition}: second equality check failed - precondition does not match postcondition`,
+		);
 		return;
 	}
 
@@ -84,6 +90,9 @@ function doSkipLawChecks(
 
 	// Check program is same as precondition (comparing to precondition or postcondition is of no impact here, equivalent result either way)
 	if (program !== precondition) {
+		console.error(
+			`${program} does not match ${precondition}: third equality check failed - hskip of program and precond`,
+		);
 		return;
 	}
 
@@ -93,6 +102,9 @@ function doSkipLawChecks(
 
 	// Check statement in arith call is the same as the precondition and postcondition
 	if (expr1 !== precondition) {
+		console.error(
+			`${expr1} does not match ${precondition}: fourth equality check failed - statement in arith call is not the same in precondition and postcondition`,
+		);
 		return;
 	}
 

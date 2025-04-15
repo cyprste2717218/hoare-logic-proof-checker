@@ -22,4 +22,20 @@ type OtherLawStructure = {
 	expr2: string;
 };
 
-export type {ProofLawDetails, HoareLawStructure, OtherLawStructure};
+type ArithObjType = {
+	expr1: string;
+	expr2: string;
+};
+
+type EqualsSplitReturnObjType = {
+	variable: string;
+	variableValue: string;
+};
+
+export type {
+	ProofLawDetails,
+	HoareLawStructure,
+	OtherLawStructure,
+	ArithObjType,
+	EqualsSplitReturnObjType,
+};

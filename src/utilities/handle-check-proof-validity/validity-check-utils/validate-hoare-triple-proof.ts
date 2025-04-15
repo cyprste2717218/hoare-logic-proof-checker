@@ -10,11 +10,9 @@ async function validateHoareTripleProof(
 	hoareLawCallDetails: GetHoareLawCallDetailsType | undefined,
 	formattedProofContent: string[],
 ): Promise<boolean> {
-	// Find line location of first hoare law call
-
 	console.log('hoareLawCallDetails:', hoareLawCallDetails);
 
-	// Early return if no hoare law call detected, hence no hoare logic proof to validate
+	// Early return if no hoare law call details passed, hence no hoare logic proof to validate
 	if (!hoareLawCallDetails) {
 		console.error('No hoare law call detected in proof content');
 		return false;

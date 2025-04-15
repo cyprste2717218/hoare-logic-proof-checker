@@ -18,32 +18,23 @@ async function checkHskipLawProof(
 
 	// Given previous check passes, check if arith proof line is valid via discharge to Z3 SMT solver (i.e. checking validity of implies statement)
 
-	let arithLawCheckResult: boolean;
-
+	// Return proof as valid if arithLawCheckResult is true, otherwise proof is invalid
 	try {
-		const pendingArithLawCheckResult: boolean = await checkArithLawCallValidity(
+		const arithLawCheckResult: boolean = await checkArithLawCallValidity(
 			passedSkipLawChecks.arith,
 		);
-		arithLawCheckResult = pendingArithLawCheckResult;
 
-		if (!(arithLawCheckResult || !arithLawCheckResult)) {
-			// To-do: need to display a system error banner in UI with this error message in this situation
-			throw new Error(
-				'Error: Checking Arith law call validity function didnt return a boolean value',
-			);
+		if (arithLawCheckResult) {
+			console.log('arith law proof line validity check passed!');
+			return arithLawCheckResult;
 		}
+
+		throw new Error(`arithLawCheckResult returned ${arithLawCheckResult}`);
 	} catch (error) {
+		// To-do: need to display a system error banner in UI with this error message in this situation
 		console.error('arith law check failed:', error);
 		return false;
 	}
-	// Return proof as valid if arithLawCheckResult is true, otherwise proof is invalid
-
-	if (!arithLawCheckResult) {
-		return false;
-	}
-
-	console.log('arith law proof line validity check passed!');
-	return true;
 }
 
 export {checkHskipLawProof};
