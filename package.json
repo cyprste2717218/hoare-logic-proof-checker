@@ -8,6 +8,9 @@
     "build": "tsc -b && vite build",
     "lint": "xo --prettier src/**/*.{ts,tsx}",
     "lint-fix": "xo --prettier src/**/*.{ts,tsx} --fix",
+    "nuke": "npm run delete-pkgs && npm run clean-cache && npm install || exit 1 && npm run build",
+    "delete-pkgs": "rimraf node_modules dist",
+    "clean-cache": "npm cache clean --force",
     "preview": "vite preview",
     "prepare": "husky install",
     "test": "jest"
