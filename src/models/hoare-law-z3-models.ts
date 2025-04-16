@@ -27,15 +27,18 @@ type ArithObjType = {
 	expr2: string;
 };
 
-type EqualsSplitReturnObjType = {
+type SplitReturnObjType = {
 	variable: string;
 	variableValue: string;
 };
+
+type SplitOperatorType = '=' | '>' | '<' | '<=' | '>=';
 
 export type {
 	ProofLawDetails,
 	HoareLawStructure,
 	OtherLawStructure,
 	ArithObjType,
-	EqualsSplitReturnObjType,
+	SplitReturnObjType,
+	SplitOperatorType,
 };

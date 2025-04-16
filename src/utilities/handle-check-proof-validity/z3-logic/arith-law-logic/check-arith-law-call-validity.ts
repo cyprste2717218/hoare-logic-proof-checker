@@ -2,17 +2,21 @@ import {handleNoDelimeterArith} from '@/utilities/handle-check-proof-validity/z3
 import {handleAndDelimeterArith} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/handle-and-delimeter-arith';
 import type {
 	ArithObjType,
-	EqualsSplitReturnObjType,
+	SplitReturnObjType,
+	SplitOperatorType,
 } from '@/models/hoare-law-z3-models';
 
-function splitAroundEquals(text: string): EqualsSplitReturnObjType {
+function splitAroundOperator(
+	text: string,
+	splitOperator: SplitOperatorType,
+): SplitReturnObjType {
 	// Remove any whitespace from the beginning and end
 	const trimmedText = text.trim();
 
-	// Split the string at the '=' sign
-	const parts = trimmedText.split('=');
+	// Split the string at the operator, e.g. '=' sign
+	const parts = trimmedText.split(splitOperator);
 
-	// If there's no '=' sign, return empty strings
+	// If specified operator not present, return empty strings
 	if (parts.length < 2) {
 		return {
 			variable: '',
@@ -23,7 +27,7 @@ function splitAroundEquals(text: string): EqualsSplitReturnObjType {
 	// Return an object with the left and right sides, trimmed of whitespace
 	return {
 		variable: parts[0].trim(),
-		variableValue: parts.slice(1).join('=').trim(), // Join remaining parts in case there are multiple '=' signs
+		variableValue: parts.slice(1).join(splitOperator).trim(), // Join remaining parts in case there are multiple of same operator
 	};
 }
 
@@ -82,4 +86,4 @@ async function checkArithLawCallValidity(
 	return result;
 }
 
-export {checkArithLawCallValidity, splitAroundEquals};
+export {checkArithLawCallValidity, splitAroundOperator};

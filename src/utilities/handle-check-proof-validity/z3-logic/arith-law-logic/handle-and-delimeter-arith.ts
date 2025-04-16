@@ -4,17 +4,17 @@
 
 import type {
 	ArithObjType,
-	EqualsSplitReturnObjType,
+	SplitReturnObjType,
 } from '@/models/hoare-law-z3-models';
-import {splitAroundEquals} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/check-arith-law-call-validity';
+import {splitAroundOperator} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/check-arith-law-call-validity';
 import {
 	handleLengthTwoExpr,
 	handleLengthThreeExpr,
 } from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/z3-arith-funcs';
 
 async function handleAndDelimeterZ3Logic(
-	allLhsExpressionPartsArr: EqualsSplitReturnObjType[],
-	allRhsExpressionPartsArr: EqualsSplitReturnObjType[],
+	allLhsExpressionPartsArr: SplitReturnObjType[],
+	allRhsExpressionPartsArr: SplitReturnObjType[],
 ): Promise<boolean> {
 	// 1). Add constraints for each variable on LHS and RHS respectively to Z3 stack
 
@@ -124,28 +124,28 @@ async function handleAndDelimeterArith(
 
 	// 1). Format into LHS and RHS expression objects arrays
 
-	const allLhsExpressionPartsArr: EqualsSplitReturnObjType[] = expr1Arr.map(
+	const allLhsExpressionPartsArr: SplitReturnObjType[] = expr1Arr.map(
 		(expression) => {
-			return splitAroundEquals(expression);
+			return splitAroundOperator(expression, '=');
 		},
 	);
 
-	const allRhsExpressionPartsArr: EqualsSplitReturnObjType[] = expr2Arr.map(
+	const allRhsExpressionPartsArr: SplitReturnObjType[] = expr2Arr.map(
 		(expression) => {
-			return splitAroundEquals(expression);
+			return splitAroundOperator(expression, '=');
 		},
 	);
 
 	// 2). Access and return all variable names from each of above arrays respectively
 
 	const allLhsVariableNames: string[] = allLhsExpressionPartsArr.map(
-		(exprObj: EqualsSplitReturnObjType) => {
+		(exprObj: SplitReturnObjType) => {
 			return exprObj.variable;
 		},
 	);
 
 	const allRhsVariableNames: string[] = allRhsExpressionPartsArr.map(
-		(exprObj: EqualsSplitReturnObjType) => {
+		(exprObj: SplitReturnObjType) => {
 			return exprObj.variable;
 		},
 	);

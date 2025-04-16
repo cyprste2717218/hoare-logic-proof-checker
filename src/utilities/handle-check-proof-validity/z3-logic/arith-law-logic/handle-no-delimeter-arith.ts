@@ -5,7 +5,7 @@
 
 // @ts-expect-error z3-solver is not recognising 'sat' as a valid export
 import {init, sat} from 'z3-solver';
-import {splitAroundEquals} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/check-arith-law-call-validity';
+import {splitAroundOperator} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/check-arith-law-call-validity';
 import type {ArithObjType} from '@/models/hoare-law-z3-models';
 
 async function handleNoDelimeterZ3Logic(
@@ -56,8 +56,8 @@ async function handleNoDelimeterArith(
 ): Promise<boolean | undefined> {
 	const {expr1, expr2} = arithObj;
 
-	const rightExpr1 = Number(splitAroundEquals(expr1).variableValue);
-	const rightExpr2 = Number(splitAroundEquals(expr2).variableValue);
+	const rightExpr1 = Number(splitAroundOperator(expr1, '=').variableValue);
+	const rightExpr2 = Number(splitAroundOperator(expr2, '=').variableValue);
 
 	console.log('expression1 right expr:', rightExpr1);
 	console.log('expression2 right expr', rightExpr2);
