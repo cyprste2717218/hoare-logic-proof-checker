@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call -- Z3 functions such as 'And' are exported in uppercase letter so can't enforce this rule ensuring only uppercase functions are constructors */
-/* eslint-disable no-useless-escape  -- needed for informative console.logs and console.errors */
-/* eslint-disable @typescript-eslint/no-unsafe-return -- lack of typing in Z3 package */
-
-import type {
+/*
+Import type {
 	ArithObjType,
 	SplitReturnObjType,
 } from '@/models/hoare-law-z3-models';
@@ -174,3 +171,4 @@ async function handleAndDelimeterArith(
 }
 
 export {handleAndDelimeterArith};
+ */

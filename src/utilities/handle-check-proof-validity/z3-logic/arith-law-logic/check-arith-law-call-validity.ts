@@ -1,5 +1,4 @@
-import {handleNoDelimeterArith} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/handle-no-delimeter-arith';
-import {handleAndDelimeterArith} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/handle-and-delimeter-arith';
+import {handleDelimiterArith} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/handle-delimeter-arith';
 import type {
 	ArithObjType,
 	SplitReturnObjType,
@@ -20,6 +19,7 @@ function splitAroundOperator(
 	if (parts.length < 2) {
 		return {
 			variable: '',
+			operator: '',
 			variableValue: '',
 		};
 	}
@@ -27,6 +27,7 @@ function splitAroundOperator(
 	// Return an object with the left and right sides, trimmed of whitespace
 	return {
 		variable: parts[0].trim(),
+		operator: splitOperator,
 		variableValue: parts.slice(1).join(splitOperator).trim(), // Join remaining parts in case there are multiple of same operator
 	};
 }
@@ -59,29 +60,23 @@ async function checkArithLawCallValidity(
 
 	const expressionsContainAnd =
 		containsAndDelimiter(expr1) && containsAndDelimiter(expr2);
-	let result: boolean;
 
 	if (expressionsContainAnd) {
 		console.log(
 			"both left and right handside of implies statement contain '/\\' delimeters",
 		);
-		const pendingResult: boolean | undefined = await handleAndDelimeterArith({
-			expr1,
-			expr2,
-		});
-
-		result = await checkPendingResult(pendingResult);
 	} else {
 		console.log(
 			"implies statement left and right handside expressions do not contain '/\\' delimeters",
 		);
-		const pendingResult: boolean | undefined = await handleNoDelimeterArith({
-			expr1,
-			expr2,
-		});
-
-		result = await checkPendingResult(pendingResult);
 	}
+
+	const pendingResult: boolean | undefined = await handleDelimiterArith({
+		expr1,
+		expr2,
+	});
+
+	const result: boolean = await checkPendingResult(pendingResult);
 
 	return result;
 }

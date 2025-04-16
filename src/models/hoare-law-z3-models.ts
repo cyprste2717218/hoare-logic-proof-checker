@@ -27,16 +27,17 @@ type ArithObjType = {
 	expr2: string;
 };
 
+type SplitOperatorType = '=' | '>' | '<' | '<=' | '>=';
+
 type SplitReturnObjType = {
 	variable: string;
+	operator: SplitOperatorType | '';
 	variableValue: string;
 };
 
-type SplitOperatorType = '=' | '>' | '<' | '<=' | '>=';
-
 type ImpliesPartExpr = {
 	operator: SplitOperatorType;
-	value: number;
+	value: string;
 };
 
 export type {
