@@ -7,7 +7,7 @@
 
 // @ts-expect-error z3-solver is not recognising 'sat' as a valid export
 import {init, sat} from 'z3-solver';
-import {type EqualsSplitReturnObjType} from '@/models/hoare-law-z3-models';
+import {type SplitReturnObjType} from '@/models/hoare-law-z3-models';
 
 async function initialiseContext() {
 	const {Context} = await init();
@@ -193,8 +193,8 @@ async function constructFinalAssertion(
 }
 
 async function handleLengthTwoExpr(
-	allLhsExpressionPartsArr: EqualsSplitReturnObjType[],
-	allRhsExpressionPartsArr: EqualsSplitReturnObjType[],
+	allLhsExpressionPartsArr: SplitReturnObjType[],
+	allRhsExpressionPartsArr: SplitReturnObjType[],
 ): Promise<boolean> {
 	const [Int, And, Solver, Implies] = await initialiseContext();
 
@@ -272,8 +272,8 @@ async function handleLengthTwoExpr(
 }
 
 async function handleLengthThreeExpr(
-	allLhsExpressionPartsArr: EqualsSplitReturnObjType[],
-	allRhsExpressionPartsArr: EqualsSplitReturnObjType[],
+	allLhsExpressionPartsArr: SplitReturnObjType[],
+	allRhsExpressionPartsArr: SplitReturnObjType[],
 ): Promise<boolean> {
 	const [Int, And, Solver, Implies] = await initialiseContext();
 
