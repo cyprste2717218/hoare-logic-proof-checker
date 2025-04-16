@@ -14,6 +14,119 @@ import {
 	type SplitOperatorType,
 } from '@/models/hoare-law-z3-models';
 
+type ConstraintPropsType = {
+	Int: any;
+	And: any;
+	Not: any;
+	solver: any;
+};
+
+type ExprValueLhsTypes = {
+	firstExprValueLhs: number | undefined;
+	secondExprValueLhs: number | undefined;
+	thirdExprValueLhs: number | undefined;
+};
+
+type ExprValueRhsTypes = {
+	firstExprValueRhs: number | undefined;
+	secondExprValueRhs: number | undefined;
+	thirdExprValueRhs: number | undefined;
+};
+
+type ExprValueTypes = ExprValueLhsTypes & ExprValueRhsTypes;
+
+type ExprOperatorLhsTypes = {
+	firstLhsOperator: SplitOperatorType | undefined;
+	secondLhsOperator: SplitOperatorType | undefined;
+	thirdLhsOperator: SplitOperatorType | undefined;
+};
+
+type ExprOperatorRhsTypes = {
+	firstRhsOperator: SplitOperatorType | undefined;
+	secondRhsOperator: SplitOperatorType | undefined;
+	thirdRhsOperator: SplitOperatorType | undefined;
+};
+
+type ExprOperatorTypes = ExprOperatorLhsTypes & ExprOperatorRhsTypes;
+
+type FetchConstraintsPropsType = {
+	constraintProps: ConstraintPropsType;
+} & ExprValueTypes &
+	ExprOperatorTypes;
+
+async function fetchConstraints(
+	fetchedConstraintsProps: FetchConstraintsPropsType,
+) {
+	const {
+		constraintProps,
+		firstExprValueLhs,
+		firstExprValueRhs,
+		secondExprValueLhs,
+		secondExprValueRhs,
+		thirdExprValueLhs,
+		thirdExprValueRhs,
+		firstLhsOperator,
+		firstRhsOperator,
+		secondLhsOperator,
+		secondRhsOperator,
+		thirdLhsOperator,
+		thirdRhsOperator,
+	} = fetchedConstraintsProps;
+
+	const fetchedConstraints = await Promise.all([
+		firstExprValueLhs && firstLhsOperator
+			? addVariableConstraint({
+					variableName: 'x',
+					operator: firstLhsOperator,
+					value: firstExprValueLhs,
+					...constraintProps,
+				})
+			: Promise.resolve(true),
+		firstExprValueRhs && firstRhsOperator
+			? addVariableConstraint({
+					variableName: 'x',
+					operator: firstRhsOperator,
+					value: firstExprValueRhs,
+					...constraintProps,
+				})
+			: Promise.resolve(true),
+		secondExprValueLhs && secondLhsOperator
+			? addVariableConstraint({
+					variableName: 'y',
+					operator: secondLhsOperator,
+					value: secondExprValueLhs,
+					...constraintProps,
+				})
+			: Promise.resolve(true),
+		secondExprValueRhs && secondRhsOperator
+			? addVariableConstraint({
+					variableName: 'y',
+					operator: secondRhsOperator,
+					value: secondExprValueRhs,
+					...constraintProps,
+				})
+			: Promise.resolve(true),
+		thirdExprValueLhs && thirdLhsOperator
+			? addVariableConstraint({
+					variableName: 'z',
+					operator: thirdLhsOperator,
+					value: thirdExprValueLhs,
+					...constraintProps,
+				})
+			: Promise.resolve(true),
+		thirdExprValueRhs && thirdRhsOperator
+			? addVariableConstraint({
+					variableName: 'z',
+					operator: thirdRhsOperator,
+					value: thirdExprValueRhs,
+					...constraintProps,
+				})
+			: Promise.resolve(true),
+	]);
+
+	return fetchedConstraints;
+}
+
 async function initialiseContext() {
 	const {Context} = await init();
 
@@ -55,24 +168,24 @@ async function handleDispatch(
 	const [Int, And, Solver, Not, Implies] = await initialiseContext();
 
 	const solver = new Solver();
-	const constraintProps = {Int, And, Not, solver};
+	const constraintProps: ConstraintPropsType = {Int, And, Not, solver};
 
-	let firstExprValueLhs;
-	let secondExprValueLhs;
-	let thirdExprValueLhs;
-	let firstExprValueRhs;
-	let secondExprValueRhs;
-	let thirdExprValueRhs;
+	let firstExprValueLhs: number | undefined;
+	let secondExprValueLhs: number | undefined;
+	let thirdExprValueLhs: number | undefined;
+	let firstExprValueRhs: number | undefined;
+	let secondExprValueRhs: number | undefined;
+	let thirdExprValueRhs: number | undefined;
 	const lhsValues = beforeImpliesExpr.map((expr) => Number(expr.value));
 
 	const rhsValues = afterImpliesExpr.map((expr) => Number(expr.value));
 
-	let firstLhsOperator;
-	let secondLhsOperator;
-	let thirdLhsOperator;
-	let firstRhsOperator;
-	let secondRhsOperator;
-	let thirdRhsOperator;
+	let firstLhsOperator: SplitOperatorType | undefined;
+	let secondLhsOperator: SplitOperatorType | undefined;
+	let thirdLhsOperator: SplitOperatorType | undefined;
+	let firstRhsOperator: SplitOperatorType | undefined;
+	let secondRhsOperator: SplitOperatorType | undefined;
+	let thirdRhsOperator: SplitOperatorType | undefined;
 	const lhsOperators: SplitOperatorType[] = beforeImpliesExpr.map(
 		(expr) => expr.operator,
 	);
@@ -128,56 +241,29 @@ async function handleDispatch(
 		thirdRhsOperator = rhsOperators[2];
 	}
 
-	const fetchedConstraints = await Promise.all([
-		firstExprValueLhs && firstLhsOperator
-			? addVariableConstraint({
-					variableName: 'x',
-					operator: firstLhsOperator,
-					value: firstExprValueLhs,
-					...constraintProps,
-				})
-			: Promise.resolve(true),
-		firstExprValueRhs && firstRhsOperator
-			? addVariableConstraint({
-					variableName: 'x',
-					operator: firstRhsOperator,
-					value: firstExprValueRhs,
-					...constraintProps,
-				})
-			: Promise.resolve(true),
-		secondExprValueLhs && secondLhsOperator
-			? addVariableConstraint({
-					variableName: 'y',
-					operator: secondLhsOperator,
-					value: secondExprValueLhs,
-					...constraintProps,
-				})
-			: Promise.resolve(true),
-		secondExprValueRhs && secondRhsOperator
-			? addVariableConstraint({
-					variableName: 'y',
-					operator: secondRhsOperator,
-					value: secondExprValueRhs,
-					...constraintProps,
-				})
-			: Promise.resolve(true),
-		thirdExprValueLhs && thirdLhsOperator
-			? addVariableConstraint({
-					variableName: 'z',
-					operator: thirdLhsOperator,
-					value: thirdExprValueLhs,
-					...constraintProps,
-				})
-			: Promise.resolve(true),
-		thirdExprValueRhs && thirdRhsOperator
-			? addVariableConstraint({
-					variableName: 'z',
-					operator: thirdRhsOperator,
-					value: thirdExprValueRhs,
-					...constraintProps,
-				})
-			: Promise.resolve(true),
-	]);
+	const exprValues: ExprValueLhsTypes & ExprValueRhsTypes = {
+		firstExprValueLhs,
+		secondExprValueLhs,
+		thirdExprValueLhs,
+		firstExprValueRhs,
+		secondExprValueRhs,
+		thirdExprValueRhs,
+	};
+
+	const operators: ExprOperatorTypes = {
+		firstLhsOperator,
+		secondLhsOperator,
+		thirdLhsOperator,
+		firstRhsOperator,
+		secondRhsOperator,
+		thirdRhsOperator,
+	};
+	const fetchedConstraintsProps: FetchConstraintsPropsType = {
+		constraintProps,
+		...exprValues,
+		...operators,
+	};
+	const fetchedConstraints = await fetchConstraints(fetchedConstraintsProps);
 
 	let lhsConstraintX;
 	let lhsConstraintY;
