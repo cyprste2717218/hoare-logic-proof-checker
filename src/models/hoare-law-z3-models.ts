@@ -34,6 +34,11 @@ type SplitReturnObjType = {
 
 type SplitOperatorType = '=' | '>' | '<' | '<=' | '>=';
 
+type ImpliesPartExpr = {
+	operator: SplitOperatorType;
+	value: number;
+};
+
 export type {
 	ProofLawDetails,
 	HoareLawStructure,
@@ -41,4 +46,5 @@ export type {
 	ArithObjType,
 	SplitReturnObjType,
 	SplitOperatorType,
+	ImpliesPartExpr,
 };

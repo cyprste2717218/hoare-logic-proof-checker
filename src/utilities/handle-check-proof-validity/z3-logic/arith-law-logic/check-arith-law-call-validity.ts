@@ -51,7 +51,7 @@ async function checkArithLawCallValidity(
 		return str.includes('/\\');
 	}
 
-	// Parsing expr1 and expr2 for number on right handside of respective equal statements
+	// Parsing expr1 and expr2 for number on right handside of respective statements, e.g. x=1 -> x=1, y>1 -> y>1
 
 	const {expr1, expr2} = arithObj;
 
