@@ -1,18 +1,34 @@
 /* eslint-disable new-cap */
+/* eslint-disable @typescript-eslint/naming-convention -- Named exports from Z3 dont adhere to strictCamelCase */
 /* eslint-disable @typescript-eslint/no-unsafe-call -- Z3 functions such as 'And' are exported in uppercase letter so can't enforce this rule ensuring only uppercase functions are constructors */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment -- lack of typing in Z3 package  */
 /* eslint-disable @typescript-eslint/no-unsafe-return -- lack of typing in Z3 package */
 
 import {type SplitOperatorType} from '@/models/hoare-law-z3-models';
 
+type CommonPropsType = {
+	operator: SplitOperatorType;
+	And: any;
+	Not: any;
+	value: number;
+};
+
+type GetConstraintPropsType = {
+	passedVarName: any;
+} & CommonPropsType;
+
+type AddVariableConstraintPropsType = {
+	variableName: 'x' | 'y' | 'z';
+	Int: any;
+	solver: any;
+} & CommonPropsType;
+
 async function getConstraint(
-	passedVarName: any,
-	value: number,
-	operator: SplitOperatorType,
-	And: any,
-	Not: any,
+	getConstraintProps: GetConstraintPropsType,
 ): Promise<{firstStatement: any}> {
 	let firstStatement;
+
+	const {passedVarName, value, operator, And, Not} = getConstraintProps;
 
 	switch (operator) {
 		case '=': {
@@ -48,63 +64,72 @@ async function getConstraint(
 }
 
 async function addVariableConstraint(
-	variableName: 'x' | 'y' | 'z',
-	operator: SplitOperatorType,
-	value: number,
-	Int: any,
-	And: any,
-	Not: any,
-	solver: any,
+	addVariableConstraintProps: AddVariableConstraintPropsType,
 ): Promise<any | false> {
 	async function addVariableConstraintX(
-		value: number,
-		operator: SplitOperatorType,
-		And: any,
-		Not: any,
+		addVariableConstraintProps: CommonPropsType,
 	): Promise<any> {
 		const x = Int.const('x');
-		const constraint = getConstraint(x, value, operator, And, Not);
+
+		const addVariableConstraintPropsX: [any, CommonPropsType] = [
+			x,
+			addVariableConstraintProps,
+		];
+		const constraint = getConstraint(
+			addVariableConstraintPropsX as unknown as GetConstraintPropsType,
+		);
 		return constraint;
 	}
 
 	async function addVariableConstraintY(
-		value: number,
-		operator: SplitOperatorType,
-		And: any,
-		Not: any,
+		addVariableConstraintProps: CommonPropsType,
 	): Promise<any> {
 		const y = Int.const('y');
-		const constraint = getConstraint(y, value, operator, And, Not);
+
+		const addVariableConstraintPropsY: [any, CommonPropsType] = [
+			y,
+			addVariableConstraintProps,
+		];
+		const constraint = getConstraint(
+			addVariableConstraintPropsY as unknown as GetConstraintPropsType,
+		);
 		return constraint;
 	}
 
 	async function addVariableConstraintZ(
-		value: number,
-		operator: SplitOperatorType,
-		And: any,
-		Not: any,
+		addVariableConstraintProps: CommonPropsType,
 	): Promise<any> {
 		const z = Int.const('z');
-		const constraint = getConstraint(z, value, operator, And, Not);
+
+		const addVariableConstraintPropsZ: [any, CommonPropsType] = [
+			z,
+			addVariableConstraintProps,
+		];
+		const constraint = getConstraint(
+			addVariableConstraintPropsZ as unknown as GetConstraintPropsType,
+		);
 		return constraint;
 	}
 
+	const {variableName, operator, value, Int, And, Not, solver} =
+		addVariableConstraintProps;
+	const paramProps: CommonPropsType = {operator, And, Not, value};
 	let addConstraint;
 
 	// Handle Z3 constant variable to create
 	switch (variableName) {
 		case 'x': {
-			addConstraint = await addVariableConstraintX(value, operator, And, Not);
+			addConstraint = await addVariableConstraintX(paramProps);
 			break;
 		}
 
 		case 'y': {
-			addConstraint = await addVariableConstraintY(value, operator, And, Not);
+			addConstraint = await addVariableConstraintY(paramProps);
 			break;
 		}
 
 		case 'z': {
-			addConstraint = await addVariableConstraintZ(value, operator, And, Not);
+			addConstraint = await addVariableConstraintZ(paramProps);
 			break;
 		}
 	}

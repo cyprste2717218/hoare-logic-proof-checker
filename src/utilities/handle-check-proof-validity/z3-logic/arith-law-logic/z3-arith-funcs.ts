@@ -4,7 +4,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment -- lack of typing in Z3 package  */
 /* eslint-disable @typescript-eslint/no-unsafe-return -- lack of typing in Z3 package */
 /* eslint-disable @typescript-eslint/restrict-template-expressions -- lack of typing in Z3 package */
-/* eslint-disable @typescript-eslint/no-unsafe-argument -- lack of typing in Z3 package */
 
 // @ts-expect-error z3-solver is not recognising 'sat' as a valid export
 import {init, sat} from 'z3-solver';
@@ -56,7 +55,7 @@ async function handleDispatch(
 	const [Int, And, Solver, Not, Implies] = await initialiseContext();
 
 	const solver = new Solver();
-	const constraintProps: [any, any, any, any] = [Int, And, Not, solver];
+	const constraintProps = {Int, And, Not, solver};
 
 	let firstExprValueLhs;
 	let secondExprValueLhs;
@@ -131,52 +130,52 @@ async function handleDispatch(
 
 	const fetchedConstraints = await Promise.all([
 		firstExprValueLhs && firstLhsOperator
-			? addVariableConstraint(
-					'x',
-					firstLhsOperator,
-					firstExprValueLhs,
+			? addVariableConstraint({
+					variableName: 'x',
+					operator: firstLhsOperator,
+					value: firstExprValueLhs,
 					...constraintProps,
-				)
+				})
 			: Promise.resolve(true),
 		firstExprValueRhs && firstRhsOperator
-			? addVariableConstraint(
-					'x',
-					firstRhsOperator,
-					firstExprValueRhs,
+			? addVariableConstraint({
+					variableName: 'x',
+					operator: firstRhsOperator,
+					value: firstExprValueRhs,
 					...constraintProps,
-				)
+				})
 			: Promise.resolve(true),
 		secondExprValueLhs && secondLhsOperator
-			? addVariableConstraint(
-					'y',
-					secondLhsOperator,
-					secondExprValueLhs,
+			? addVariableConstraint({
+					variableName: 'y',
+					operator: secondLhsOperator,
+					value: secondExprValueLhs,
 					...constraintProps,
-				)
+				})
 			: Promise.resolve(true),
 		secondExprValueRhs && secondRhsOperator
-			? addVariableConstraint(
-					'y',
-					secondRhsOperator,
-					secondExprValueRhs,
+			? addVariableConstraint({
+					variableName: 'y',
+					operator: secondRhsOperator,
+					value: secondExprValueRhs,
 					...constraintProps,
-				)
+				})
 			: Promise.resolve(true),
 		thirdExprValueLhs && thirdLhsOperator
-			? addVariableConstraint(
-					'z',
-					thirdLhsOperator,
-					thirdExprValueLhs,
+			? addVariableConstraint({
+					variableName: 'z',
+					operator: thirdLhsOperator,
+					value: thirdExprValueLhs,
 					...constraintProps,
-				)
+				})
 			: Promise.resolve(true),
 		thirdExprValueRhs && thirdRhsOperator
-			? addVariableConstraint(
-					'z',
-					thirdRhsOperator,
-					thirdExprValueRhs,
+			? addVariableConstraint({
+					variableName: 'z',
+					operator: thirdRhsOperator,
+					value: thirdExprValueRhs,
 					...constraintProps,
-				)
+				})
 			: Promise.resolve(true),
 	]);
 
