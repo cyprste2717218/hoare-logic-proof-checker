@@ -44,7 +44,7 @@ function checkDisallowedModelValues(
 		}
 	}
 
-	function setModelValue(i: number): string {
+	function setModelValue(i: number, totalNumExprs: number): string {
 		switch (i) {
 			case 0: {
 				if (modelValues.xValue) {
@@ -106,7 +106,7 @@ function checkDisallowedModelValues(
 				'<=': (x: number, y: number) => x <= y,
 			};
 
-			const modelValue = setModelValue(i);
+			const modelValue = setModelValue(i, beforeImpliesExpr.length);
 
 			if (modelValue === '') {
 				console.log("modelValue was not assigned a value, i.e. ''");
@@ -175,17 +175,25 @@ function checkSatResult({
 		}
 
 		if (declarations.length >= 2) {
-			modelValues.zValue =
-				declarations[1].name() === 'z'
-					? model.get(declarations[1]).asString()
-					: undefined;
-			console.log('model zValue:', modelValues.zValue);
+			if (declarations.length === 2) {
+				modelValues.yValue =
+					declarations[1].name() === 'y'
+						? model.get(declarations[1]).asString()
+						: undefined;
+				console.log('model yValue:', modelValues.yValue);
+			} else {
+				modelValues.zValue =
+					declarations[1].name() === 'z'
+						? model.get(declarations[1]).asString()
+						: undefined;
+				console.log('model zValue:', modelValues.zValue);
+			}
 		}
 
 		if (declarations.length === 3) {
 			modelValues.yValue =
 				declarations[2].name() === 'y'
-					? model.get(declarations[1]).asString()
+					? model.get(declarations[2]).asString()
 					: undefined;
 			console.log('model yValue:', modelValues.yValue);
 		}

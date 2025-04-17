@@ -8,9 +8,8 @@ const validProofData = {
 
 const invalidProofData = {
 	skipLaw: {
-		proofOne: [],
-		proofTwo: [],
-		proofThree: []
+		proofOne: ['x>3 -> x<3 :arith', '{x<3} x<3 {x<3} :hskip 1'],
+		proofTwo: ['a>1 /\\ b<3 -> b>1 /\\ a<3 :arith', '{a>1 /\\ b<3} a>1 /\\ b<3 {a>1 /\\ b<3} :hskip 1'],
 	}
 }
 
