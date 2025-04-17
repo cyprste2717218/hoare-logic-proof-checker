@@ -30,4 +30,13 @@ describe('Skip Law Invalid Proofs', () => {
 		);
 
 	});
+
+	test('should invalidate proof with more than three variable expressions', () => {
+
+		const inputData = invalidProofData.skipLaw.proofFour;
+		return handleCheckProofValidity(inputData).then(
+			(result: boolean) => { expect(result).toEqual(false) }
+		);
+
+	});
 })
