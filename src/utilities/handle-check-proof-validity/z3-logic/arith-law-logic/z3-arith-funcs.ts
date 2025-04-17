@@ -127,11 +127,23 @@ async function fetchConstraints(
 	return fetchedConstraints;
 }
 
-async function initialiseContext() {
-	const {Context} = await init();
+let z3Context: any = null;
 
-	// @ts-expect-error z3 package doesn't provide typing for these constructs at current v4.14.1
-	const {Int, And, Solver, Not, Implies} = new Context('main');
+async function getZ3Context() {
+	if (!z3Context) {
+		const {Context} = await init();
+
+		// @ts-expect-error z3 package doesn't provide typing for these constructs at current v4.14.1
+		z3Context = new Context('main');
+	}
+
+	return z3Context;
+}
+
+async function initialiseContext() {
+	const context = await getZ3Context();
+
+	const {Int, And, Solver, Not, Implies} = context;
 
 	return [Int, And, Solver, Not, Implies];
 }
@@ -168,6 +180,8 @@ async function handleDispatch(
 	const [Int, And, Solver, Not, Implies] = await initialiseContext();
 
 	const solver = new Solver();
+	await solver.push();
+
 	const constraintProps: ConstraintPropsType = {Int, And, Not, solver};
 
 	let firstExprValueLhs: number | undefined;
@@ -341,8 +355,7 @@ async function handleDispatch(
 
 		return isSat;
 	} finally {
-		// Clean up
-		solver.reset();
+		await solver.pop();
 	}
 }
 
