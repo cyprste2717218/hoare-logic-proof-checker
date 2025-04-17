@@ -44,7 +44,7 @@ function checkDisallowedModelValues(
 		}
 	}
 
-	function setModelValue(i: number, totalNumExprs: number): string {
+	function setModelValue(i: number): string {
 		switch (i) {
 			case 0: {
 				if (modelValues.xValue) {
@@ -106,7 +106,7 @@ function checkDisallowedModelValues(
 				'<=': (x: number, y: number) => x <= y,
 			};
 
-			const modelValue = setModelValue(i, beforeImpliesExpr.length);
+			const modelValue = setModelValue(i);
 
 			if (modelValue === '') {
 				console.log("modelValue was not assigned a value, i.e. ''");
