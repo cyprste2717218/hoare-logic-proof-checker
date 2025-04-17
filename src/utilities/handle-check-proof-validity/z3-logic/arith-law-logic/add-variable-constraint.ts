@@ -71,13 +71,11 @@ async function addVariableConstraint(
 	): Promise<any> {
 		const x = Int.const('x');
 
-		const addVariableConstraintPropsX: [any, CommonPropsType] = [
-			x,
-			addVariableConstraintProps,
-		];
-		const constraint = getConstraint(
-			addVariableConstraintPropsX as unknown as GetConstraintPropsType,
-		);
+		const addVariableConstraintPropsX: GetConstraintPropsType = {
+			passedVarName: x,
+			...addVariableConstraintProps,
+		};
+		const constraint = getConstraint(addVariableConstraintPropsX);
 		return constraint;
 	}
 
@@ -86,13 +84,11 @@ async function addVariableConstraint(
 	): Promise<any> {
 		const y = Int.const('y');
 
-		const addVariableConstraintPropsY: [any, CommonPropsType] = [
-			y,
-			addVariableConstraintProps,
-		];
-		const constraint = getConstraint(
-			addVariableConstraintPropsY as unknown as GetConstraintPropsType,
-		);
+		const addVariableConstraintPropsY: GetConstraintPropsType = {
+			passedVarName: y,
+			...addVariableConstraintProps,
+		};
+		const constraint = getConstraint(addVariableConstraintPropsY);
 		return constraint;
 	}
 
@@ -101,13 +97,11 @@ async function addVariableConstraint(
 	): Promise<any> {
 		const z = Int.const('z');
 
-		const addVariableConstraintPropsZ: [any, CommonPropsType] = [
-			z,
-			addVariableConstraintProps,
-		];
-		const constraint = getConstraint(
-			addVariableConstraintPropsZ as unknown as GetConstraintPropsType,
-		);
+		const addVariableConstraintPropsZ: GetConstraintPropsType = {
+			passedVarName: z,
+			...addVariableConstraintProps,
+		};
+		const constraint = getConstraint(addVariableConstraintPropsZ);
 		return constraint;
 	}
 
