@@ -31,6 +31,7 @@ function HoareLogicProofValidator({
 		const {syntaxErrors, formattedProofLines} = handleProofSyntaxCheck({
 			proofContent,
 		});
+		console.log('formattedProofLines:', formattedProofLines);
 		if (syntaxErrors.length > 0) {
 			setCurrentProofState('Invalid - Syntax Error');
 			setProofErrors(syntaxErrors);

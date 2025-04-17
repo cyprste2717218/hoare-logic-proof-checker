@@ -13,7 +13,10 @@
     "clean-cache": "npm cache clean --force",
     "preview": "vite preview",
     "prepare": "husky install",
-    "test": "jest"
+    "test": "npm run test:unit && npm run test:it && npm run test:end",
+    "test:unit": "jest --testMatch \"**/*.unit.test.ts\"",
+    "test:it": "jest --testMatch \"**/*.it.test.ts\"",
+    "test:e2e": "jest --testMatch \"**/*.e2e.test.ts\""
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",
@@ -40,6 +43,8 @@
     "@commitlint/cli": "^19.8.0",
     "@commitlint/config-conventional": "^19.8.0",
     "@eslint/js": "^9.21.0",
+    "@jest/globals": "^29.7.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

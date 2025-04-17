@@ -166,26 +166,28 @@ function checkSatResult({
 		};
 		// Logging values satisfying z3 stack to console
 
-		modelValues.xValue =
-			declarations[0].name() === 'x'
-				? model.get(declarations[0]).asString()
-				: undefined;
-		console.log('model xValue:', modelValues.xValue);
+		if (declarations.length > 0) {
+			modelValues.xValue =
+				declarations[0].name() === 'x'
+					? model.get(declarations[0]).asString()
+					: undefined;
+			console.log('model xValue:', modelValues.xValue);
+		}
 
-		if (declarations.length === 2) {
-			modelValues.yValue =
-				declarations[1].name() === 'y'
+		if (declarations.length >= 2) {
+			modelValues.zValue =
+				declarations[1].name() === 'z'
 					? model.get(declarations[1]).asString()
 					: undefined;
-			console.log('model yValue:', modelValues.yValue);
+			console.log('model zValue:', modelValues.zValue);
 		}
 
 		if (declarations.length === 3) {
-			modelValues.zValue =
-				declarations[2].name() === 'z'
-					? model.get(declarations[2]).asString()
+			modelValues.yValue =
+				declarations[2].name() === 'y'
+					? model.get(declarations[1]).asString()
 					: undefined;
-			console.log('model zValue:', modelValues.zValue);
+			console.log('model yValue:', modelValues.yValue);
 		}
 
 		const checkDisallowedModelValuesProps: [
