@@ -30,7 +30,11 @@ type LawType = {
 	};
 };
 
-type LawTypeKeys = keyof LawType['hoareLaws'] | keyof LawType['other'];
+type LawTypeHoare = keyof LawType['hoareLaws'];
+
+type LawTypeOther = keyof LawType['other'];
+
+type LawTypeKeys = LawTypeHoare | LawTypeOther;
 
 type DiagnosticsType = {
 	isValid: boolean;
@@ -41,15 +45,37 @@ type RegexCheckItem = {
 	expression: RegExp;
 	message: string;
 };
+
 type AllRegexChecks = Record<string, RegexCheckItem>;
+
+type GetHoareLawCallDetailsType = {
+	law: LawTypeHoare;
+	proofLine: string;
+	lineNum: number;
+};
+
+type CollectedTripleProofLines = {
+	hoareLaw: {
+		lawName: LawTypeHoare;
+		line: string;
+	};
+	supportingProofLine: {
+		lawName: LawTypeOther;
+		line: string;
+	};
+};
 
 export type {
 	CurrentProofStateType,
 	CurrentPageContentType,
 	ErrorMsg,
 	LawType,
+	LawTypeHoare,
+	LawTypeOther,
 	LawTypeKeys,
 	DiagnosticsType,
 	RegexCheckItem,
 	AllRegexChecks,
+	GetHoareLawCallDetailsType,
+	CollectedTripleProofLines,
 };

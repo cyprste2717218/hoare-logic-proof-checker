@@ -4,7 +4,7 @@ import {
 	type DiagnosticsType,
 } from '@/models/misc';
 import {checkSpecificLawRegex} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format-utils/check-specific-law-regex';
-import {checkLawIsPassed} from '@/utilities/handle-proof-syntax-check/syntax-check/parse-proof-line-format-utils/check-law-is-passed';
+import {checkLawIsPassed} from '@/utilities/common/check-law-is-passed';
 import {validRegexFormats} from '@/lib/regex-formats';
 
 function checkLawGroup(key: LawTypeKeys): keyof LawType {

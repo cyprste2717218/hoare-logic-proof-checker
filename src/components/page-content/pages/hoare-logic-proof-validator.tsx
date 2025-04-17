@@ -2,7 +2,10 @@ import ProofEntryInput from '../../proof-entry-input/proof-entry-input';
 import {HoareTripleInput} from '../../hoare-triple-input/hoare-triple-input';
 import {Button} from '@/components/base/button.js';
 import type {CurrentProofStateType, ErrorMsg} from '@/models/misc';
-import {handleProofSyntaxCheck} from '@/utilities/proof-handle-utilities';
+import {
+	handleCheckProofValidity,
+	handleProofSyntaxCheck,
+} from '@/utilities/proof-handle-utilities';
 
 type HoareLogicProofValidatorProps = {
 	currentProofState: CurrentProofStateType;
@@ -23,11 +26,29 @@ function HoareLogicProofValidator({
 	setProofContent,
 	setProofErrors,
 }: HoareLogicProofValidatorProps) {
-	const handleClick = () => {
-		const syntaxErrors: ErrorMsg[] = handleProofSyntaxCheck({proofContent});
+	const handleClick = async () => {
+		// Retrieve and set any syntax errors in proof
+		const {syntaxErrors, formattedProofLines} = handleProofSyntaxCheck({
+			proofContent,
+		});
+		console.log('formattedProofLines:', formattedProofLines);
 		if (syntaxErrors.length > 0) {
 			setCurrentProofState('Invalid - Syntax Error');
 			setProofErrors(syntaxErrors);
+			return;
+		}
+
+		// No syntax errors detected so passing formatted (i.e. whitespace trimmed) proof lines to overall proof validity checker func
+
+		const proofValidityCheck: boolean =
+			await handleCheckProofValidity(formattedProofLines);
+
+		// Checking if overall proof is valid or not, setting CurrentProofState state accordingly
+
+		if (proofValidityCheck) {
+			setCurrentProofState('Valid');
+		} else {
+			setCurrentProofState('Invalid - Proof Error');
 		}
 	};
 

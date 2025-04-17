@@ -7,9 +7,14 @@ type HandleProofCheckProps = {
 	proofContent: string;
 };
 
+type HandleProofSyntaxCheckProps = {
+	formattedProofLines: string[];
+	syntaxErrors: ErrorMsg[];
+};
+
 function handleProofSyntaxCheck({
 	proofContent,
-}: HandleProofCheckProps): ErrorMsg[] {
+}: HandleProofCheckProps): HandleProofSyntaxCheckProps {
 	const lawSuffixs: LawTypeKeys[] = [
 		...(Object.keys(validRegexFormats.hoareLaws) as LawTypeKeys[]),
 		...(Object.keys(validRegexFormats.other) as LawTypeKeys[]),
@@ -36,7 +41,7 @@ function handleProofSyntaxCheck({
 		console.log('Proof adheres to syntax');
 	}
 
-	return errors;
+	return {syntaxErrors: errors, formattedProofLines};
 }
 
 export {handleProofSyntaxCheck};

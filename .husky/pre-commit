@@ -3,7 +3,7 @@
 
 echo "pre-commit hook started (husky)"
 echo "-------------------------------"
-echo "checking and altering code to match prettier formatting rules "
+echo "checking code matches xo/prettier checks "
 npm run lint
 echo "running npm packages audit"
 npm audit

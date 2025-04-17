@@ -11,8 +11,10 @@ function doOtherLawChecks(textLine: string, law: LawTypeKeys): DiagnosticsType {
 			return match ? match[1] : '';
 		}
 
+		// Checks that :arith call is of the form <char><oper><int> /\ <char><oper><int>... -> <char><oper><int> /\ <char><oper><int> ... e.g. x>1 -> x>1, x = 2 /\ y <= 2 -> x=2 /\ y <= 2
 		function checkArrowFormat(textLine: string): boolean {
-			const pattern = /^[a-zA-Z]=\d{1,2}\s*->\s*[a-zA-Z]=\d{1,2}\s*$/;
+			const pattern =
+				/^([a-zA-Z]\s?(?:=|>|<|>=|<=)\s?\d{1,2}(\s*\/\\\s*[a-zA-Z]\s?(?:=|>|<|>=|<=)\s?\d{1,2})*)\s*->\s*([a-zA-Z]\s?(?:=|>|<|>=|<=)\s?\d{1,2}(\s*\/\\\s*[a-zA-Z]\s?(?:=|>|<|>=|<=)\s?\d{1,2})*)\s*$/;
 			return pattern.test(textLine);
 		}
 
@@ -34,7 +36,10 @@ function doOtherLawChecks(textLine: string, law: LawTypeKeys): DiagnosticsType {
 
 		if (!checkArrowFormat(retrieveLineWithoutSuffix)) {
 			diagnostics.isValid = false;
-			diagnostics.errors.push(':arith law must be of the form a=b->c=d');
+			diagnostics.errors.push(
+				':arith law must be of the form a <op> b -> c <op> d',
+				'where <op> can be >, <, <=, >= or =',
+			);
 		}
 
 		return diagnostics;

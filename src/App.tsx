@@ -42,6 +42,7 @@ function App() {
 		}
 	}
 
+	console.log('are CORS isolated:', globalThis.crossOriginIsolated);
 	return (
 		<>
 			<CustomSidebar handlePageContentChange={handlePageContentChange}>

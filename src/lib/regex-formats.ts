@@ -25,6 +25,7 @@ const validRegexFormats: LawType = {
 };
 
 const allChecks: AllRegexChecks = {
+	// To-do: allow for optional single whitespace char between constants and operators, i.e. x = 3, y > 4
 	preConditionOpenCloseBraces: {
 		expression: /^{[^{}]*}/,
 		message:
