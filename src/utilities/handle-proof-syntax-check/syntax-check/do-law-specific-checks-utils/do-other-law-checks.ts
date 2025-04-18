@@ -11,10 +11,25 @@ function doOtherLawChecks(textLine: string, law: LawTypeKeys): DiagnosticsType {
 			return match ? match[1] : '';
 		}
 
-		// Checks that :arith call is of the form <char><oper><int> /\ <char><oper><int>... -> <char><oper><int> /\ <char><oper><int> ... e.g. x>1 -> x>1, x = 2 /\ y <= 2 -> x=2 /\ y <= 2
 		function checkArrowFormat(textLine: string): boolean {
+			/*
+			| Key: 
+			| <char> = alphabetical character, i.e. 'a', 'b', 'c'
+			| <num> = number, i.e. '1', '2', '3'
+			| <mop> = mathematical operator, i.e. '+', '-', '*', '/'
+			| <cop> = comparison operator, i.e. '=', '>', '<', '>=', '<='
+			| [n..*] = n or more occurences
+			| [n..m] = n to m occurences
+	
+			Checks that :arith call is of the form:
+			(<char><cop><num>) /\ (<char><cop><num>) -> <char><cop><num> | [1..*](<char|num><mop><char|num>)<cop>[1..*](<char|num><mop><char|num>)
+			
+			For example:
+			 x>1 /\ y>1 -> x+y>2
+			 x=1 -> x+2=3
+			*/
 			const pattern =
-				/^([a-zA-Z]\s?(?:=|>|<|>=|<=)\s?\d{1,2}(\s*\/\\\s*[a-zA-Z]\s?(?:=|>|<|>=|<=)\s?\d{1,2})*)\s*->\s*([a-zA-Z]\s?(?:=|>|<|>=|<=)\s?\d{1,2}(\s*\/\\\s*[a-zA-Z]\s?(?:=|>|<|>=|<=)\s?\d{1,2})*)\s*$/;
+				/^([a-zA-Z](?:=|>|<|>=|<=)\s?\d{1,2}(\s*\/\\\s*[a-zA-Z](?:=|>|<|>=|<=)\s?\d{1,2})*)\s*->\s*([a-zA-Z](?:[*\-+/][a-zA-Z\d])*(?:=|>|<|>=|<=)[a-zA-Z\d](?:[*\-+/][a-zA-Z\d])*(\s*\/\\\s*[a-zA-Z](?:[*\-+/][a-zA-Z\d])*(?:=|>|<|>=|<=)[a-zA-Z\d](?:[*\-+/][a-zA-Z\d])*)*)\s*$/;
 			return pattern.test(textLine);
 		}
 
@@ -37,8 +52,13 @@ function doOtherLawChecks(textLine: string, law: LawTypeKeys): DiagnosticsType {
 		if (!checkArrowFormat(retrieveLineWithoutSuffix)) {
 			diagnostics.isValid = false;
 			diagnostics.errors.push(
-				':arith law must be of the form a <op> b -> c <op> d',
-				'where <op> can be >, <, <=, >= or =',
+				'arith law must be of the form:',
+				'--------------------------------',
+				'a<cop>b -> c<mop>d<cop>e',
+				'--------------------------------',
+				'where <cop> can be >, <, <=, >= or =',
+				'and <mop> can be +, -, / or *',
+				'e.g. x=1 -> x+2=3',
 			);
 		}
 
