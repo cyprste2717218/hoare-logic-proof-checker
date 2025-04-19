@@ -59,6 +59,11 @@ const allChecks: AllRegexChecks = {
 		message:
 			'Program supplied to triple in Assignment Law call is incorrectly formatted, should be a single expression of the form <char>:=<expr>, e.g. x:=x+2',
 	},
+	substitution: {
+		expression: /^[a-zA-Z]\|>(?:[a-zA-Z\d]|[a-zA-Z\d](?:[+\-*/][a-zA-Z\d])+)$/,
+		message:
+			'Substitution expression is incorrectlty formatted, should be a single expression of the form <char>|><expr> enclosed between [], e.g. [x|>x+2]',
+	},
 };
 
 export {validRegexFormats, allChecks};
