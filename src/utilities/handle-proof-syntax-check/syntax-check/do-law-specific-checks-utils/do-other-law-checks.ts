@@ -70,7 +70,7 @@ function doOtherLawChecks(
 		function extractAfterImpliesArrow(line: string): string {
 			const pattern = /->(.*?)$/;
 			const match = pattern.exec(line);
-			return match ? match[1].trimEnd() : '';
+			return match ? match[1].trim() : '';
 		}
 
 		function checkSubstitutionFormat(textLine: string): boolean {
@@ -139,7 +139,7 @@ function doOtherLawChecks(
 			function extractBeforeImpliesArrow(line: string): string {
 				const pattern = /(.*?)->/;
 				const match = pattern.exec(line);
-				return match ? match[1] : '';
+				return match ? match[1].trim() : '';
 			}
 
 			const extractedPreCond: string = extractBeforeImpliesArrow(textLine);
@@ -151,7 +151,7 @@ function doOtherLawChecks(
 
 			// Check body meets expected format for a hoare triple precondition body
 			const preConditionBodyCheck =
-				!checks.preConditionBody.expression.test(extractedPreCond);
+				checks.preConditionBody.expression.test(extractedPreCond);
 			return preConditionBodyCheck;
 		}
 
