@@ -52,13 +52,12 @@ const allChecks: AllRegexChecks = {
 		expression:
 			/^[a-zA-Z]+(?:[<>]=?|=|:=)[a-zA-Z\d](?:\s*\/\\\s*[a-zA-Z]+(?:[<>]=?|=|:=)[a-zA-Z\d])*$/,
 		message:
-			'Program supplied to triple is incorrectly formatted, should be a single expression or a list of expressions of the form <expr><operator><expr> delimited by /\\, e.g. x:=3',
+			'Program supplied to triple in Skip Law call is incorrectly formatted, should be a single expression or a list of expressions of the form <expr><operator><expr> delimited by /\\, e.g. x:=3',
 	},
 	programBodyHassign: {
-		expression:
-			/^[a-zA-Z]+(?:[<>]=?|=|:=)[a-zA-Z\d](?:\s*\/\\\s*[a-zA-Z]+(?:[<>]=?|=|:=)[a-zA-Z\d])*$/,
+		expression: /^[a-zA-Z]:=(?:[a-zA-Z\d]|[a-zA-Z\d](?:[*\-+/][a-zA-Z\d])+)$/,
 		message:
-			'Program supplied to triple is incorrectly formatted, should be a single expression or a list of expressions of the form <expr><operator><expr> delimited by /\\, e.g. x:=3',
+			'Program supplied to triple in Assignment Law call is incorrectly formatted, should be a single expression of the form <char>:=<expr>, e.g. x:=x+2',
 	},
 };
 
