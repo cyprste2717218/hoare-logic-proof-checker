@@ -1,7 +1,12 @@
-import {type AllRegexChecks, type DiagnosticsType} from '@/models/misc';
+import {
+	type LawTypeKeys,
+	type AllRegexChecks,
+	type DiagnosticsType,
+} from '@/models/misc';
 
 function doHoareLawChecks(
 	textLine: string,
+	law: LawTypeKeys,
 	checks: AllRegexChecks,
 ): DiagnosticsType {
 	// Methods for checking different parts of proof line, i.e. pre-condition, program body and post-condition
@@ -63,6 +68,70 @@ function doHoareLawChecks(
 	}
 
 	function doProgramBodyChecks(textLine: string): DiagnosticsType {
+		function returnProgramBodySyntaxCheck(
+			law: LawTypeKeys,
+			programBody: string,
+			diagnostics: DiagnosticsType,
+		): DiagnosticsType {
+			function assignProgramBodySyntaxCheck(
+				law: LawTypeKeys,
+				programBody: string,
+			): boolean {
+				switch (law) {
+					case 'hskip': {
+						return checks.programBodyHskip.expression.test(programBody);
+					}
+
+					case 'hassign': {
+						return checks.programBodyHassign.expression.test(programBody);
+					}
+
+					default: {
+						console.log(
+							`no applicable syntax check for program body using hoare law ${law}`,
+						);
+						return false;
+					}
+				}
+			}
+
+			switch (law) {
+				case 'hskip': {
+					if (!assignProgramBodySyntaxCheck(law, programBody)) {
+						console.log('program body does not match expected syntax');
+
+						diagnostics.errors.push(checks.programBodyHskip.message);
+						diagnostics.isValid = false;
+					}
+
+					break;
+				}
+
+				case 'hassign': {
+					if (!assignProgramBodySyntaxCheck(law, programBody)) {
+						console.log('program body does not match expected syntax');
+
+						diagnostics.errors.push(checks.programBodyHassign.message);
+						diagnostics.isValid = false;
+					}
+
+					break;
+				}
+
+				default: {
+					console.log(
+						`no applicable syntax check for program body using hoare law ${law}`,
+					);
+					diagnostics.errors.push(
+						'check of program body syntax failed as law call is currently unsupported',
+					);
+					diagnostics.isValid = false;
+				}
+			}
+
+			return diagnostics;
+		}
+
 		function extractProgramBody(text: string): string | undefined {
 			const match = /{[^{}]*}([^{]*){/.exec(text);
 			return match?.[1].trim();
@@ -90,18 +159,8 @@ function doHoareLawChecks(
 			return diagnostics;
 		}
 
-		if (!checks.programBody.expression.test(programBody)) {
-			console.log('program body does not match expected syntax');
-
-			diagnostics.errors.push(checks.programBody.message);
-			diagnostics.isValid = false;
-
-			return diagnostics;
-		}
-
-		console.log('program body matches expected syntax');
-
-		return diagnostics;
+		// Check syntax of program body based on hoare law call type (differing syntax requirements for different hoare law calls, i.e. hassign versus hskip)
+		return returnProgramBodySyntaxCheck(law, programBody, diagnostics);
 	}
 
 	function doPostConditionChecks(textLine: string): DiagnosticsType {
