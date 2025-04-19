@@ -70,7 +70,7 @@ function doOtherLawChecks(
 		function extractAfterImpliesArrow(line: string): string {
 			const pattern = /->(.*?)$/;
 			const match = pattern.exec(line);
-			return match ? match[1] : '';
+			return match ? match[1].trimEnd() : '';
 		}
 
 		function checkSubstitutionFormat(textLine: string): boolean {
@@ -99,7 +99,7 @@ function doOtherLawChecks(
 
 			// Check body meets expected format for a hoare triple postcondition body
 			const substExpresionCheck =
-				!checks.substitution.expression.test(extractedSubstExpr);
+				checks.substitution.expression.test(extractedSubstExpr);
 			return substExpresionCheck;
 		}
 
@@ -115,6 +115,7 @@ function doOtherLawChecks(
 			}
 
 			const extractedPostCond: string = extractBetweenParentheses(textLine);
+			console.log('extracted postcond in subst call:', extractedPostCond);
 
 			if (extractedPostCond.length === 0) {
 				console.log(
@@ -130,7 +131,7 @@ function doOtherLawChecks(
 
 			// Check body meets expected format for a hoare triple postcondition body
 			const postConditionBodyCheck =
-				!checks.postConditionBody.expression.test(extractedPostCond);
+				checks.postConditionBody.expression.test(extractedPostCond);
 			return postConditionBodyCheck;
 		}
 
@@ -155,7 +156,7 @@ function doOtherLawChecks(
 		}
 
 		function checkArrowFormat(textLine: string) {
-			const pattern = /^\S+->\S+$/;
+			const pattern = /^.+->.+$/;
 			return pattern.test(textLine);
 		}
 
@@ -187,10 +188,12 @@ function doOtherLawChecks(
 			diagnostics.errors.push(
 				'subst law must be of the form:',
 				'--------------------------------',
-				'<expr> -> (<expr>)[<expr>|><expr]',
+				'<expr> -> (<expr>)[<expr>|><expr>]',
 				'--------------------------------',
 				'e.g. x=1 -> (x=3)[x |> x+2]',
 			);
+
+			return diagnostics;
 		}
 
 		console.log('expressions delimited by -> present in :subst law call');
@@ -202,6 +205,8 @@ function doOtherLawChecks(
 				'Malformed precondition body in :subst law call:',
 				checks.preConditionBody.message,
 			);
+
+			return diagnostics;
 		}
 
 		console.log('precondition format met in :subst law call');
@@ -222,9 +227,11 @@ function doOtherLawChecks(
 		if (!checkPostConditionFormat(expressionAfterImplies)) {
 			diagnostics.isValid = false;
 			diagnostics.errors.push(
-				'Malformed precondition body in :subst law call:',
+				'Malformed postcondition body in :subst law call:',
 				checks.postConditionBody.message,
 			);
+
+			return diagnostics;
 		}
 
 		console.log('postcondition format met in :subst law call');
@@ -233,6 +240,8 @@ function doOtherLawChecks(
 		if (!checkSubstitutionFormat(expressionAfterImplies)) {
 			diagnostics.isValid = false;
 			diagnostics.errors.push(checks.substitution.message);
+
+			return diagnostics;
 		}
 
 		console.log('substitution expression format met in :subst law call');
