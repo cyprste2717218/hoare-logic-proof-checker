@@ -2,12 +2,12 @@ import type {CollectedTripleProofLines} from '@/models/misc';
 import type {
 	HoareLawStructure,
 	OtherLawStructure,
-	ProofLawDetails,
+	ProofSkipLawDetails,
 } from '@/models/hoare-law-z3-models';
 
 function doSkipLawChecks(
 	formattedProofContent: CollectedTripleProofLines,
-): ProofLawDetails | undefined {
+): ProofSkipLawDetails | undefined {
 	function decomposeArithLawLine(proofLine: string): OtherLawStructure {
 		function splitAroundImplication(text: string): string[] {
 			const pattern = /^(.*?)\s*(->)\s*(.*?)(?:\s*:arith)?$/;
@@ -118,7 +118,7 @@ function doSkipLawChecks(
 			expr1,
 			expr2,
 		},
-		hskip: {
+		hoareLaw: {
 			precondition,
 			program,
 			postcondition,

@@ -13,6 +13,7 @@ import {
 	type ImpliesPartExpr,
 	type SplitOperatorType,
 } from '@/models/hoare-law-z3-models';
+import {type LawTypeHoare} from '@/models/misc';
 
 type ConstraintPropsType = {
 	Int: any;
@@ -49,16 +50,24 @@ type ExprOperatorRhsTypes = {
 
 type ExprOperatorTypes = ExprOperatorLhsTypes & ExprOperatorRhsTypes;
 
+type FetchConstraintsPropsLhsType = {
+	constraintProps: ConstraintPropsType;
+} & ExprValueLhsTypes &
+	ExprOperatorLhsTypes;
+
 type FetchConstraintsPropsType = {
 	constraintProps: ConstraintPropsType;
 } & ExprValueTypes &
 	ExprOperatorTypes;
 
 async function fetchConstraints(
-	fetchedConstraintsProps: FetchConstraintsPropsType,
+	fetchedConstraintsProps:
+		| FetchConstraintsPropsType
+		| FetchConstraintsPropsLhsType,
 ) {
+	const {constraintProps} = fetchedConstraintsProps;
+
 	const {
-		constraintProps,
 		firstExprValueLhs,
 		firstExprValueRhs,
 		secondExprValueLhs,
@@ -71,7 +80,29 @@ async function fetchConstraints(
 		secondRhsOperator,
 		thirdLhsOperator,
 		thirdRhsOperator,
-	} = fetchedConstraintsProps;
+	} = isFetchConstraintsPropsType(fetchedConstraintsProps)
+		? fetchedConstraintsProps
+		: {
+				firstExprValueLhs: undefined,
+				firstExprValueRhs: undefined,
+				secondExprValueLhs: undefined,
+				secondExprValueRhs: undefined,
+				thirdExprValueLhs: undefined,
+				thirdExprValueRhs: undefined,
+				firstLhsOperator: undefined,
+				firstRhsOperator: undefined,
+				secondLhsOperator: undefined,
+				secondRhsOperator: undefined,
+				thirdLhsOperator: undefined,
+				thirdRhsOperator: undefined,
+			};
+
+	// Type guard function
+	function isFetchConstraintsPropsType(
+		props: FetchConstraintsPropsType | FetchConstraintsPropsLhsType,
+	): props is FetchConstraintsPropsType {
+		return 'firstExprValueRhs' in props;
+	}
 
 	const fetchedConstraints = await Promise.all([
 		firstExprValueLhs && firstLhsOperator
@@ -176,6 +207,7 @@ async function constructImpliesExpr(
 async function handleDispatch(
 	beforeImpliesExpr: ImpliesPartExpr[],
 	afterImpliesExpr: ImpliesPartExpr[],
+	tripleLaw: LawTypeHoare,
 ): Promise<boolean> {
 	const [Int, And, Solver, Not, Implies] = await initialiseContext();
 
@@ -184,22 +216,24 @@ async function handleDispatch(
 
 	const constraintProps: ConstraintPropsType = {Int, And, Not, solver};
 
-	let firstExprValueLhs: number | undefined;
-	let secondExprValueLhs: number | undefined;
-	let thirdExprValueLhs: number | undefined;
-	let firstExprValueRhs: number | undefined;
-	let secondExprValueRhs: number | undefined;
+	let firstExprValueLhs;
+	let secondExprValueLhs;
+	let thirdExprValueLhs;
+	let firstExprValueRhs;
+	let secondExprValueRhs;
 	let thirdExprValueRhs: number | undefined;
+
 	const lhsValues = beforeImpliesExpr.map((expr) => Number(expr.value));
 
 	const rhsValues = afterImpliesExpr.map((expr) => Number(expr.value));
 
-	let firstLhsOperator: SplitOperatorType | undefined;
-	let secondLhsOperator: SplitOperatorType | undefined;
-	let thirdLhsOperator: SplitOperatorType | undefined;
-	let firstRhsOperator: SplitOperatorType | undefined;
-	let secondRhsOperator: SplitOperatorType | undefined;
+	let firstLhsOperator;
+	let secondLhsOperator;
+	let thirdLhsOperator;
+	let firstRhsOperator;
+	let secondRhsOperator;
 	let thirdRhsOperator: SplitOperatorType | undefined;
+
 	const lhsOperators: SplitOperatorType[] = beforeImpliesExpr.map(
 		(expr) => expr.operator,
 	);
@@ -207,77 +241,153 @@ async function handleDispatch(
 		(expr) => expr.operator,
 	);
 
-	// Check lhsOperators and rhsOperators length match
+	// Check lhsOperators and rhsOperators length match, if dont match ensure calling 'tripleLaw' is for the Assignment Law
 	if (lhsOperators.length !== rhsOperators.length) {
-		console.error('lhsOperators arr length doesnt match rhsOperators length');
+		if (tripleLaw === 'hskip') {
+			console.error('lhsOperators arr length doesnt match rhsOperators length');
+			return false;
+		}
+
+		if (tripleLaw !== 'hassign') {
+			console.error(
+				'lhsOperators arr length doesnt match rhsOperators length in unknown hoare law call:',
+				tripleLaw,
+			);
+			return false;
+		}
+	}
+
+	let fetchedConstraints: [any, any, any, any, any, any] = [
+		true,
+		true,
+		true,
+		true,
+		true,
+		true,
+	];
+
+	if (tripleLaw === 'hskip') {
+		const isAtLeastLengthOne =
+			lhsValues.length > 0 &&
+			rhsValues.length > 0 &&
+			lhsOperators.length > 0 &&
+			rhsOperators.length > 0;
+
+		const isAtLeastLengthTwo =
+			lhsValues.length >= 2 &&
+			rhsValues.length >= 2 &&
+			lhsOperators.length >= 2 &&
+			rhsOperators.length >= 2;
+
+		const isAtLeastLengthThree =
+			lhsValues.length === 3 &&
+			rhsValues.length === 3 &&
+			lhsOperators.length === 3 &&
+			rhsOperators.length === 3;
+
+		if (isAtLeastLengthOne) {
+			firstExprValueLhs = lhsValues[0];
+			firstExprValueRhs = rhsValues[0];
+
+			// Set the operators for the expression based on position
+			firstLhsOperator = lhsOperators[0];
+			firstRhsOperator = rhsOperators[0];
+		}
+
+		if (isAtLeastLengthTwo) {
+			secondExprValueLhs = lhsValues[1];
+			secondExprValueRhs = rhsValues[1];
+
+			// Set the operators for the expression based on position
+			secondLhsOperator = lhsOperators[1];
+			secondRhsOperator = rhsOperators[1];
+		}
+
+		if (isAtLeastLengthThree) {
+			thirdExprValueLhs = lhsValues[2];
+			thirdExprValueRhs = rhsValues[2];
+
+			// Set the operators for the expression based on position
+			thirdLhsOperator = lhsOperators[2];
+			thirdRhsOperator = rhsOperators[2];
+		}
+
+		const exprValues: ExprValueLhsTypes & ExprValueRhsTypes = {
+			firstExprValueLhs,
+			secondExprValueLhs,
+			thirdExprValueLhs,
+			firstExprValueRhs,
+			secondExprValueRhs,
+			thirdExprValueRhs,
+		};
+
+		const operators: ExprOperatorTypes = {
+			firstLhsOperator,
+			secondLhsOperator,
+			thirdLhsOperator,
+			firstRhsOperator,
+			secondRhsOperator,
+			thirdRhsOperator,
+		};
+		const fetchedConstraintsProps: FetchConstraintsPropsType = {
+			constraintProps,
+			...exprValues,
+			...operators,
+		};
+		fetchedConstraints = await fetchConstraints(fetchedConstraintsProps);
+	} else if (tripleLaw === 'hassign') {
+		const isAtLeastLengthOne = lhsValues.length > 0 && lhsOperators.length > 0;
+
+		const isAtLeastLengthTwo =
+			lhsValues.length >= 2 && lhsOperators.length >= 2;
+
+		const isAtLeastLengthThree =
+			lhsValues.length === 3 && lhsOperators.length === 3;
+
+		if (isAtLeastLengthOne) {
+			firstExprValueLhs = lhsValues[0];
+
+			// Set the operators for the expression based on position
+			firstLhsOperator = lhsOperators[0];
+		}
+
+		if (isAtLeastLengthTwo) {
+			secondExprValueLhs = lhsValues[1];
+
+			// Set the operators for the expression based on position
+			secondLhsOperator = lhsOperators[1];
+		}
+
+		if (isAtLeastLengthThree) {
+			thirdExprValueLhs = lhsValues[2];
+
+			// Set the operators for the expression based on position
+			thirdLhsOperator = lhsOperators[2];
+		}
+
+		const exprValues: ExprValueLhsTypes = {
+			firstExprValueLhs,
+			secondExprValueLhs,
+			thirdExprValueLhs,
+		};
+
+		const operators: ExprOperatorLhsTypes = {
+			firstLhsOperator,
+			secondLhsOperator,
+			thirdLhsOperator,
+		};
+		const fetchedConstraintsProps: FetchConstraintsPropsLhsType = {
+			constraintProps,
+			...exprValues,
+			...operators,
+		};
+		fetchedConstraints = await fetchConstraints(fetchedConstraintsProps);
+	}
+
+	if (fetchedConstraints === undefined) {
+		console.error('fetchedConstraints is undefined');
 		return false;
 	}
-
-	if (
-		lhsValues.length > 0 &&
-		rhsValues.length > 0 &&
-		lhsOperators.length > 0 &&
-		rhsOperators.length > 0
-	) {
-		firstExprValueLhs = lhsValues[0];
-		firstExprValueRhs = rhsValues[0];
-
-		// Set the operators for the expression based on position
-		firstLhsOperator = lhsOperators[0];
-		firstRhsOperator = rhsOperators[0];
-	}
-
-	if (
-		lhsValues.length >= 2 &&
-		rhsValues.length >= 2 &&
-		lhsOperators.length >= 2 &&
-		rhsOperators.length >= 2
-	) {
-		secondExprValueLhs = lhsValues[1];
-		secondExprValueRhs = rhsValues[1];
-
-		// Set the operators for the expression based on position
-		secondLhsOperator = lhsOperators[1];
-		secondRhsOperator = rhsOperators[1];
-	}
-
-	if (
-		lhsValues.length === 3 &&
-		rhsValues.length === 3 &&
-		lhsOperators.length === 3 &&
-		rhsOperators.length === 3
-	) {
-		thirdExprValueLhs = lhsValues[2];
-		thirdExprValueRhs = rhsValues[2];
-
-		// Set the operators for the expression based on position
-		thirdLhsOperator = lhsOperators[2];
-		thirdRhsOperator = rhsOperators[2];
-	}
-
-	const exprValues: ExprValueLhsTypes & ExprValueRhsTypes = {
-		firstExprValueLhs,
-		secondExprValueLhs,
-		thirdExprValueLhs,
-		firstExprValueRhs,
-		secondExprValueRhs,
-		thirdExprValueRhs,
-	};
-
-	const operators: ExprOperatorTypes = {
-		firstLhsOperator,
-		secondLhsOperator,
-		thirdLhsOperator,
-		firstRhsOperator,
-		secondRhsOperator,
-		thirdRhsOperator,
-	};
-	const fetchedConstraintsProps: FetchConstraintsPropsType = {
-		constraintProps,
-		...exprValues,
-		...operators,
-	};
-	const fetchedConstraints = await fetchConstraints(fetchedConstraintsProps);
 
 	let lhsConstraintX;
 	let lhsConstraintY;
@@ -286,49 +396,53 @@ async function handleDispatch(
 	let rhsConstraintY;
 	let rhsConstraintZ;
 
-	if (fetchedConstraints.length >= 2) {
-		lhsConstraintX = fetchedConstraints[0];
-		rhsConstraintX = fetchedConstraints[1];
-	}
+	if (tripleLaw === 'hskip') {
+		if (fetchedConstraints.length >= 2) {
+			lhsConstraintX = fetchedConstraints[0];
+			rhsConstraintX = fetchedConstraints[1];
+		}
 
-	if (fetchedConstraints.length >= 4) {
-		lhsConstraintY = fetchedConstraints[2];
-		rhsConstraintY = fetchedConstraints[3];
-	}
+		if (fetchedConstraints.length >= 4) {
+			lhsConstraintY = fetchedConstraints[2];
+			rhsConstraintY = fetchedConstraints[3];
+		}
 
-	if (fetchedConstraints.length === 6) {
-		lhsConstraintZ = fetchedConstraints[4];
-		rhsConstraintZ = fetchedConstraints[5];
-	}
+		if (fetchedConstraints.length === 6) {
+			lhsConstraintZ = fetchedConstraints[4];
+			rhsConstraintZ = fetchedConstraints[5];
+		}
 
-	const beforeImpliesConstraints = [
-		lhsConstraintX,
-		lhsConstraintY,
-		lhsConstraintZ,
-	].filter((constraint) => constraint !== undefined);
+		const beforeImpliesConstraints = [
+			lhsConstraintX,
+			lhsConstraintY,
+			lhsConstraintZ,
+		].filter((constraint) => constraint !== undefined);
 
-	const afterImpliesConstraints = [
-		rhsConstraintX,
-		rhsConstraintY,
-		rhsConstraintZ,
-	].filter((constraint) => constraint !== undefined);
+		const afterImpliesConstraints = [
+			rhsConstraintX,
+			rhsConstraintY,
+			rhsConstraintZ,
+		].filter((constraint) => constraint !== undefined);
 
-	const beforeImplies = await constructImpliesExpr(
-		And,
-		beforeImpliesConstraints,
-		solver,
-	);
-	if (beforeImplies === false) {
-		return false;
-	}
+		const beforeImplies = await constructImpliesExpr(
+			And,
+			beforeImpliesConstraints,
+			solver,
+		);
+		if (beforeImplies === false) {
+			return false;
+		}
 
-	const afterImplies = await constructImpliesExpr(
-		And,
-		afterImpliesConstraints,
-		solver,
-	);
-	if (afterImplies === false) {
-		return false;
+		const afterImplies = await constructImpliesExpr(
+			And,
+			afterImpliesConstraints,
+			solver,
+		);
+		if (afterImplies === false) {
+			return false;
+		}
+	} else if (tripleLaw === 'hassign') {
+		// Implement
 	}
 
 	try {
@@ -339,18 +453,20 @@ async function handleDispatch(
 		);
 		const result = await solver.check();
 
-		const isSatProps: [any, any, ImpliesPartExpr[], ImpliesPartExpr[]] = [
-			result,
-			solver,
-			beforeImpliesExpr,
-			afterImpliesExpr,
-		];
+		const isSatProps: [
+			any,
+			any,
+			ImpliesPartExpr[],
+			ImpliesPartExpr[],
+			LawTypeHoare,
+		] = [result, solver, beforeImpliesExpr, afterImpliesExpr, tripleLaw];
 
 		const isSat = checkSatResult({
 			result: isSatProps[0],
 			solver: isSatProps[1],
 			beforeImpliesExpr: isSatProps[2],
 			afterImpliesExpr: isSatProps[3],
+			tripleLaw: isSatProps[4],
 		});
 
 		return isSat;

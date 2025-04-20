@@ -5,6 +5,7 @@
 
 import {splitAroundOperator} from './check-arith-law-call-validity';
 import {handleDispatch} from './z3-arith-funcs';
+import {type LawTypeHoare} from '@/models/misc';
 import type {
 	ArithObjType,
 	ImpliesPartExpr,
@@ -14,6 +15,7 @@ import type {
 
 async function handleDelimiterArith(
 	arithObj: ArithObjType,
+	tripleLaw: LawTypeHoare,
 ): Promise<boolean | undefined> {
 	function arraysHaveMatchingVariables(
 		arr1: string[],
@@ -87,17 +89,42 @@ async function handleDelimiterArith(
 	);
 
 	if (!compareExprArrsResult) {
-		console.error(
-			'Error condition triggered during comparison of expression array lengths between lhs and rhs of implies statement',
-		);
-		return false;
+		// This is possible only in hassign proofs (in terms of what is currently implemented, other laws not implemented outside of skip law and assignment law at time of writing). Therefore, need to check flag, 'tripleLaw' passed to handleDelimieterArith indicating hoare law being used to verify triple
+
+		if (tripleLaw === 'hskip') {
+			console.error(
+				'Error condition triggered during comparison of expression array lengths between lhs and rhs of implies statement',
+			);
+			return false;
+		}
+
+		if (tripleLaw === 'hassign') {
+			console.log(
+				'pass at compareExprArrsResult stage as this check is essential for hskip proofs only',
+			);
+		}
 	}
 
-	console.log(
-		'Expression array length comparison checks between lhs and rhs of implies statement all pass!',
-	);
+	tripleLaw === 'hskip'
+		? console.log(
+				'Expression array length comparison checks between lhs and rhs of implies statement all pass!',
+			)
+		: '';
 
-	// Getting the operators which splits the value from its variable declaration in each expression, from expr1Arr and expr2Arr and formatting with their variable names and corresponding values into arrs to pass to handleZ3Logic func
+	/* 
+	For hskip proofs: 
+
+	- Getting the operators which splits the value from its variable declaration in each expression, from expr1Arr and expr2Arr and formatting with their variable names and corresponding values into arrs to pass to handleZ3Logic func
+	
+	For hassign proofs:
+
+	- Getting the operators which splits the value from its variable declaration in each expression, from expr1Arr, in case of expr2Arr extracting but breaking up the overall assignment expression into the:
+
+	- array of variable names
+	- the assignment expression itself, e.g. 'x+y' or 'x+2'
+	- the comparison operator
+	- the single digit value following the comparison operator
+	*/
 
 	const beforeImpliesExprArr: SplitReturnObjType[] = [];
 	const afterImpliesExprArr: SplitReturnObjType[] = [];
@@ -133,40 +160,44 @@ async function handleDelimiterArith(
 		});
 	}
 
-	for (const expression of expr2Arr) {
-		const currentExprOperator: SplitOperatorType | undefined =
-			findOperator(expression);
-		if (currentExprOperator === undefined) {
-			console.error(
-				'operator in expr1Arr expression is not acceptable, i.e. not one of "=", ">", "<", "<=", ">=" ',
+	if (tripleLaw === 'hskip') {
+		for (const expression of expr2Arr) {
+			const currentExprOperator: SplitOperatorType | undefined =
+				findOperator(expression);
+			if (currentExprOperator === undefined) {
+				console.error(
+					'operator in expr1Arr expression is not acceptable, i.e. not one of "=", ">", "<", "<=", ">=" ',
+				);
+				return false;
+			}
+
+			const currentImpliesExpr: SplitReturnObjType = splitAroundOperator(
+				expression,
+				currentExprOperator,
 			);
-			return false;
+
+			const {variable, operator, variableValue} = currentImpliesExpr;
+
+			if (variable === '' || operator === '' || variableValue === '') {
+				console.error(
+					"splitReturnObj returned '' for either variable, operator or variableValue",
+				);
+				return false;
+			}
+
+			afterImpliesExprArr.push({
+				variable,
+				operator: currentExprOperator,
+				variableValue,
+			});
 		}
 
-		const currentImpliesExpr: SplitReturnObjType = splitAroundOperator(
-			expression,
-			currentExprOperator,
+		console.log(
+			"operators in expr1Arr and expr2Arr in implies statement respectively are valid, i.e. one of the following: '=', '>', '<', '<=', '>='",
 		);
-
-		const {variable, operator, variableValue} = currentImpliesExpr;
-
-		if (variable === '' || operator === '' || variableValue === '') {
-			console.error(
-				"splitReturnObj returned '' for either variable, operator or variableValue",
-			);
-			return false;
-		}
-
-		afterImpliesExprArr.push({
-			variable,
-			operator: currentExprOperator,
-			variableValue,
-		});
+	} else if (tripleLaw === 'hassign') {
+		// Implement
 	}
-
-	console.log(
-		"operators in expr1Arr and expr2Arr in implies statement respectively are valid, i.e. one of the following: '=', '>', '<', '<=', '>='",
-	);
 
 	// Get the variable in each expression, e.g. 'x' from 'x=1', and add to array for respective side of implies statement for comparison to check all variables on lhs referenced on rhs. a False value is returned otherwise
 
@@ -178,11 +209,25 @@ async function handleDelimiterArith(
 		},
 	);
 
-	const allRhsVariableNames: string[] = afterImpliesExprArr.map(
-		(exprObj: SplitReturnObjType) => {
-			return exprObj.variable;
-		},
-	);
+	let allRhsVariableNames: string[] = [];
+
+	if (tripleLaw === 'hskip') {
+		allRhsVariableNames = afterImpliesExprArr.map(
+			(exprObj: SplitReturnObjType) => {
+				return exprObj.variable;
+			},
+		);
+	} else if (tripleLaw === 'hassign') {
+		// Implement
+	}
+
+	// Error checking for rhs variable names arr assignment
+	if (allRhsVariableNames.length === 0) {
+		console.error(
+			'error extracting all rhs variable names from arith expression',
+		);
+		return false;
+	}
 
 	// 2). Comparing and checking all variable names match up
 
@@ -217,6 +262,7 @@ async function handleDelimiterArith(
 	const dispatchResult: boolean = await handleDispatch(
 		transformedBeforeImpliesArr,
 		transformedAfterImpliesArr,
+		tripleLaw,
 	);
 
 	if (!dispatchResult) {

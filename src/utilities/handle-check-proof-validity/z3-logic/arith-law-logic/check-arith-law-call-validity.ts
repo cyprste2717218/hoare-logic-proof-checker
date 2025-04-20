@@ -4,6 +4,7 @@ import type {
 	SplitReturnObjType,
 	SplitOperatorType,
 } from '@/models/hoare-law-z3-models';
+import {type LawTypeHoare} from '@/models/misc';
 
 function splitAroundOperator(
 	text: string,
@@ -34,6 +35,7 @@ function splitAroundOperator(
 
 async function checkArithLawCallValidity(
 	arithObj: ArithObjType,
+	tripleLaw: LawTypeHoare,
 ): Promise<boolean> {
 	async function checkPendingResult(
 		pendingResult: boolean | undefined,
@@ -71,10 +73,13 @@ async function checkArithLawCallValidity(
 		);
 	}
 
-	const pendingResult: boolean | undefined = await handleDelimiterArith({
-		expr1,
-		expr2,
-	});
+	const pendingResult: boolean | undefined = await handleDelimiterArith(
+		{
+			expr1,
+			expr2,
+		},
+		tripleLaw,
+	);
 
 	const result: boolean = await checkPendingResult(pendingResult);
 

@@ -1,14 +1,24 @@
-type ProofLawDetails = {
-	arith: {
-		expr1: string;
-		expr2: string;
-	};
-	hskip: {
+type HoareLaw = {
+	hoareLaw: {
 		precondition: string;
 		program: string;
 		postcondition: string;
 	};
 };
+
+type ArithLawExpr = {
+	arith: ArithObjType;
+};
+
+type SubstLawExpr = {
+	subst: SubstObjType;
+};
+
+type ProofSkipLawDetails = ArithLawExpr & HoareLaw;
+
+type ProofAssignLawDetails = SubstLawExpr & HoareLaw;
+
+type ArithAndSubstDetails = SubstLawExpr & ArithLawExpr;
 
 type HoareLawStructure = {
 	precondition: string;
@@ -27,6 +37,12 @@ type ArithObjType = {
 	expr2: string;
 };
 
+type SubstObjType = {
+	precondition: string;
+	postcondition: string;
+	substitutionExpression: string;
+};
+
 type SplitOperatorType = '=' | '>' | '<' | '<=' | '>=';
 
 type SplitReturnObjType = {
@@ -41,7 +57,11 @@ type ImpliesPartExpr = {
 };
 
 export type {
-	ProofLawDetails,
+	ArithLawExpr,
+	SubstLawExpr,
+	ArithAndSubstDetails,
+	ProofSkipLawDetails,
+	ProofAssignLawDetails,
 	HoareLawStructure,
 	OtherLawStructure,
 	ArithObjType,

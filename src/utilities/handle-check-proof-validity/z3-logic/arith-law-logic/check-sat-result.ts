@@ -7,6 +7,7 @@ import type {
 	ImpliesPartExpr,
 	SplitOperatorType,
 } from '@/models/hoare-law-z3-models';
+import type {LawTypeHoare} from '@/models/misc';
 
 type ModelValuesType = {
 	xValue: undefined | string;
@@ -17,6 +18,7 @@ function checkDisallowedModelValues(
 	beforeImpliesExpr: ImpliesPartExpr[],
 	afterImpliesExpr: ImpliesPartExpr[],
 	modelValues: ModelValuesType,
+	tripleLaw: LawTypeHoare,
 ): boolean {
 	function setComparisonOperator(
 		lhsOperator: SplitOperatorType,
@@ -82,62 +84,75 @@ function checkDisallowedModelValues(
 	}
 
 	let errorPresent = false;
-	let i = 0;
 
-	while (i < beforeImpliesExpr.length) {
-		const lhsValue = beforeImpliesExpr[i].value;
-		const lhsOperator = beforeImpliesExpr[i].operator;
+	if (tripleLaw === 'hskip') {
+		let i = 0;
+		while (i < beforeImpliesExpr.length) {
+			const lhsValue = beforeImpliesExpr[i].value;
+			const lhsOperator = beforeImpliesExpr[i].operator;
 
-		const rhsValue = afterImpliesExpr[i].value;
-		const rhsOperator = afterImpliesExpr[i].operator;
+			const rhsValue = afterImpliesExpr[i].value;
+			const rhsOperator = afterImpliesExpr[i].operator;
 
-		// Map through all operators and values
+			// Map through all operators and values
 
-		if (lhsOperator === rhsOperator) {
-			const comparisonOperator: string = setComparisonOperator(lhsOperator);
+			if (lhsOperator === rhsOperator) {
+				const comparisonOperator: string = setComparisonOperator(lhsOperator);
 
-			// Check xValue found to satisfy constraints is as expected for operator type, i.e. xValue === lhsValue === rhsValue when operator is '=', xValue > lhsValue and xValue > rhsValue when operator is '>' etc.
+				/* 
+				For Skip Law triple:
+				
+				- Check each variable, e.g. xValue, in model found to satisfy constraints as expected for operator type, i.e. xValue === lhsValue === rhsValue when operator is '=', xValue > lhsValue and xValue > rhsValue when operator is '>' etc. */
 
-			const compareOperations = {
-				'=': (x: number, y: number) => x === y,
-				'>': (x: number, y: number) => x > y,
-				'<': (x: number, y: number) => x < y,
-				'>=': (x: number, y: number) => x >= y,
-				'<=': (x: number, y: number) => x <= y,
-			};
+				const compareOperations = {
+					'=': (x: number, y: number) => x === y,
+					'>': (x: number, y: number) => x > y,
+					'<': (x: number, y: number) => x < y,
+					'>=': (x: number, y: number) => x >= y,
+					'<=': (x: number, y: number) => x <= y,
+				};
 
-			const modelValue = setModelValue(i);
+				const modelValue = setModelValue(i);
 
-			if (modelValue === '') {
-				console.log("modelValue was not assigned a value, i.e. ''");
-				errorPresent = true;
-			}
+				if (modelValue === '') {
+					console.log("modelValue was not assigned a value, i.e. ''");
+					errorPresent = true;
+				}
 
-			if (
-				compareOperations[comparisonOperator as SplitOperatorType](
-					Number(modelValue),
-					Number(lhsValue),
-				) &&
-				compareOperations[comparisonOperator as SplitOperatorType](
-					Number(modelValue),
-					Number(rhsValue),
-				)
-			) {
-				console.log('pass');
+				if (
+					compareOperations[comparisonOperator as SplitOperatorType](
+						Number(modelValue),
+						Number(lhsValue),
+					) &&
+					compareOperations[comparisonOperator as SplitOperatorType](
+						Number(modelValue),
+						Number(rhsValue),
+					)
+				) {
+					console.log('pass');
+				} else {
+					console.log(
+						`model value ${modelValue} returned didnt meet logical constraint for variable`,
+					);
+					errorPresent = true;
+				}
 			} else {
 				console.log(
-					`model value ${modelValue} returned didnt meet logical constraint for variable`,
+					"Error: Values discovered to satisfy constraints for arith law call in skip law call proof don't match ones passed to method, hence not a display of validity in this instance",
 				);
 				errorPresent = true;
 			}
-		} else {
-			console.log(
-				"Error: Values discovered to satisfy constraints for arith law call in skip law call proof don't match ones passed to method, hence not a display of validity in this instance",
-			);
-			errorPresent = true;
-		}
 
-		i++;
+			i++;
+		}
+	} else if (tripleLaw === 'hassign') {
+		// Implement
+		/*
+		For Assignment law triple:
+		
+		- Check variable, e.g., xValue, assigned to in model is found to satisify postcondition and that any other variables, e.g. yValue, zValue, are as expected from their preconditions
+		
+		*/
 	}
 
 	return errorPresent;
@@ -148,11 +163,13 @@ function checkSatResult({
 	solver,
 	beforeImpliesExpr,
 	afterImpliesExpr,
+	tripleLaw,
 }: {
 	result: any;
 	solver: any;
 	beforeImpliesExpr: ImpliesPartExpr[];
 	afterImpliesExpr: ImpliesPartExpr[];
+	tripleLaw: LawTypeHoare;
 }): boolean {
 	console.log('sat result overall is:', result);
 	if (result === 'sat') {
@@ -202,7 +219,8 @@ function checkSatResult({
 			ImpliesPartExpr[],
 			ImpliesPartExpr[],
 			ModelValuesType,
-		] = [beforeImpliesExpr, afterImpliesExpr, modelValues];
+			LawTypeHoare,
+		] = [beforeImpliesExpr, afterImpliesExpr, modelValues, tripleLaw];
 
 		if (checkDisallowedModelValues(...checkDisallowedModelValuesProps)) {
 			console.log(
