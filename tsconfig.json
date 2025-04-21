@@ -10,7 +10,7 @@
   ],
   "compilerOptions": {
     "lib": [
-      "ES2021.String",
+      "ES2022",
     ],
     "baseUrl": ".",
     "paths": {
