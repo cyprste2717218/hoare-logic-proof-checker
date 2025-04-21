@@ -1,6 +1,6 @@
+import {decomposeHoareLawLine} from '../common-funcs';
 import type {CollectedTripleProofLines} from '@/models/misc';
 import type {
-	HoareLawStructure,
 	OtherLawStructure,
 	ProofSkipLawDetails,
 } from '@/models/hoare-law-z3-models';
@@ -32,29 +32,6 @@ function doSkipLawChecks(
 		};
 	}
 
-	function decomposeSkipLawLine(proofLine: string): HoareLawStructure {
-		function splitHoareTriple(text: string): string[] {
-			const pattern = /{(.*?)}(.*?){(.*?)}/;
-			const match = pattern.exec(text);
-
-			if (!match) {
-				return ['', '', ''];
-			}
-
-			// For Hoare triple of form {P} C {Q}
-			// match[1] is precondition (P), match[2] is program (C), match[3] is postcondition (Q)
-			return [match[1].trim(), match[2].trim(), match[3].trim()];
-		}
-
-		const returnStructure: string[] = splitHoareTriple(proofLine);
-		console.log('skip law line split up:', returnStructure);
-		return {
-			precondition: returnStructure[0],
-			program: returnStructure[1],
-			postcondition: returnStructure[2],
-		};
-	}
-
 	const arithProofLine: string = formattedProofContent.supportingProofLine.line;
 	console.log('arithProofLine before being sent:', arithProofLine);
 	const {expr1, expr2} = decomposeArithLawLine(arithProofLine);
@@ -62,7 +39,7 @@ function doSkipLawChecks(
 	const skipLawProofLine: string = formattedProofContent.hoareLaw.line;
 	console.log('skipLawProofLine before being sent:', skipLawProofLine);
 	const {precondition, program, postcondition} =
-		decomposeSkipLawLine(skipLawProofLine);
+		decomposeHoareLawLine(skipLawProofLine);
 
 	// Check arith law proof line has same expression before and after ->
 	if (expr1 !== expr2) {

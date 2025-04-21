@@ -87,6 +87,7 @@ function checkDisallowedModelValues(
 
 	if (tripleLaw === 'hskip') {
 		let i = 0;
+		console.log('beforeImpliesExpr is value:', beforeImpliesExpr);
 		while (i < beforeImpliesExpr.length) {
 			const lhsValue = beforeImpliesExpr[i].value;
 			const lhsOperator = beforeImpliesExpr[i].operator;

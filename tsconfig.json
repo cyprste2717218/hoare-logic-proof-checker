@@ -9,9 +9,14 @@
     }
   ],
   "compilerOptions": {
+    "lib": [
+      "ES2021.String",
+    ],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     },
     "strictNullChecks": true
   }

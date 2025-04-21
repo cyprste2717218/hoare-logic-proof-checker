@@ -22,25 +22,33 @@ async function checkHassignLawProof(
 		return false;
 	}
 
+	console.log('passed assign law triple content checks for hassign triple');
+
 	// Check content of subst line calls matches up with hassign triple details
-	const passedSubstLineCallChecks: ArithAndSubstDetails = doSubstLawChecks(
-		passedAssignLawTripleChecks,
-	);
+	const passedSubstLineCallChecks: ArithAndSubstDetails | undefined =
+		doSubstLawChecks(passedAssignLawTripleChecks);
 
 	if (!passedSubstLineCallChecks) {
 		console.error('subst law content checks for hassign triple failed');
 		return false;
 	}
 
-	// Check content of arith line call matches up with subst line details
-	const passedArithLineCallChecks: ArithLawExpr = doSupportingArithLawChecks(
-		passedSubstLineCallChecks,
+	console.log(
+		'passed substitution expression content checks for hassign triple',
 	);
+
+	// Check content of arith line call matches up with subst line details
+	const passedArithLineCallChecks: ArithLawExpr | undefined =
+		doSupportingArithLawChecks(passedSubstLineCallChecks);
 
 	if (!passedArithLineCallChecks) {
 		console.error('arith law content checks for subst law call failed');
 		return false;
 	}
+
+	console.log(
+		'passed arith expression content checks for substitution expression in hassign triple',
+	);
 
 	// Given previous check passes, check if arith proof line is valid via discharge to Z3 SMT solver (i.e. checking validity of implies statement)
 

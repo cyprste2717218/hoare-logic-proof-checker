@@ -14,11 +14,18 @@ type SubstLawExpr = {
 	subst: SubstObjType;
 };
 
+type SubstLawUndefined = {
+	substitutionExpression: string;
+};
+type ArithLawUndefined = {
+	arithExpression: string;
+};
+
 type ProofSkipLawDetails = ArithLawExpr & HoareLaw;
 
-type ProofAssignLawDetails = SubstLawExpr & HoareLaw;
+type ProofAssignLawDetails = SubstLawUndefined & HoareLaw & ArithLawUndefined;
 
-type ArithAndSubstDetails = SubstLawExpr & ArithLawExpr;
+type ArithAndSubstDetails = SubstLawExpr & ArithLawUndefined;
 
 type HoareLawStructure = {
 	precondition: string;
@@ -34,13 +41,14 @@ type OtherLawStructure = {
 
 type ArithObjType = {
 	expr1: string;
-	expr2: string;
+	expr2: string | string[];
 };
 
 type SubstObjType = {
-	precondition: string;
-	postcondition: string;
-	substitutionExpression: string;
+	substPrecondition: string;
+	substPostcondition: string;
+	substVariable: string;
+	substAssignment: string;
 };
 
 type SplitOperatorType = '=' | '>' | '<' | '<=' | '>=';
