@@ -3,20 +3,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return -- lack of typing in Z3 package  */
 /* eslint-disable @typescript-eslint/no-unsafe-call -- lack of typing in Z3 package */
 
+import {handleDispatch} from '../handle-dispatch-hoare-law';
 import {splitAroundOperator} from './check-arith-law-call-validity';
-import {handleHskipDispatch, handleHassignDispatch} from './z3-arith-funcs';
 import {type LawTypeHoare} from '@/models/misc';
 import type {
 	ArithObjType,
+	DispatchPropsType,
 	SplitOperatorType,
 	SplitReturnObjType,
 } from '@/models/hoare-law-z3-models';
-
-type HskipDispatchProps = [SplitReturnObjType[], SplitReturnObjType[]];
-
-type HassignDispatchProps = [SplitReturnObjType[], ArithObjType];
-
-type DispatchPropsType = HskipDispatchProps | HassignDispatchProps;
 
 async function handleDelimiterArith(
 	arithObj: ArithObjType,
@@ -247,29 +242,6 @@ async function handleDelimiterArith(
 		}
 
 		return true;
-	}
-
-	async function handleDispatch(
-		dispatchProps: DispatchPropsType,
-		tripleLaw: LawTypeHoare,
-	): Promise<boolean> {
-		const props = dispatchProps;
-		let dispatchResult: boolean;
-
-		if (tripleLaw === 'hskip') {
-			dispatchResult = await handleHskipDispatch(
-				...(props as HskipDispatchProps),
-			);
-		} else if (tripleLaw === 'hassign') {
-			dispatchResult = await handleHassignDispatch(
-				...(props as HassignDispatchProps),
-			);
-		} else {
-			console.error('tripleLaw is not one of hskip or hassign');
-			dispatchResult = false;
-		}
-
-		return dispatchResult;
 	}
 
 	const {expr1, expr2} = arithObj; // Expr1 and expr2 will contain only one of the following operators respectively: '=', '>', '<', '<=', '>=' within each sub-expression, i.e. 'x=1 /\ y=2' or 'x>1 /\ y>3'

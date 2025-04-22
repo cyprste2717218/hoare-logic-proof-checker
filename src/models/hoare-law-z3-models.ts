@@ -181,6 +181,12 @@ type Z3Variable = {
 
 type VariableDictionary = Record<string, any>;
 
+type HskipDispatchProps = [SplitReturnObjType[], SplitReturnObjType[]];
+
+type HassignDispatchProps = [SplitReturnObjType[], ArithObjType];
+
+type DispatchPropsType = HskipDispatchProps | HassignDispatchProps;
+
 export type {
 	ArithLawExpr,
 	SubstLawExpr,
@@ -212,4 +218,7 @@ export type {
 	ExprOperatorLhsTypes,
 	ExprOperatorRhsTypes,
 	ExprOperatorTypes,
+	HskipDispatchProps,
+	HassignDispatchProps,
+	DispatchPropsType,
 };
