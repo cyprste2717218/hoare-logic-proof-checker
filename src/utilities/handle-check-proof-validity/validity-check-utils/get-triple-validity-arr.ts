@@ -41,7 +41,7 @@ async function getTripleValidityArr(
 			);
 
 		if (checkHoareLawCallResult) {
-			/* eslint-disable no-await-in-loop -- Could be a performance gain here if altering this code to use Promises.all() and allowing other loops to execute snchronously but sufficient to leave for now in current use case */
+			/* eslint-disable no-await-in-loop -- Could be a performance gain here if altering this code to use Promises.all() and allowing other loops to execute asynchronously but sufficient to leave for now in current use case */
 			const tripleValidResult: boolean = await validateHoareTripleProof(
 				checkHoareLawCallResult,
 				formattedProofContent,

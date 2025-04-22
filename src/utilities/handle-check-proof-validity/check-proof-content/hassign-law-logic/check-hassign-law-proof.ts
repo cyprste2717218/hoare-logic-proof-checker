@@ -1,7 +1,7 @@
 import {doSubstLawChecks} from '../subst-law-logic/do-subst-law-checks';
 import {doSupportingArithLawChecks} from '../subst-law-logic/do-supporting-arith-law-checks';
 import {doAssignLawTripleChecks} from './do-assign-law-triple-checks';
-import {checkArithLawCallValidity} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/check-arith-law-call-validity';
+import {checkArithLawCallValidity} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-z3-logic/check-arith-law-call-validity';
 import type {CollectedTripleProofLines} from '@/models/misc';
 import {
 	type ArithAndSubstDetails,

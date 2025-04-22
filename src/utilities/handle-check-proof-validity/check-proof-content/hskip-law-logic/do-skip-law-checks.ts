@@ -1,4 +1,4 @@
-import {decomposeHoareLawLine} from '../common-funcs';
+import {decomposeHoareLawLine} from '../../z3-logic/common-funcs';
 import type {CollectedTripleProofLines} from '@/models/misc';
 import type {
 	OtherLawStructure,

@@ -7,7 +7,7 @@
 
 // @ts-expect-error z3-solver is not recognising 'sat' as a valid export
 import {init, sat} from 'z3-solver';
-import {handleEquationCompose} from '../hassign-law-logic/handle-equation-compose';
+import {handleEquationCompose} from '../hassign-law-z3-logic/handle-equation-compose';
 import {tracker} from '../z3-variable-tracker-class';
 import {initialiseContext} from '../initialise-z3-funcs';
 import {

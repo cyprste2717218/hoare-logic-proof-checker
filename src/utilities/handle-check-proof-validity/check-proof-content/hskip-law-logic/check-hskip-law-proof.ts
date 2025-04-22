@@ -1,5 +1,5 @@
-import {checkArithLawCallValidity} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/check-arith-law-call-validity';
-import {doSkipLawChecks} from '@/utilities/handle-check-proof-validity/z3-logic/hskip-law-logic/do-skip-law-checks';
+import {checkArithLawCallValidity} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-z3-logic/check-arith-law-call-validity';
+import {doSkipLawChecks} from '@/utilities/handle-check-proof-validity/check-proof-content/hskip-law-logic/do-skip-law-checks';
 import type {CollectedTripleProofLines} from '@/models/misc';
 import type {ProofSkipLawDetails} from '@/models/hoare-law-z3-models';
 

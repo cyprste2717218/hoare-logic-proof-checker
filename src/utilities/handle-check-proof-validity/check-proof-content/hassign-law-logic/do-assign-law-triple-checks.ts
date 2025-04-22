@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return -- temporary fix */
 
-import {decomposeHoareLawLine} from '../common-funcs';
+import {decomposeHoareLawLine} from '../../z3-logic/common-funcs';
 import type {CollectedTripleProofLines} from '@/models/misc';
 import {type ProofAssignLawDetails} from '@/models/hoare-law-z3-models';
 
