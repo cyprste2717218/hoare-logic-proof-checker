@@ -12,7 +12,7 @@ describe('Assign Law Valid Proofs', () => {
 
 	});
 
-	/* test('should validate multi-variable expression hassign proof asserting for validity over domain of values', () => {
+	test('should validate multi-variable expression hassign proof asserting for validity over domain of values', () => {
 
 		const inputData = validProofData.assignLaw.proofTwo;
 		return handleCheckProofValidity(inputData).then(
@@ -28,6 +28,6 @@ describe('Assign Law Valid Proofs', () => {
 			(result: boolean) => { expect(result).toEqual(true) }
 		);
 
-	}); */
+	});
 
 })

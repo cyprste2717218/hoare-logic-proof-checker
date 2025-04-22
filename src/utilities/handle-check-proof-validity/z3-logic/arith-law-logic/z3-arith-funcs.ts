@@ -153,47 +153,18 @@ async function fetchConstraints(
 ) {
 	const {constraintProps} = fetchedConstraintsProps;
 
+	// Extract all values, using type guard to determine which properties to include
 	const {
 		firstExprValueLhs,
-		firstExprValueRhs,
 		secondExprValueLhs,
-		secondExprValueRhs,
 		thirdExprValueLhs,
-		thirdExprValueRhs,
 		firstLhsOperator,
-		firstRhsOperator,
 		secondLhsOperator,
-		secondRhsOperator,
 		thirdLhsOperator,
-		thirdRhsOperator,
 		firstExprVarNameLhs,
-		firstExprVarNameRhs,
 		secondExprVarNameLhs,
-		secondExprVarNameRhs,
 		thirdExprVarNameLhs,
-		thirdExprVarNameRhs,
-	} = isFetchConstraintsPropsType(fetchedConstraintsProps)
-		? fetchedConstraintsProps
-		: {
-				firstExprValueLhs: undefined,
-				firstExprValueRhs: undefined,
-				secondExprValueLhs: undefined,
-				secondExprValueRhs: undefined,
-				thirdExprValueLhs: undefined,
-				thirdExprValueRhs: undefined,
-				firstLhsOperator: undefined,
-				firstRhsOperator: undefined,
-				secondLhsOperator: undefined,
-				secondRhsOperator: undefined,
-				thirdLhsOperator: undefined,
-				thirdRhsOperator: undefined,
-				firstExprVarNameLhs: undefined,
-				firstExprVarNameRhs: undefined,
-				secondExprVarNameLhs: undefined,
-				secondExprVarNameRhs: undefined,
-				thirdExprVarNameLhs: undefined,
-				thirdExprVarNameRhs: undefined,
-			};
+	} = fetchedConstraintsProps;
 
 	// Type guard function
 	function isFetchConstraintsPropsType(
@@ -202,7 +173,42 @@ async function fetchConstraints(
 		return 'firstExprValueRhs' in props;
 	}
 
+	// Get RHS values only if the type is FetchConstraintsPropsType
+	const {
+		firstExprValueRhs,
+		secondExprValueRhs,
+		thirdExprValueRhs,
+		firstRhsOperator,
+		secondRhsOperator,
+		thirdRhsOperator,
+		firstExprVarNameRhs,
+		secondExprVarNameRhs,
+		thirdExprVarNameRhs,
+	} = isFetchConstraintsPropsType(fetchedConstraintsProps)
+		? fetchedConstraintsProps
+		: {
+				firstExprValueRhs: undefined,
+				secondExprValueRhs: undefined,
+				thirdExprValueRhs: undefined,
+				firstRhsOperator: undefined,
+				secondRhsOperator: undefined,
+				thirdRhsOperator: undefined,
+				firstExprVarNameRhs: undefined,
+				secondExprVarNameRhs: undefined,
+				thirdExprVarNameRhs: undefined,
+			};
+
+	console.log(
+		'firstExprValueLhs:',
+		firstExprValueLhs,
+		'firstLhsOperator:',
+		firstLhsOperator,
+		'firstExprVarNamLhs:',
+		firstExprVarNameLhs,
+	);
+
 	const fetchedConstraints = await Promise.all([
+		// LHS constraints - these will always be processed
 		firstExprValueLhs && firstLhsOperator && firstExprVarNameLhs
 			? addVariableConstraint({
 					variableName: 'x',
@@ -212,7 +218,11 @@ async function fetchConstraints(
 					...constraintProps,
 				})
 			: Promise.resolve(true),
-		firstExprValueRhs && firstRhsOperator && firstExprVarNameRhs
+		// RHS constraints - these will only be processed if type is FetchConstraintsPropsType
+		isFetchConstraintsPropsType(fetchedConstraintsProps) &&
+		firstExprValueRhs &&
+		firstRhsOperator &&
+		firstExprVarNameRhs
 			? addVariableConstraint({
 					variableName: 'x',
 					operator: firstRhsOperator,
@@ -230,7 +240,10 @@ async function fetchConstraints(
 					...constraintProps,
 				})
 			: Promise.resolve(true),
-		secondExprValueRhs && secondRhsOperator && secondExprVarNameRhs
+		isFetchConstraintsPropsType(fetchedConstraintsProps) &&
+		secondExprValueRhs &&
+		secondRhsOperator &&
+		secondExprVarNameRhs
 			? addVariableConstraint({
 					variableName: 'y',
 					operator: secondRhsOperator,
@@ -248,7 +261,10 @@ async function fetchConstraints(
 					...constraintProps,
 				})
 			: Promise.resolve(true),
-		thirdExprValueRhs && thirdRhsOperator && thirdExprVarNameRhs
+		isFetchConstraintsPropsType(fetchedConstraintsProps) &&
+		thirdExprValueRhs &&
+		thirdRhsOperator &&
+		thirdExprVarNameRhs
 			? addVariableConstraint({
 					variableName: 'z',
 					operator: thirdRhsOperator,
@@ -506,6 +522,8 @@ async function constructImpliesExpr(
 	solver: any,
 ): Promise<false | any> {
 	const impliesExprResult = And(...constraints).eq(true);
+	console.log('this is constraints:', constraints);
+	console.log('this is impliesExprResult:', impliesExprResult);
 
 	solver.add(impliesExprResult);
 
@@ -565,7 +583,7 @@ async function handleEquationCompose(
 
 		// Helper functions
 		const isAlpha = (char: string): boolean => /^[a-zA-Z]$/.test(char);
-		const isDigit = (char: string): boolean => /^\d$/.test(char);
+		// Const isDigit = (char: string): boolean => /^\d$/.test(char);
 		const isMathOperator = (char: string): boolean =>
 			['+', '-', '*', '/'].includes(char);
 		const isEqualityOperator = (char: string): boolean =>
@@ -684,9 +702,7 @@ async function handleEquationCompose(
 		return;
 	}
 
-	if (numVarEntries === 1) {
-		console.log('has 1 entry in definedVars:', definedVars[0]);
-	}
+	console.log('entries in definedVars:', Object.keys(definedVars));
 
 	const createdZ3Assertion: any = constructZ3Assertion(expr2, definedVars);
 
@@ -999,6 +1015,13 @@ async function handleHassignDispatch(
 		undefined,
 	];
 
+	console.log(
+		'these are lhsValues, lhsOperators and lhsVarNames:',
+		lhsValues,
+		lhsOperators,
+		lhsVarNames,
+	);
+
 	const {
 		firstExprValueLhs,
 		secondExprValueLhs,
@@ -1017,23 +1040,32 @@ async function handleHassignDispatch(
 		thirdExprVarNameLhs,
 	};
 
+	console.log('these are exprVariableNames:', exprVariableNames);
+
 	const exprValues: ExprValueLhsTypes = {
 		firstExprValueLhs,
 		secondExprValueLhs,
 		thirdExprValueLhs,
 	};
 
+	console.log('these are exprValues:', exprValues);
+
 	const operators: ExprOperatorLhsTypes = {
 		firstLhsOperator,
 		secondLhsOperator,
 		thirdLhsOperator,
 	};
+
+	console.log('these are operators:', operators);
+
 	const fetchedConstraintsProps: FetchConstraintsPropsLhsType = {
 		constraintProps,
-		...exprVariableNames,
 		...exprValues,
 		...operators,
+		...exprVariableNames,
 	};
+
+	console.log('this is the fetchedConstraintsProps:', fetchedConstraintsProps);
 	fetchedConstraints = await fetchConstraints(fetchedConstraintsProps);
 
 	if (fetchedConstraints === undefined) {
@@ -1045,11 +1077,25 @@ async function handleHassignDispatch(
 	let lhsConstraintY;
 	let lhsConstraintZ;
 
+	if (fetchedConstraints.length > 0) {
+		lhsConstraintX = fetchedConstraints[0];
+	}
+
+	if (fetchedConstraints.length >= 2) {
+		lhsConstraintY = fetchedConstraints[1];
+	}
+
+	if (fetchedConstraints.length >= 3) {
+		lhsConstraintZ = fetchedConstraints[2];
+	}
+
 	const beforeImpliesConstraints = [
 		lhsConstraintX,
 		lhsConstraintY,
 		lhsConstraintZ,
 	].filter((constraint) => constraint !== undefined);
+
+	console.log('beforeImpliesConstraints:', beforeImpliesConstraints);
 
 	const beforeImplies = await constructImpliesExpr(
 		And,

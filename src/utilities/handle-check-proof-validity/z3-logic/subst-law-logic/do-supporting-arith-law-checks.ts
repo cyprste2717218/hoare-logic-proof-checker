@@ -169,6 +169,12 @@ function doSupportingArithLawChecks(
 
 		// Check result of assignment expression to variable in postcondition of arith proof line matches postcondition value in substitution proof line
 
+		console.log(
+			'substResultDomain is:',
+			substResultDomain,
+			'and arithResultDomain is:',
+			arithResultDomain,
+		);
 		if (substResultDomain !== arithResultDomain) {
 			console.error(
 				'Error: result of assignment expression in arith call does not match with postcondition in subst call',

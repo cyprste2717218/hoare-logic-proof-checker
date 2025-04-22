@@ -3,7 +3,7 @@ import { handleCheckProofValidity } from "../../../src/utilities/proof-handle-ut
 import { invalidProofData } from '../../__mocks__/test-data/proof-data';
 
 
-describe.skip('Assign Law Invalid Proofs', () => {
+describe('Assign Law Invalid Proofs', () => {
 	test('should invalidate clearly false two variable proof, i.e. execution of program from precondition does not support evidence for postcondition', () => {
 
 		const inputData = invalidProofData.assignLaw.proofOne;

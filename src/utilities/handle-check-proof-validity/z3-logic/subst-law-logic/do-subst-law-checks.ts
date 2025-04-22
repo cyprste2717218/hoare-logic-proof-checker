@@ -217,7 +217,7 @@ function doSubstLawChecks(
 		}
 
 		const arithExpression = extractBeforeArithSuffix(
-			assignLawDetails.substitutionExpression,
+			assignLawDetails.arithExpression,
 		);
 
 		if (arithExpression === '') {

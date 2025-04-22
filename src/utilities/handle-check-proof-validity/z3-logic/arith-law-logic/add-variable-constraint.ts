@@ -73,6 +73,7 @@ async function addVariableConstraint(
 		addVariableConstraintProps: CommonPropsType,
 	): Promise<any> {
 		const {tracker, realProgramVarName} = addVariableConstraintProps;
+
 		const x = Int.const('x');
 		tracker.addVariable(realProgramVarName, x, 'Int');
 

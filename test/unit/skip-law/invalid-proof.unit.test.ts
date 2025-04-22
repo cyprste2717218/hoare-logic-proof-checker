@@ -3,7 +3,7 @@ import { handleCheckProofValidity } from "../../../src/utilities/proof-handle-ut
 import { invalidProofData } from '../../__mocks__/test-data/proof-data';
 
 
-describe.skip('Skip Law Invalid Proofs', () => {
+describe('Skip Law Invalid Proofs', () => {
 	test('should invalidate single expression hskip proof with conflicting variable domains in supporting implies statement', () => {
 
 		const inputData = invalidProofData.skipLaw.proofOne;
