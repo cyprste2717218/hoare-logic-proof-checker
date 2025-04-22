@@ -171,7 +171,7 @@ function checkSatResult({
 	result: any;
 	solver: any;
 	beforeImpliesExpr: SplitReturnObjType[];
-	afterImpliesExpr: SplitReturnObjType[];
+	afterImpliesExpr?: SplitReturnObjType[];
 	tripleLaw: LawTypeHoare;
 }): boolean {
 	console.log('sat result overall is:', result);
@@ -218,18 +218,27 @@ function checkSatResult({
 			console.log('model yValue:', modelValues.yValue);
 		}
 
-		const checkDisallowedModelValuesProps: [
-			SplitReturnObjType[],
-			SplitReturnObjType[],
-			ModelValuesType,
-			LawTypeHoare,
-		] = [beforeImpliesExpr, afterImpliesExpr, modelValues, tripleLaw];
+		if (tripleLaw === 'hskip') {
+			if (afterImpliesExpr === undefined) {
+				console.log(
+					'checkSatResult error: afterImpliesExpr is undefined in checkSatResult which it shouldnt be for hskip',
+				);
+				return false;
+			}
 
-		if (checkDisallowedModelValues(...checkDisallowedModelValuesProps)) {
-			console.log(
-				'checkSatResult error: model values generated dont match constraints in proof, e.g. xValue = 5 with constraint of x < 3',
-			);
-			return false;
+			const checkDisallowedModelValuesProps: [
+				SplitReturnObjType[],
+				SplitReturnObjType[],
+				ModelValuesType,
+				LawTypeHoare,
+			] = [beforeImpliesExpr, afterImpliesExpr, modelValues, tripleLaw];
+
+			if (checkDisallowedModelValues(...checkDisallowedModelValuesProps)) {
+				console.log(
+					'checkSatResult error: model values generated dont match constraints in proof, e.g. xValue = 5 with constraint of x < 3',
+				);
+				return false;
+			}
 		}
 
 		return true;

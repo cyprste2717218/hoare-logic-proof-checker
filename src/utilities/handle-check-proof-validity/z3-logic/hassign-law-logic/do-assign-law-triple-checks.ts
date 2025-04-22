@@ -6,8 +6,9 @@ function doAssignLawTripleChecks(
 	formattedProofContent: CollectedTripleProofLines,
 ): ProofAssignLawDetails | undefined {
 	function extractAlphabeticalChars(input: string): string[] {
-		const regex = /[a-zA-Z]+/g;
-		return input.match(regex) ?? [];
+		const regex = /[a-zA-Z]/g;
+		const matches = input.match(regex) ?? [];
+		return [...new Set(matches)];
 	}
 
 	function areArraysEqual(arr1: string[], arr2: string[]): boolean {
@@ -45,6 +46,8 @@ function doAssignLawTripleChecks(
 		return;
 	}
 
+	console.log('preCondVars:', preCondVars);
+	console.log('programBodyVars:', programBodyVars);
 	if (!areArraysEqual(preCondVars, programBodyVars)) {
 		console.error(
 			"The exact same variables declared in precondition aren't referred to in the program body",

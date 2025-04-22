@@ -555,6 +555,106 @@ async function handleEquationCompose(
 		return definedVariables;
 	}
 
+	function constructZ3Assertion(
+		tokens: string[],
+		definedVars: Record<string, any>,
+	): any {
+		if (tokens.length < 3) {
+			throw new Error('Expression must have at least 3 tokens');
+		}
+
+		// Helper functions
+		const isAlpha = (char: string): boolean => /^[a-zA-Z]$/.test(char);
+		const isDigit = (char: string): boolean => /^\d$/.test(char);
+		const isMathOperator = (char: string): boolean =>
+			['+', '-', '*', '/'].includes(char);
+		const isEqualityOperator = (char: string): boolean =>
+			['=', '>', '<', '<=', '>='].includes(char);
+
+		const getZ3MathMethod = (operator: string): string => {
+			const methodMap: Record<string, string> = {
+				'+': 'add',
+				'-': 'sub',
+				'*': 'mul',
+				'/': 'div',
+			};
+			return methodMap[operator];
+		};
+
+		const getZ3EqualityMethod = (operator: string): string => {
+			const methodMap: Record<string, string> = {
+				'=': 'eq',
+				'>': 'gt',
+				'<': 'lt',
+				'>=': 'ge',
+				'<=': 'le',
+			};
+			return methodMap[operator];
+		};
+
+		// First token must be alphabetical - get corresponding Z3 variable
+		if (!isAlpha(tokens[0]) || !definedVars[tokens[0]]) {
+			throw new Error('First token must be a defined variable');
+		}
+
+		let expression = definedVars[tokens[0]];
+		let i = 1;
+
+		// Process the expression until we hit an equality operator
+		while (i < tokens.length && !isEqualityOperator(tokens[i])) {
+			if (isMathOperator(tokens[i])) {
+				const operator = tokens[i];
+				i++;
+
+				// Next token must be either a variable or number
+				if (i >= tokens.length) {
+					throw new Error('Unexpected end of expression');
+				}
+
+				const nextToken = tokens[i];
+				const operand = isAlpha(nextToken)
+					? definedVars[nextToken]
+					: Number(nextToken);
+
+				if (operand === undefined) {
+					throw new Error(`Invalid operand: ${nextToken}`);
+				}
+
+				const methodName = getZ3MathMethod(operator);
+				expression = expression[methodName](operand);
+				i++;
+			} else {
+				throw new Error(`Unexpected token: ${tokens[i]}`);
+			}
+		}
+
+		// Process equality operator and final value
+		if (i < tokens.length) {
+			const equalityOperator = tokens[i];
+			if (!isEqualityOperator(equalityOperator)) {
+				throw new Error(`Expected equality operator, got: ${equalityOperator}`);
+			}
+
+			i++;
+			if (i >= tokens.length) {
+				throw new Error('Expected value after equality operator');
+			}
+
+			const finalValue = isAlpha(tokens[i])
+				? definedVars[tokens[i]]
+				: Number(tokens[i]);
+
+			if (finalValue === undefined) {
+				throw new Error(`Invalid final value: ${tokens[i]}`);
+			}
+
+			const methodName = getZ3EqualityMethod(equalityOperator);
+			expression = expression[methodName](finalValue);
+		}
+
+		return expression.eq(true);
+	}
+
 	const {expr1, expr2} = arithObj;
 
 	// Check expr1 and expr2 are the correct datatypes:
@@ -585,8 +685,12 @@ async function handleEquationCompose(
 	}
 
 	if (numVarEntries === 1) {
-		console.log('has 1 entry in definedVars');
+		console.log('has 1 entry in definedVars:', definedVars[0]);
 	}
+
+	const createdZ3Assertion: any = constructZ3Assertion(expr2, definedVars);
+
+	return createdZ3Assertion;
 }
 
 async function handleHskipDispatch(
@@ -956,7 +1060,40 @@ async function handleHassignDispatch(
 		return false;
 	}
 
-	return false;
+	// Get content for afterImplies by calling to handleEquationCompose func
+
+	const afterImplies = await handleEquationCompose(
+		arithObj,
+		lhsVarNames,
+		tracker,
+	);
+
+	try {
+		solver.add(Implies(beforeImplies, afterImplies).eq(true));
+		console.log('final assertion added in handleDispatch');
+		console.log(
+			'checking satisfiability of z3 stack for constructed proof overall',
+		);
+		const result = await solver.check();
+
+		const isSatProps: [any, any, SplitReturnObjType[], LawTypeHoare] = [
+			result,
+			solver,
+			beforeImpliesExpr,
+			'hassign',
+		];
+
+		const isSat = checkSatResult({
+			result: isSatProps[0],
+			solver: isSatProps[1],
+			beforeImpliesExpr: isSatProps[2],
+			tripleLaw: isSatProps[3],
+		});
+
+		return isSat;
+	} finally {
+		await solver.pop();
+	}
 }
 
 export {handleHskipDispatch, handleHassignDispatch};

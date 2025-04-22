@@ -156,8 +156,11 @@ function doSupportingArithLawChecks(
 
 		// Check substitution expression matches expression in arith proof line
 		if (substAssignment !== arithAssignExpr) {
+			console.log(
+				`Error: substitution expression ${arithAssignExpr} in arith call does not match with expression ${substAssignment} in subst call`,
+			);
 			console.error(
-				'Error: substitution expression in arith call does not match with expression in subst call',
+				`Error: substitution expression ${arithAssignExpr} in arith call does not match with expression ${substAssignment} in subst call`,
 			);
 			return;
 		}
@@ -165,6 +168,7 @@ function doSupportingArithLawChecks(
 		console.log('substitution expression matches assignment expression');
 
 		// Check result of assignment expression to variable in postcondition of arith proof line matches postcondition value in substitution proof line
+
 		if (substResultDomain !== arithResultDomain) {
 			console.error(
 				'Error: result of assignment expression in arith call does not match with postcondition in subst call',

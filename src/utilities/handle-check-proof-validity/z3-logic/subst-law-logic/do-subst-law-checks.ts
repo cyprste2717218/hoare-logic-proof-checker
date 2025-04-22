@@ -147,6 +147,12 @@ function doSubstLawChecks(
 		};
 	}
 
+	function extractBeforeArithSuffix(input: string): string {
+		const pattern = /^(.*?)(?=:arith|$)/;
+		const match = pattern.exec(input);
+		return match ? match[1].trim() : '';
+	}
+
 	try {
 		// Decompose and extract content from substitution proof line as well as the variable and value of the program body expression in the hoare triple, for use in following comparison checks
 
@@ -210,8 +216,19 @@ function doSubstLawChecks(
 			return;
 		}
 
+		const arithExpression = extractBeforeArithSuffix(
+			assignLawDetails.substitutionExpression,
+		);
+
+		if (arithExpression === '') {
+			console.error(
+				'Error in doSubstLawChecks: arithExpression is empty after attempt to remove :arith suffix',
+			);
+			return;
+		}
+
 		return {
-			arithExpression: assignLawDetails.arithExpression,
+			arithExpression,
 			subst: {
 				substPrecondition: substPreCondition,
 				substPostcondition: substPostCondition,
