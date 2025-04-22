@@ -1,7 +1,9 @@
 import {type ErrorMsg, type LawTypeKeys} from '@/models/misc';
 import {validRegexFormats} from '@/lib/regex-formats';
-import {formatProof} from '@/utilities/handle-proof-syntax-check/format-utils';
-import {hasFormatErrors} from '@/utilities/handle-proof-syntax-check/syntax-check/has-format-errors';
+import {
+	formatProof,
+	hasFormatErrors,
+} from '@/utilities/handle-proof-syntax-check/format-utils';
 
 type HandleProofCheckProps = {
 	proofContent: string;

@@ -10,13 +10,13 @@ import {init, sat} from 'z3-solver';
 import {handleEquationCompose} from '../hassign-law-logic/handle-equation-compose';
 import {tracker} from '../z3-variable-tracker-class';
 import {initialiseContext} from '../initialise-z3-funcs';
-import {checkSatResult} from './check-sat-result';
-import {addVariableConstraint} from './add-variable-constraint';
 import {
 	handleCreateExprValues,
 	handleCreateOperators,
 	handleCreateVariableNames,
-} from './handle-create-construct-funcs';
+} from '../handle-create-construct-funcs';
+import {checkSatResult} from './check-sat-result';
+import {addVariableConstraint} from './add-variable-constraint';
 import {
 	type SplitReturnObjType,
 	type ArithObjType,
