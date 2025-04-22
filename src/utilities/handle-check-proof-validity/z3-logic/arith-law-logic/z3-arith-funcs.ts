@@ -16,6 +16,12 @@ import {
 } from '@/models/hoare-law-z3-models';
 import {type LawTypeHoare} from '@/models/misc';
 
+type ModelValuesType = {
+	xValue: undefined | string;
+	yValue: undefined | string;
+	zValue: undefined | string;
+};
+
 type ConstraintPropsType = {
 	Int: any;
 	And: any;
@@ -547,6 +553,8 @@ async function handleEquationCompose(
 	arithObj: ArithObjType,
 	variableNames: string[],
 	tracker: Z3VariableTracker,
+	solver: any,
+	Not: any,
 ): Promise<any> {
 	function getDefinedVariables(
 		letterVariables: string[],
@@ -670,7 +678,7 @@ async function handleEquationCompose(
 			expression = expression[methodName](finalValue);
 		}
 
-		return expression.eq(true);
+		return expression;
 	}
 
 	const {expr1, expr2} = arithObj;
@@ -706,7 +714,72 @@ async function handleEquationCompose(
 
 	const createdZ3Assertion: any = constructZ3Assertion(expr2, definedVars);
 
-	return createdZ3Assertion;
+	// Creating z3 scope to add assertion created to z3 stack to check if a model can be found with disproves the equation, assertion is deleted from global z3 scope after regardless of whether stack is satisfiable or not
+	solver.push();
+	console.log(`createdZ3Assertion: ${createdZ3Assertion}`);
+	console.log(`Not(createdZ3Assertion): ${Not(createdZ3Assertion).eq(true)}`);
+	solver.add(Not(createdZ3Assertion).eq(true));
+	const result = await solver.check();
+
+	if (result === 'sat') {
+		console.error(
+			'Error in handleEquationCompose: z3 found model that doesnt satisfy variable domain constraints:',
+		);
+
+		const model = await solver.model();
+
+		const declarations = model.decls();
+
+		const modelValues: ModelValuesType = {
+			xValue: undefined,
+			yValue: undefined,
+			zValue: undefined,
+		};
+		// Logging values satisfying z3 stack to console
+
+		if (declarations.length > 0) {
+			modelValues.xValue =
+				declarations[0].name() === 'x'
+					? model.get(declarations[0]).asString()
+					: undefined;
+			console.log('model xValue:', modelValues.xValue);
+		}
+
+		if (declarations.length >= 2) {
+			if (declarations.length === 2) {
+				modelValues.yValue =
+					declarations[1].name() === 'y'
+						? model.get(declarations[1]).asString()
+						: undefined;
+				console.log('model yValue:', modelValues.yValue);
+			} else {
+				modelValues.zValue =
+					declarations[1].name() === 'z'
+						? model.get(declarations[1]).asString()
+						: undefined;
+				console.log('model zValue:', modelValues.zValue);
+			}
+		}
+
+		if (declarations.length === 3) {
+			modelValues.yValue =
+				declarations[2].name() === 'y'
+					? model.get(declarations[2]).asString()
+					: undefined;
+			console.log('model yValue:', modelValues.yValue);
+		}
+
+		solver.pop();
+		return false;
+	}
+
+	if (result === 'unsat') {
+		console.log(
+			'No model value found by z3 that disproves statement based on variable domain constraints so must be valid',
+		);
+		solver.pop();
+		return createdZ3Assertion.eq(true);
+	}
 }
 
 async function handleHskipDispatch(
@@ -1112,7 +1185,16 @@ async function handleHassignDispatch(
 		arithObj,
 		lhsVarNames,
 		tracker,
+		solver,
+		Not,
 	);
+
+	if (afterImplies === false) {
+		console.error(
+			'Discovered counterexample to proof, so not evidence of valid hoare triple assignment proof',
+		);
+		return false;
+	}
 
 	try {
 		solver.add(Implies(beforeImplies, afterImplies).eq(true));
