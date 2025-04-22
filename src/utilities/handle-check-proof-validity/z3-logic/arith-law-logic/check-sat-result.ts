@@ -4,8 +4,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment -- lack of typing in Z3 package  */
 
 import type {
-	ImpliesPartExpr,
 	SplitOperatorType,
+	SplitReturnObjType,
 } from '@/models/hoare-law-z3-models';
 import type {LawTypeHoare} from '@/models/misc';
 
@@ -15,8 +15,8 @@ type ModelValuesType = {
 	zValue: undefined | string;
 };
 function checkDisallowedModelValues(
-	beforeImpliesExpr: ImpliesPartExpr[],
-	afterImpliesExpr: ImpliesPartExpr[],
+	beforeImpliesExpr: SplitReturnObjType[],
+	afterImpliesExpr: SplitReturnObjType[],
 	modelValues: ModelValuesType,
 	tripleLaw: LawTypeHoare,
 ): boolean {
@@ -89,16 +89,18 @@ function checkDisallowedModelValues(
 		let i = 0;
 		console.log('beforeImpliesExpr is value:', beforeImpliesExpr);
 		while (i < beforeImpliesExpr.length) {
-			const lhsValue = beforeImpliesExpr[i].value;
+			const lhsValue = beforeImpliesExpr[i].variableValue;
 			const lhsOperator = beforeImpliesExpr[i].operator;
 
-			const rhsValue = afterImpliesExpr[i].value;
+			const rhsValue = afterImpliesExpr[i].variableValue;
 			const rhsOperator = afterImpliesExpr[i].operator;
 
 			// Map through all operators and values
 
 			if (lhsOperator === rhsOperator) {
-				const comparisonOperator: string = setComparisonOperator(lhsOperator);
+				const comparisonOperator: string = setComparisonOperator(
+					lhsOperator as SplitOperatorType,
+				);
 
 				/* 
 				For Skip Law triple:
@@ -168,8 +170,8 @@ function checkSatResult({
 }: {
 	result: any;
 	solver: any;
-	beforeImpliesExpr: ImpliesPartExpr[];
-	afterImpliesExpr: ImpliesPartExpr[];
+	beforeImpliesExpr: SplitReturnObjType[];
+	afterImpliesExpr: SplitReturnObjType[];
 	tripleLaw: LawTypeHoare;
 }): boolean {
 	console.log('sat result overall is:', result);
@@ -217,8 +219,8 @@ function checkSatResult({
 		}
 
 		const checkDisallowedModelValuesProps: [
-			ImpliesPartExpr[],
-			ImpliesPartExpr[],
+			SplitReturnObjType[],
+			SplitReturnObjType[],
 			ModelValuesType,
 			LawTypeHoare,
 		] = [beforeImpliesExpr, afterImpliesExpr, modelValues, tripleLaw];

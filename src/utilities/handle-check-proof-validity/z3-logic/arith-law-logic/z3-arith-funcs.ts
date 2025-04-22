@@ -10,8 +10,8 @@ import {init, sat} from 'z3-solver';
 import {checkSatResult} from './check-sat-result';
 import {addVariableConstraint} from './add-variable-constraint';
 import {
+	type SplitReturnObjType,
 	type ArithObjType,
-	type ImpliesPartExpr,
 	type SplitOperatorType,
 } from '@/models/hoare-law-z3-models';
 import {type LawTypeHoare} from '@/models/misc';
@@ -21,6 +21,7 @@ type ConstraintPropsType = {
 	And: any;
 	Not: any;
 	solver: any;
+	tracker: any;
 };
 
 type ExprValueLhsTypes = {
@@ -51,15 +52,31 @@ type ExprOperatorRhsTypes = {
 
 type ExprOperatorTypes = ExprOperatorLhsTypes & ExprOperatorRhsTypes;
 
+type ExprVarNameLhsTypes = {
+	firstExprVarNameLhs: string | undefined;
+	secondExprVarNameLhs: string | undefined;
+	thirdExprVarNameLhs: string | undefined;
+};
+
+type ExprVarNameRhsTypes = {
+	firstExprVarNameRhs: string | undefined;
+	secondExprVarNameRhs: string | undefined;
+	thirdExprVarNameRhs: string | undefined;
+};
+
+type ExprVarNameTypes = ExprVarNameLhsTypes & ExprVarNameRhsTypes;
+
 type FetchConstraintsPropsLhsType = {
 	constraintProps: ConstraintPropsType;
 } & ExprValueLhsTypes &
-	ExprOperatorLhsTypes;
+	ExprOperatorLhsTypes &
+	ExprVarNameLhsTypes;
 
 type FetchConstraintsPropsType = {
 	constraintProps: ConstraintPropsType;
 } & ExprValueTypes &
-	ExprOperatorTypes;
+	ExprOperatorTypes &
+	ExprVarNameTypes;
 
 type ExpressionValues = {
 	firstExprValueLhs?: number;
@@ -74,6 +91,12 @@ type ExpressionValues = {
 	firstRhsOperator?: SplitOperatorType;
 	secondRhsOperator?: SplitOperatorType;
 	thirdRhsOperator?: SplitOperatorType;
+	firstExprVarNameLhs?: string;
+	secondExprVarNameLhs?: string;
+	thirdExprVarNameLhs?: string;
+	firstExprVarNameRhs?: string;
+	secondExprVarNameRhs?: string;
+	thirdExprVarNameRhs?: string;
 };
 
 type CreatedOperatorsType =
@@ -85,7 +108,43 @@ type CreatedValuesType =
 	| {lhsValues: number[]; rhsValues?: undefined}
 	| undefined;
 
+type CreatedVariableNamesType =
+	| {
+			lhsVarNames: string[];
+			rhsVarNames: string[];
+	  }
+	| {
+			lhsVarNames: string[];
+			rhsVarNames?: undefined;
+	  }
+	| undefined;
+
+type Z3Variable = {
+	variable: any; // Z3 variable reference
+	programVarName: string;
+	type: 'Int' | 'Bool' | 'Real';
+};
+
+type VariableDictionary = Record<string, any>;
+
+class Z3VariableTracker {
+	private readonly variables = new Map<string, Z3Variable>();
+
+	addVariable(programVarName: string, variable: any, type: Z3Variable['type']) {
+		this.variables.set(programVarName, {variable, programVarName, type});
+	}
+
+	getVariable(name: string): Z3Variable | undefined {
+		return this.variables.get(name);
+	}
+
+	getAllVariables(): Z3Variable[] {
+		return Array.from(this.variables.values());
+	}
+}
+
 let z3Context: any = null;
+const tracker = new Z3VariableTracker();
 
 async function fetchConstraints(
 	fetchedConstraintsProps:
@@ -107,6 +166,12 @@ async function fetchConstraints(
 		secondRhsOperator,
 		thirdLhsOperator,
 		thirdRhsOperator,
+		firstExprVarNameLhs,
+		firstExprVarNameRhs,
+		secondExprVarNameLhs,
+		secondExprVarNameRhs,
+		thirdExprVarNameLhs,
+		thirdExprVarNameRhs,
 	} = isFetchConstraintsPropsType(fetchedConstraintsProps)
 		? fetchedConstraintsProps
 		: {
@@ -122,6 +187,12 @@ async function fetchConstraints(
 				secondRhsOperator: undefined,
 				thirdLhsOperator: undefined,
 				thirdRhsOperator: undefined,
+				firstExprVarNameLhs: undefined,
+				firstExprVarNameRhs: undefined,
+				secondExprVarNameLhs: undefined,
+				secondExprVarNameRhs: undefined,
+				thirdExprVarNameLhs: undefined,
+				thirdExprVarNameRhs: undefined,
 			};
 
 	// Type guard function
@@ -132,51 +203,57 @@ async function fetchConstraints(
 	}
 
 	const fetchedConstraints = await Promise.all([
-		firstExprValueLhs && firstLhsOperator
+		firstExprValueLhs && firstLhsOperator && firstExprVarNameLhs
 			? addVariableConstraint({
 					variableName: 'x',
 					operator: firstLhsOperator,
 					value: firstExprValueLhs,
+					realProgramVarName: firstExprVarNameLhs,
 					...constraintProps,
 				})
 			: Promise.resolve(true),
-		firstExprValueRhs && firstRhsOperator
+		firstExprValueRhs && firstRhsOperator && firstExprVarNameRhs
 			? addVariableConstraint({
 					variableName: 'x',
 					operator: firstRhsOperator,
 					value: firstExprValueRhs,
+					realProgramVarName: firstExprVarNameRhs,
 					...constraintProps,
 				})
 			: Promise.resolve(true),
-		secondExprValueLhs && secondLhsOperator
+		secondExprValueLhs && secondLhsOperator && secondExprVarNameLhs
 			? addVariableConstraint({
 					variableName: 'y',
 					operator: secondLhsOperator,
 					value: secondExprValueLhs,
+					realProgramVarName: secondExprVarNameLhs,
 					...constraintProps,
 				})
 			: Promise.resolve(true),
-		secondExprValueRhs && secondRhsOperator
+		secondExprValueRhs && secondRhsOperator && secondExprVarNameRhs
 			? addVariableConstraint({
 					variableName: 'y',
 					operator: secondRhsOperator,
 					value: secondExprValueRhs,
+					realProgramVarName: secondExprVarNameRhs,
 					...constraintProps,
 				})
 			: Promise.resolve(true),
-		thirdExprValueLhs && thirdLhsOperator
+		thirdExprValueLhs && thirdLhsOperator && thirdExprVarNameLhs
 			? addVariableConstraint({
 					variableName: 'z',
 					operator: thirdLhsOperator,
 					value: thirdExprValueLhs,
+					realProgramVarName: thirdExprVarNameLhs,
 					...constraintProps,
 				})
 			: Promise.resolve(true),
-		thirdExprValueRhs && thirdRhsOperator
+		thirdExprValueRhs && thirdRhsOperator && thirdExprVarNameRhs
 			? addVariableConstraint({
 					variableName: 'z',
 					operator: thirdRhsOperator,
 					value: thirdExprValueRhs,
+					realProgramVarName: thirdExprVarNameRhs,
 					...constraintProps,
 				})
 			: Promise.resolve(true),
@@ -204,22 +281,64 @@ async function initialiseContext() {
 	return [Int, And, Solver, Not, Implies];
 }
 
+function handleCreateVariableNames(
+	callingProofLaw: LawTypeHoare,
+	beforeImpliesExpr: SplitReturnObjType[],
+	afterImpliesExpr?: SplitReturnObjType[],
+) {
+	function handleCreateExprVarNamesLhs(
+		beforeImpliesExpr: SplitReturnObjType[],
+	): string[] {
+		const lhsVarNames = beforeImpliesExpr.map((expr) => expr.variable);
+		return lhsVarNames;
+	}
+
+	function handleCreateExprVarNamesRhs(
+		afterImpliesExpr: SplitReturnObjType[],
+	): string[] {
+		const rhsVarNames = afterImpliesExpr.map((expr) => expr.variable);
+		return rhsVarNames;
+	}
+
+	if (callingProofLaw === 'hskip') {
+		const lhsVarNames = handleCreateExprVarNamesLhs(beforeImpliesExpr);
+		const rhsVarNames = handleCreateExprVarNamesRhs(afterImpliesExpr!);
+
+		return {lhsVarNames, rhsVarNames};
+	}
+
+	if (callingProofLaw === 'hassign') {
+		const lhsVarNames = handleCreateExprVarNamesLhs(beforeImpliesExpr);
+
+		return {lhsVarNames};
+	}
+
+	console.error(
+		'callingProofLaw in handleCreateVariableNames is not a valid value',
+	);
+	return undefined;
+}
+
 function handleCreateExprValues(
 	callingProofLaw: LawTypeHoare,
-	beforeImpliesExpr: ImpliesPartExpr[],
-	afterImpliesExpr?: ImpliesPartExpr[],
+	beforeImpliesExpr: SplitReturnObjType[],
+	afterImpliesExpr?: SplitReturnObjType[],
 ) {
 	function handleCreateExprValuesLhs(
-		beforeImpliesExpr: ImpliesPartExpr[],
+		beforeImpliesExpr: SplitReturnObjType[],
 	): number[] {
-		const lhsValues = beforeImpliesExpr.map((expr) => Number(expr.value));
+		const lhsValues = beforeImpliesExpr.map((expr) =>
+			Number(expr.variableValue),
+		);
 		return lhsValues;
 	}
 
 	function handleCreateExprValuesRhs(
-		afterImpliesExpr: ImpliesPartExpr[],
+		afterImpliesExpr: SplitReturnObjType[],
 	): number[] {
-		const rhsValues = afterImpliesExpr.map((expr) => Number(expr.value));
+		const rhsValues = afterImpliesExpr.map((expr) =>
+			Number(expr.variableValue),
+		);
 		return rhsValues;
 	}
 
@@ -236,23 +355,25 @@ function handleCreateExprValues(
 		return {lhsValues};
 	}
 
-	console.error('callingProofLaw is not a valid value');
+	console.error(
+		'callingProofLaw in handleCreateExprValues is not a valid value',
+	);
 	return undefined;
 }
 
 function handleCreateOperators(
 	callingProofLaw: LawTypeHoare,
-	beforeImpliesExpr: ImpliesPartExpr[],
-	afterImpliesExpr?: ImpliesPartExpr[],
+	beforeImpliesExpr: SplitReturnObjType[],
+	afterImpliesExpr?: SplitReturnObjType[],
 ):
 	| {lhsOperators: SplitOperatorType[]; rhsOperators?: SplitOperatorType[]}
 	| undefined {
-	function handleCreateOperatorsLhs(beforeImpliesExpr: ImpliesPartExpr[]) {
+	function handleCreateOperatorsLhs(beforeImpliesExpr: SplitReturnObjType[]) {
 		function createOpers(
-			beforeImpliesExpr: ImpliesPartExpr[],
+			beforeImpliesExpr: SplitReturnObjType[],
 		): SplitOperatorType[] {
 			const lhsOperators: SplitOperatorType[] = beforeImpliesExpr.map(
-				(expr) => expr.operator,
+				(expr) => expr.operator as SplitOperatorType,
 			);
 
 			return lhsOperators;
@@ -264,13 +385,13 @@ function handleCreateOperators(
 	}
 
 	function handleCreateOperatorsRhs(
-		afterImpliesExpr: ImpliesPartExpr[],
+		afterImpliesExpr: SplitReturnObjType[],
 	): SplitOperatorType[] {
 		function createOpers(
-			afterImpliesExpr: ImpliesPartExpr[],
+			afterImpliesExpr: SplitReturnObjType[],
 		): SplitOperatorType[] {
 			const rhsOperators: SplitOperatorType[] = afterImpliesExpr.map(
-				(expr) => expr.operator,
+				(expr) => expr.operator as SplitOperatorType,
 			);
 
 			return rhsOperators;
@@ -312,11 +433,13 @@ function handleCreateOperators(
 	return undefined;
 }
 
-function processValuesAndOperators(
+function processValuesOperatorsNames(
 	lhsValues: number[],
 	lhsOperators: SplitOperatorType[],
+	lhsVarNames: string[],
 	rhsValues?: number[],
 	rhsOperators?: SplitOperatorType[],
+	rhsVarNames?: string[],
 ): ExpressionValues {
 	const result: ExpressionValues = {};
 
@@ -325,35 +448,45 @@ function processValuesAndOperators(
 		arr?.[index];
 
 	for (let i = 0; i < 3; i++) {
-		if (lhsValues.length > i && lhsOperators.length > i) {
+		if (
+			lhsValues.length > i &&
+			lhsOperators.length > i &&
+			lhsVarNames.length > i
+		) {
 			switch (i) {
 				case 0: {
 					result.firstExprValueLhs = lhsValues[i];
 					result.firstLhsOperator = lhsOperators[i];
+					result.firstExprVarNameLhs = lhsVarNames[i];
 					result.firstExprValueRhs = safeGet(rhsValues, i);
 					result.firstRhsOperator = safeGet(rhsOperators, i);
+					result.firstExprVarNameRhs = safeGet(rhsVarNames, i);
 					break;
 				}
 
 				case 1: {
 					result.secondExprValueLhs = lhsValues[i];
 					result.secondLhsOperator = lhsOperators[i];
+					result.secondExprVarNameLhs = lhsVarNames[i];
 					result.secondExprValueRhs = safeGet(rhsValues, i);
 					result.secondRhsOperator = safeGet(rhsOperators, i);
+					result.secondExprVarNameRhs = safeGet(rhsVarNames, i);
 					break;
 				}
 
 				case 2: {
 					result.thirdExprValueLhs = lhsValues[i];
 					result.thirdLhsOperator = lhsOperators[i];
+					result.thirdExprVarNameLhs = lhsVarNames[i];
 					result.thirdExprValueRhs = safeGet(rhsValues, i);
 					result.thirdRhsOperator = safeGet(rhsOperators, i);
+					result.thirdExprVarNameRhs = safeGet(rhsVarNames, i);
 					break;
 				}
 
 				default: {
 					console.error(
-						'Error handling processValuesAndOperators func, invalid i value of:',
+						'Error handling processValuesOperatorsNames func, invalid i value of:',
 						i,
 					);
 				}
@@ -392,18 +525,81 @@ async function constructImpliesExpr(
 	// Could do with sending message about needing to refresh the page to re-try adding all assertions to z3 stack again due to error encountered
 }
 
+async function handleEquationCompose(
+	arithObj: ArithObjType,
+	variableNames: string[],
+	tracker: Z3VariableTracker,
+): Promise<any> {
+	function getDefinedVariables(
+		letterVariables: string[],
+		tracker: Z3VariableTracker,
+	): VariableDictionary {
+		// Initialize result dictionary
+		const definedVariables: VariableDictionary = {};
+
+		// Process each letter
+		for (const letter of letterVariables) {
+			// Ensure letter is a single alphabetical character
+			if (/^[a-zA-Z]$/.test(letter)) {
+				const variable = tracker.getVariable(letter)?.variable;
+
+				// Only add defined variables to the result
+				if (variable !== undefined) {
+					definedVariables[letter] = variable;
+				}
+			} else {
+				console.warn(`Skipping invalid variable name: ${letter}`);
+			}
+		}
+
+		return definedVariables;
+	}
+
+	const {expr1, expr2} = arithObj;
+
+	// Check expr1 and expr2 are the correct datatypes:
+
+	if (typeof expr2 === 'string') {
+		console.error(
+			`Error in handleEquationCompose: expr2 must be string [], but is ${typeof expr2}`,
+		);
+		return;
+	}
+
+	if (expr1 === undefined) {
+		console.error('Error in handleEquationCompose: expr1 is undefined');
+		return;
+	}
+
+	console.log('datatype checks pass for handleEquationCompose');
+
+	// Retrieving z3 variables already defined and added to Map<string, Z3Variable> from adding constraints to z3 stack in addVariableConstraint func
+
+	const definedVars = getDefinedVariables(variableNames, tracker); //  { x: Z3Var, y: Z3Var }
+
+	const numVarEntries = Object.entries(definedVars).length;
+
+	if (!numVarEntries) {
+		console.error('Error in handleEquationCompose: definedVars is empty');
+		return;
+	}
+
+	if (numVarEntries === 1) {
+		console.log('has 1 entry in definedVars');
+	}
+}
+
 async function handleHskipDispatch(
-	beforeImpliesExpr: ImpliesPartExpr[],
-	afterImpliesExpr: ImpliesPartExpr[],
+	beforeImpliesExpr: SplitReturnObjType[],
+	afterImpliesExpr: SplitReturnObjType[],
 ): Promise<boolean> {
 	const [Int, And, Solver, Not, Implies] = await initialiseContext();
 
 	const solver = new Solver();
 	await solver.push();
 
-	const constraintProps: ConstraintPropsType = {Int, And, Not, solver};
+	const constraintProps: ConstraintPropsType = {Int, And, Not, solver, tracker};
 
-	// To-do: simplify this into a type alias etc.
 	const createdOperators: CreatedOperatorsType = handleCreateOperators(
 		'hskip',
 		beforeImpliesExpr,
@@ -449,6 +645,22 @@ async function handleHskipDispatch(
 	// No errors so destructure lhsValues and rhsValues
 	const {lhsValues, rhsValues} = createdValues;
 
+	// --------------------------
+	// handling creating variable names
+	// --------------------------
+
+	const createdVariableNames: CreatedVariableNamesType =
+		handleCreateVariableNames('hassign', beforeImpliesExpr, afterImpliesExpr);
+
+	// - Error checking on variable names created for use in hskip proof logic
+	if (!createdVariableNames) {
+		console.error('createdVariableNames are undefined in handleHskipDispatch');
+		return false;
+	}
+
+	// - No errors so destructure lhsValues and rhsValues
+	const {lhsVarNames, rhsVarNames} = createdVariableNames;
+
 	let fetchedConstraints: [any, any, any, any, any, any] = [
 		true,
 		true,
@@ -471,12 +683,29 @@ async function handleHskipDispatch(
 		firstRhsOperator,
 		secondRhsOperator,
 		thirdRhsOperator,
-	} = processValuesAndOperators(
+		firstExprVarNameLhs,
+		secondExprVarNameLhs,
+		thirdExprVarNameLhs,
+		firstExprVarNameRhs,
+		secondExprVarNameRhs,
+		thirdExprVarNameRhs,
+	} = processValuesOperatorsNames(
 		lhsValues,
 		lhsOperators,
+		lhsVarNames,
 		rhsValues,
 		rhsOperators,
+		rhsVarNames,
 	);
+
+	const exprVariableNames: ExprVarNameTypes = {
+		firstExprVarNameLhs,
+		secondExprVarNameLhs,
+		thirdExprVarNameLhs,
+		firstExprVarNameRhs,
+		secondExprVarNameRhs,
+		thirdExprVarNameRhs,
+	};
 
 	const exprValues: ExprValueLhsTypes & ExprValueRhsTypes = {
 		firstExprValueLhs,
@@ -497,6 +726,7 @@ async function handleHskipDispatch(
 	};
 	const fetchedConstraintsProps: FetchConstraintsPropsType = {
 		constraintProps,
+		...exprVariableNames,
 		...exprValues,
 		...operators,
 	};
@@ -570,8 +800,8 @@ async function handleHskipDispatch(
 		const isSatProps: [
 			any,
 			any,
-			ImpliesPartExpr[],
-			ImpliesPartExpr[],
+			SplitReturnObjType[],
+			SplitReturnObjType[],
 			LawTypeHoare,
 		] = [result, solver, beforeImpliesExpr, afterImpliesExpr, 'hskip'];
 
@@ -590,7 +820,7 @@ async function handleHskipDispatch(
 }
 
 async function handleHassignDispatch(
-	beforeImpliesExpr: ImpliesPartExpr[],
+	beforeImpliesExpr: SplitReturnObjType[],
 	arithObj: ArithObjType,
 ): Promise<boolean> {
 	// Set constraints for all lhs variables
@@ -602,7 +832,7 @@ async function handleHassignDispatch(
 	const solver = new Solver();
 	await solver.push();
 
-	const constraintProps: ConstraintPropsType = {Int, And, Not, solver};
+	const constraintProps: ConstraintPropsType = {Int, And, Not, solver, tracker};
 	// --------------------------
 	// handling creating operators
 	// --------------------------
@@ -638,6 +868,24 @@ async function handleHassignDispatch(
 	// - No errors so destructure lhsValues and rhsValues
 	const {lhsValues} = createdValues;
 
+	// --------------------------
+	// handling creating variable names
+	// --------------------------
+
+	const createdVariableNames: CreatedVariableNamesType =
+		handleCreateVariableNames('hassign', beforeImpliesExpr);
+
+	// - Error checking on variable names created for use in hskip proof logic
+	if (!createdVariableNames) {
+		console.error(
+			'createdVariableNames are undefined in handleHassignDispatch',
+		);
+		return false;
+	}
+
+	// - No errors so destructure lhsVarNames
+	const {lhsVarNames} = createdVariableNames;
+
 	let fetchedConstraints: [any, any, any, undefined, undefined, undefined] = [
 		true,
 		true,
@@ -654,7 +902,16 @@ async function handleHassignDispatch(
 		firstLhsOperator,
 		secondLhsOperator,
 		thirdLhsOperator,
-	} = processValuesAndOperators(lhsValues, lhsOperators);
+		firstExprVarNameLhs,
+		secondExprVarNameLhs,
+		thirdExprVarNameLhs,
+	} = processValuesOperatorsNames(lhsValues, lhsOperators, lhsVarNames);
+
+	const exprVariableNames: ExprVarNameLhsTypes = {
+		firstExprVarNameLhs,
+		secondExprVarNameLhs,
+		thirdExprVarNameLhs,
+	};
 
 	const exprValues: ExprValueLhsTypes = {
 		firstExprValueLhs,
@@ -669,6 +926,7 @@ async function handleHassignDispatch(
 	};
 	const fetchedConstraintsProps: FetchConstraintsPropsLhsType = {
 		constraintProps,
+		...exprVariableNames,
 		...exprValues,
 		...operators,
 	};
@@ -676,6 +934,25 @@ async function handleHassignDispatch(
 
 	if (fetchedConstraints === undefined) {
 		console.error('fetchedConstraints is undefined');
+		return false;
+	}
+
+	let lhsConstraintX;
+	let lhsConstraintY;
+	let lhsConstraintZ;
+
+	const beforeImpliesConstraints = [
+		lhsConstraintX,
+		lhsConstraintY,
+		lhsConstraintZ,
+	].filter((constraint) => constraint !== undefined);
+
+	const beforeImplies = await constructImpliesExpr(
+		And,
+		beforeImpliesConstraints,
+		solver,
+	);
+	if (beforeImplies === false) {
 		return false;
 	}
 

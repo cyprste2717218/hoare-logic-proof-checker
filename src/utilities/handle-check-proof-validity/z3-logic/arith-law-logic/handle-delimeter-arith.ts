@@ -8,14 +8,13 @@ import {handleHskipDispatch, handleHassignDispatch} from './z3-arith-funcs';
 import {type LawTypeHoare} from '@/models/misc';
 import type {
 	ArithObjType,
-	ImpliesPartExpr,
 	SplitOperatorType,
 	SplitReturnObjType,
 } from '@/models/hoare-law-z3-models';
 
-type HskipDispatchProps = [ImpliesPartExpr[], ImpliesPartExpr[]];
+type HskipDispatchProps = [SplitReturnObjType[], SplitReturnObjType[]];
 
-type HassignDispatchProps = [ImpliesPartExpr[], ArithObjType];
+type HassignDispatchProps = [SplitReturnObjType[], ArithObjType];
 
 type DispatchPropsType = HskipDispatchProps | HassignDispatchProps;
 
@@ -373,30 +372,14 @@ async function handleDelimiterArith(
 		}
 	}
 
-	// Removing unneeded 'variable' property from each object and renaming variableValue prop as value in beforeImpliesExprArr and afterImpliesExprArr
-
-	const transformedBeforeImpliesArr = beforeImpliesExprArr.map(
-		({variable, variableValue, ...rest}) => ({
-			...rest,
-			value: variableValue,
-		}),
-	) as ImpliesPartExpr[];
-
-	const transformedAfterImpliesArr = afterImpliesExprArr.map(
-		({variable, variableValue, ...rest}) => ({
-			...rest,
-			value: variableValue,
-		}),
-	) as ImpliesPartExpr[];
-
 	// Dispatching to Z3 to check satisfiability of overall implication statement
 
 	let dispatchProps: DispatchPropsType;
 
 	if (tripleLaw === 'hskip') {
-		dispatchProps = [transformedBeforeImpliesArr, transformedAfterImpliesArr];
+		dispatchProps = [beforeImpliesExprArr, afterImpliesExprArr];
 	} else if (tripleLaw === 'hassign') {
-		dispatchProps = [transformedBeforeImpliesArr, arithObj];
+		dispatchProps = [beforeImpliesExprArr, arithObj];
 	} else {
 		console.error(
 			`unable to define dispatchProps for hoare triple law ${tripleLaw}`,
