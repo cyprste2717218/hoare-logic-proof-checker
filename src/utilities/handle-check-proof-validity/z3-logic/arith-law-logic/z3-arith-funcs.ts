@@ -9,6 +9,7 @@
 import {init, sat} from 'z3-solver';
 import {handleEquationCompose} from '../hassign-law-logic/handle-equation-compose';
 import {tracker} from '../z3-variable-tracker-class';
+import {initialiseContext} from '../initialise-z3-funcs';
 import {checkSatResult} from './check-sat-result';
 import {addVariableConstraint} from './add-variable-constraint';
 import {
@@ -35,8 +36,6 @@ import {
 	type ExprOperatorLhsTypes,
 } from '@/models/hoare-law-z3-models';
 import {type LawTypeHoare} from '@/models/misc';
-
-let z3Context: any = null;
 
 async function fetchConstraints(
 	fetchedConstraintsProps:
@@ -168,25 +167,6 @@ async function fetchConstraints(
 	]);
 
 	return fetchedConstraints;
-}
-
-async function getZ3Context() {
-	if (!z3Context) {
-		const {Context} = await init();
-
-		// @ts-expect-error z3 package doesn't provide typing for these constructs at current v4.14.1
-		z3Context = new Context('main');
-	}
-
-	return z3Context;
-}
-
-async function initialiseContext() {
-	const context = await getZ3Context();
-
-	const {Int, And, Solver, Not, Implies} = context;
-
-	return [Int, And, Solver, Not, Implies];
 }
 
 function processValuesOperatorsNames(
