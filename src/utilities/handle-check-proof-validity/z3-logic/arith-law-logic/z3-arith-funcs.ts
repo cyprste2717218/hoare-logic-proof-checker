@@ -7,150 +7,39 @@
 
 // @ts-expect-error z3-solver is not recognising 'sat' as a valid export
 import {init, sat} from 'z3-solver';
+import {handleEquationCompose} from '../hassign-law-logic/handle-equation-compose';
+import {tracker} from '../z3-variable-tracker-class';
 import {checkSatResult} from './check-sat-result';
 import {addVariableConstraint} from './add-variable-constraint';
+import {
+	handleCreateExprValues,
+	handleCreateOperators,
+	handleCreateVariableNames,
+} from './handle-create-construct-funcs';
 import {
 	type SplitReturnObjType,
 	type ArithObjType,
 	type SplitOperatorType,
+	Z3Variable,
+	type FetchConstraintsPropsType,
+	type ConstraintPropsType,
+	type CreatedOperatorsType,
+	type CreatedValuesType,
+	type CreatedVariableNamesType,
+	type ExpressionValues,
+	type FetchConstraintsPropsLhsType,
+	ModelValuesType,
+	VariableDictionary,
+	type ExprVarNameTypes,
+	type ExprValueTypes,
+	type ExprOperatorTypes,
+	type ExprVarNameLhsTypes,
+	type ExprValueLhsTypes,
+	type ExprOperatorLhsTypes,
 } from '@/models/hoare-law-z3-models';
 import {type LawTypeHoare} from '@/models/misc';
 
-type ModelValuesType = {
-	xValue: undefined | string;
-	yValue: undefined | string;
-	zValue: undefined | string;
-};
-
-type ConstraintPropsType = {
-	Int: any;
-	And: any;
-	Not: any;
-	solver: any;
-	tracker: any;
-};
-
-type ExprValueLhsTypes = {
-	firstExprValueLhs: number | undefined;
-	secondExprValueLhs: number | undefined;
-	thirdExprValueLhs: number | undefined;
-};
-
-type ExprValueRhsTypes = {
-	firstExprValueRhs: number | undefined;
-	secondExprValueRhs: number | undefined;
-	thirdExprValueRhs: number | undefined;
-};
-
-type ExprValueTypes = ExprValueLhsTypes & ExprValueRhsTypes;
-
-type ExprOperatorLhsTypes = {
-	firstLhsOperator: SplitOperatorType | undefined;
-	secondLhsOperator: SplitOperatorType | undefined;
-	thirdLhsOperator: SplitOperatorType | undefined;
-};
-
-type ExprOperatorRhsTypes = {
-	firstRhsOperator: SplitOperatorType | undefined;
-	secondRhsOperator: SplitOperatorType | undefined;
-	thirdRhsOperator: SplitOperatorType | undefined;
-};
-
-type ExprOperatorTypes = ExprOperatorLhsTypes & ExprOperatorRhsTypes;
-
-type ExprVarNameLhsTypes = {
-	firstExprVarNameLhs: string | undefined;
-	secondExprVarNameLhs: string | undefined;
-	thirdExprVarNameLhs: string | undefined;
-};
-
-type ExprVarNameRhsTypes = {
-	firstExprVarNameRhs: string | undefined;
-	secondExprVarNameRhs: string | undefined;
-	thirdExprVarNameRhs: string | undefined;
-};
-
-type ExprVarNameTypes = ExprVarNameLhsTypes & ExprVarNameRhsTypes;
-
-type FetchConstraintsPropsLhsType = {
-	constraintProps: ConstraintPropsType;
-} & ExprValueLhsTypes &
-	ExprOperatorLhsTypes &
-	ExprVarNameLhsTypes;
-
-type FetchConstraintsPropsType = {
-	constraintProps: ConstraintPropsType;
-} & ExprValueTypes &
-	ExprOperatorTypes &
-	ExprVarNameTypes;
-
-type ExpressionValues = {
-	firstExprValueLhs?: number;
-	secondExprValueLhs?: number;
-	thirdExprValueLhs?: number;
-	firstExprValueRhs?: number;
-	secondExprValueRhs?: number;
-	thirdExprValueRhs?: number;
-	firstLhsOperator?: SplitOperatorType;
-	secondLhsOperator?: SplitOperatorType;
-	thirdLhsOperator?: SplitOperatorType;
-	firstRhsOperator?: SplitOperatorType;
-	secondRhsOperator?: SplitOperatorType;
-	thirdRhsOperator?: SplitOperatorType;
-	firstExprVarNameLhs?: string;
-	secondExprVarNameLhs?: string;
-	thirdExprVarNameLhs?: string;
-	firstExprVarNameRhs?: string;
-	secondExprVarNameRhs?: string;
-	thirdExprVarNameRhs?: string;
-};
-
-type CreatedOperatorsType =
-	| {lhsOperators: SplitOperatorType[]; rhsOperators?: SplitOperatorType[]}
-	| undefined;
-
-type CreatedValuesType =
-	| {lhsValues: number[]; rhsValues: number[]}
-	| {lhsValues: number[]; rhsValues?: undefined}
-	| undefined;
-
-type CreatedVariableNamesType =
-	| {
-			lhsVarNames: string[];
-			rhsVarNames: string[];
-	  }
-	| {
-			lhsVarNames: string[];
-			rhsVarNames?: undefined;
-	  }
-	| undefined;
-
-type Z3Variable = {
-	variable: any; // Z3 variable reference
-	programVarName: string;
-	type: 'Int' | 'Bool' | 'Real';
-};
-
-type VariableDictionary = Record<string, any>;
-
-class Z3VariableTracker {
-	private readonly variables = new Map<string, Z3Variable>();
-
-	addVariable(programVarName: string, variable: any, type: Z3Variable['type']) {
-		this.variables.set(programVarName, {variable, programVarName, type});
-	}
-
-	getVariable(name: string): Z3Variable | undefined {
-		return this.variables.get(name);
-	}
-
-	getAllVariables(): Z3Variable[] {
-		return Array.from(this.variables.values());
-	}
-}
-
 let z3Context: any = null;
-const tracker = new Z3VariableTracker();
 
 async function fetchConstraints(
 	fetchedConstraintsProps:
@@ -303,158 +192,6 @@ async function initialiseContext() {
 	return [Int, And, Solver, Not, Implies];
 }
 
-function handleCreateVariableNames(
-	callingProofLaw: LawTypeHoare,
-	beforeImpliesExpr: SplitReturnObjType[],
-	afterImpliesExpr?: SplitReturnObjType[],
-) {
-	function handleCreateExprVarNamesLhs(
-		beforeImpliesExpr: SplitReturnObjType[],
-	): string[] {
-		const lhsVarNames = beforeImpliesExpr.map((expr) => expr.variable);
-		return lhsVarNames;
-	}
-
-	function handleCreateExprVarNamesRhs(
-		afterImpliesExpr: SplitReturnObjType[],
-	): string[] {
-		const rhsVarNames = afterImpliesExpr.map((expr) => expr.variable);
-		return rhsVarNames;
-	}
-
-	if (callingProofLaw === 'hskip') {
-		const lhsVarNames = handleCreateExprVarNamesLhs(beforeImpliesExpr);
-		const rhsVarNames = handleCreateExprVarNamesRhs(afterImpliesExpr!);
-
-		return {lhsVarNames, rhsVarNames};
-	}
-
-	if (callingProofLaw === 'hassign') {
-		const lhsVarNames = handleCreateExprVarNamesLhs(beforeImpliesExpr);
-
-		return {lhsVarNames};
-	}
-
-	console.error(
-		'callingProofLaw in handleCreateVariableNames is not a valid value',
-	);
-	return undefined;
-}
-
-function handleCreateExprValues(
-	callingProofLaw: LawTypeHoare,
-	beforeImpliesExpr: SplitReturnObjType[],
-	afterImpliesExpr?: SplitReturnObjType[],
-) {
-	function handleCreateExprValuesLhs(
-		beforeImpliesExpr: SplitReturnObjType[],
-	): number[] {
-		const lhsValues = beforeImpliesExpr.map((expr) =>
-			Number(expr.variableValue),
-		);
-		return lhsValues;
-	}
-
-	function handleCreateExprValuesRhs(
-		afterImpliesExpr: SplitReturnObjType[],
-	): number[] {
-		const rhsValues = afterImpliesExpr.map((expr) =>
-			Number(expr.variableValue),
-		);
-		return rhsValues;
-	}
-
-	if (callingProofLaw === 'hskip') {
-		const lhsValues = handleCreateExprValuesLhs(beforeImpliesExpr);
-		const rhsValues = handleCreateExprValuesRhs(afterImpliesExpr!);
-
-		return {lhsValues, rhsValues};
-	}
-
-	if (callingProofLaw === 'hassign') {
-		const lhsValues = handleCreateExprValuesLhs(beforeImpliesExpr);
-
-		return {lhsValues};
-	}
-
-	console.error(
-		'callingProofLaw in handleCreateExprValues is not a valid value',
-	);
-	return undefined;
-}
-
-function handleCreateOperators(
-	callingProofLaw: LawTypeHoare,
-	beforeImpliesExpr: SplitReturnObjType[],
-	afterImpliesExpr?: SplitReturnObjType[],
-):
-	| {lhsOperators: SplitOperatorType[]; rhsOperators?: SplitOperatorType[]}
-	| undefined {
-	function handleCreateOperatorsLhs(beforeImpliesExpr: SplitReturnObjType[]) {
-		function createOpers(
-			beforeImpliesExpr: SplitReturnObjType[],
-		): SplitOperatorType[] {
-			const lhsOperators: SplitOperatorType[] = beforeImpliesExpr.map(
-				(expr) => expr.operator as SplitOperatorType,
-			);
-
-			return lhsOperators;
-		}
-
-		const lhsOperators = createOpers(beforeImpliesExpr);
-
-		return lhsOperators;
-	}
-
-	function handleCreateOperatorsRhs(
-		afterImpliesExpr: SplitReturnObjType[],
-	): SplitOperatorType[] {
-		function createOpers(
-			afterImpliesExpr: SplitReturnObjType[],
-		): SplitOperatorType[] {
-			const rhsOperators: SplitOperatorType[] = afterImpliesExpr.map(
-				(expr) => expr.operator as SplitOperatorType,
-			);
-
-			return rhsOperators;
-		}
-
-		const rhsOperators = createOpers(afterImpliesExpr);
-
-		return rhsOperators;
-	}
-
-	const lhsOperators: SplitOperatorType[] = [];
-	const rhsOperators: SplitOperatorType[] = [];
-
-	if (callingProofLaw === 'hskip') {
-		lhsOperators.push(...handleCreateOperatorsLhs(beforeImpliesExpr));
-		rhsOperators.push(...handleCreateOperatorsRhs(afterImpliesExpr!));
-
-		// Check lhsOperators and rhsOperators length match
-		if (lhsOperators.length !== rhsOperators.length) {
-			console.error('lhsOperators arr length doesnt match rhsOperators length');
-			return;
-		}
-
-		return {
-			lhsOperators,
-			rhsOperators,
-		};
-	}
-
-	if (callingProofLaw === 'hassign') {
-		lhsOperators.push(...handleCreateOperatorsLhs(beforeImpliesExpr));
-
-		return {
-			lhsOperators,
-		};
-	}
-
-	console.error('callingProofLaw is not a valid value');
-	return undefined;
-}
-
 function processValuesOperatorsNames(
 	lhsValues: number[],
 	lhsOperators: SplitOperatorType[],
@@ -547,239 +284,6 @@ async function constructImpliesExpr(
 	);
 	return false;
 	// Could do with sending message about needing to refresh the page to re-try adding all assertions to z3 stack again due to error encountered
-}
-
-async function handleEquationCompose(
-	arithObj: ArithObjType,
-	variableNames: string[],
-	tracker: Z3VariableTracker,
-	solver: any,
-	Not: any,
-): Promise<any> {
-	function getDefinedVariables(
-		letterVariables: string[],
-		tracker: Z3VariableTracker,
-	): VariableDictionary {
-		// Initialize result dictionary
-		const definedVariables: VariableDictionary = {};
-
-		// Process each letter
-		for (const letter of letterVariables) {
-			// Ensure letter is a single alphabetical character
-			if (/^[a-zA-Z]$/.test(letter)) {
-				const variable = tracker.getVariable(letter)?.variable;
-
-				// Only add defined variables to the result
-				if (variable !== undefined) {
-					definedVariables[letter] = variable;
-				}
-			} else {
-				console.warn(`Skipping invalid variable name: ${letter}`);
-			}
-		}
-
-		return definedVariables;
-	}
-
-	function constructZ3Assertion(
-		tokens: string[],
-		definedVars: Record<string, any>,
-	): any {
-		if (tokens.length < 3) {
-			throw new Error('Expression must have at least 3 tokens');
-		}
-
-		// Helper functions
-		const isAlpha = (char: string): boolean => /^[a-zA-Z]$/.test(char);
-		// Const isDigit = (char: string): boolean => /^\d$/.test(char);
-		const isMathOperator = (char: string): boolean =>
-			['+', '-', '*', '/'].includes(char);
-		const isEqualityOperator = (char: string): boolean =>
-			['=', '>', '<', '<=', '>='].includes(char);
-
-		const getZ3MathMethod = (operator: string): string => {
-			const methodMap: Record<string, string> = {
-				'+': 'add',
-				'-': 'sub',
-				'*': 'mul',
-				'/': 'div',
-			};
-			return methodMap[operator];
-		};
-
-		const getZ3EqualityMethod = (operator: string): string => {
-			const methodMap: Record<string, string> = {
-				'=': 'eq',
-				'>': 'gt',
-				'<': 'lt',
-				'>=': 'ge',
-				'<=': 'le',
-			};
-			return methodMap[operator];
-		};
-
-		// First token must be alphabetical - get corresponding Z3 variable
-		if (!isAlpha(tokens[0]) || !definedVars[tokens[0]]) {
-			throw new Error('First token must be a defined variable');
-		}
-
-		let expression = definedVars[tokens[0]];
-		let i = 1;
-
-		// Process the expression until we hit an equality operator
-		while (i < tokens.length && !isEqualityOperator(tokens[i])) {
-			if (isMathOperator(tokens[i])) {
-				const operator = tokens[i];
-				i++;
-
-				// Next token must be either a variable or number
-				if (i >= tokens.length) {
-					throw new Error('Unexpected end of expression');
-				}
-
-				const nextToken = tokens[i];
-				const operand = isAlpha(nextToken)
-					? definedVars[nextToken]
-					: Number(nextToken);
-
-				if (operand === undefined) {
-					throw new Error(`Invalid operand: ${nextToken}`);
-				}
-
-				const methodName = getZ3MathMethod(operator);
-				expression = expression[methodName](operand);
-				i++;
-			} else {
-				throw new Error(`Unexpected token: ${tokens[i]}`);
-			}
-		}
-
-		// Process equality operator and final value
-		if (i < tokens.length) {
-			const equalityOperator = tokens[i];
-			if (!isEqualityOperator(equalityOperator)) {
-				throw new Error(`Expected equality operator, got: ${equalityOperator}`);
-			}
-
-			i++;
-			if (i >= tokens.length) {
-				throw new Error('Expected value after equality operator');
-			}
-
-			const finalValue = isAlpha(tokens[i])
-				? definedVars[tokens[i]]
-				: Number(tokens[i]);
-
-			if (finalValue === undefined) {
-				throw new Error(`Invalid final value: ${tokens[i]}`);
-			}
-
-			const methodName = getZ3EqualityMethod(equalityOperator);
-			expression = expression[methodName](finalValue);
-		}
-
-		return expression;
-	}
-
-	const {expr1, expr2} = arithObj;
-
-	// Check expr1 and expr2 are the correct datatypes:
-
-	if (typeof expr2 === 'string') {
-		console.error(
-			`Error in handleEquationCompose: expr2 must be string [], but is ${typeof expr2}`,
-		);
-		return;
-	}
-
-	if (expr1 === undefined) {
-		console.error('Error in handleEquationCompose: expr1 is undefined');
-		return;
-	}
-
-	console.log('datatype checks pass for handleEquationCompose');
-
-	// Retrieving z3 variables already defined and added to Map<string, Z3Variable> from adding constraints to z3 stack in addVariableConstraint func
-
-	const definedVars = getDefinedVariables(variableNames, tracker); //  { x: Z3Var, y: Z3Var }
-
-	const numVarEntries = Object.entries(definedVars).length;
-
-	if (!numVarEntries) {
-		console.error('Error in handleEquationCompose: definedVars is empty');
-		return;
-	}
-
-	console.log('entries in definedVars:', Object.keys(definedVars));
-
-	const createdZ3Assertion: any = constructZ3Assertion(expr2, definedVars);
-
-	// Creating z3 scope to add assertion created to z3 stack to check if a model can be found with disproves the equation, assertion is deleted from global z3 scope after regardless of whether stack is satisfiable or not
-	solver.push();
-	console.log(`createdZ3Assertion: ${createdZ3Assertion}`);
-	console.log(`Not(createdZ3Assertion): ${Not(createdZ3Assertion).eq(true)}`);
-	solver.add(Not(createdZ3Assertion).eq(true));
-	const result = await solver.check();
-
-	if (result === 'sat') {
-		console.error(
-			'Error in handleEquationCompose: z3 found model that doesnt satisfy variable domain constraints:',
-		);
-
-		const model = await solver.model();
-
-		const declarations = model.decls();
-
-		const modelValues: ModelValuesType = {
-			xValue: undefined,
-			yValue: undefined,
-			zValue: undefined,
-		};
-		// Logging values satisfying z3 stack to console
-
-		if (declarations.length > 0) {
-			modelValues.xValue =
-				declarations[0].name() === 'x'
-					? model.get(declarations[0]).asString()
-					: undefined;
-			console.log('model xValue:', modelValues.xValue);
-		}
-
-		if (declarations.length >= 2) {
-			if (declarations.length === 2) {
-				modelValues.yValue =
-					declarations[1].name() === 'y'
-						? model.get(declarations[1]).asString()
-						: undefined;
-				console.log('model yValue:', modelValues.yValue);
-			} else {
-				modelValues.zValue =
-					declarations[1].name() === 'z'
-						? model.get(declarations[1]).asString()
-						: undefined;
-				console.log('model zValue:', modelValues.zValue);
-			}
-		}
-
-		if (declarations.length === 3) {
-			modelValues.yValue =
-				declarations[2].name() === 'y'
-					? model.get(declarations[2]).asString()
-					: undefined;
-			console.log('model yValue:', modelValues.yValue);
-		}
-
-		solver.pop();
-		return false;
-	}
-
-	if (result === 'unsat') {
-		console.log(
-			'No model value found by z3 that disproves statement based on variable domain constraints so must be valid',
-		);
-		solver.pop();
-		return createdZ3Assertion.eq(true);
-	}
 }
 
 async function handleHskipDispatch(
@@ -900,7 +404,7 @@ async function handleHskipDispatch(
 		thirdExprVarNameRhs,
 	};
 
-	const exprValues: ExprValueLhsTypes & ExprValueRhsTypes = {
+	const exprValues: ExprValueTypes = {
 		firstExprValueLhs,
 		secondExprValueLhs,
 		thirdExprValueLhs,
@@ -1184,7 +688,6 @@ async function handleHassignDispatch(
 	const afterImplies = await handleEquationCompose(
 		arithObj,
 		lhsVarNames,
-		tracker,
 		solver,
 		Not,
 	);
