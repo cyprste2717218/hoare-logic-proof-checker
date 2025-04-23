@@ -1,4 +1,4 @@
-import {handleDelimiterArith} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-z3-logic/handle-delimeter-arith';
+import {handleDelimiterArith} from '@/utilities/handle-check-proof-validity/check-proof-content/arith-law-logic/handle-delimeter-arith';
 import type {
 	ArithObjType,
 	SplitReturnObjType,
