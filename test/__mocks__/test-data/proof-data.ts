@@ -20,8 +20,14 @@ const invalidProofData = {
 		proofFour: ['x=1 /\\ y>3 /\\ z=6 /\\ w=2 -> x=1 /\\ y>3 /\\ z=6 /\\ w=2  :arith', '{x=1 /\\ y>3 /\\ z=6 /\\ w=2} x=1 /\\ y>3 /\\ z=6 /\\ w=2  {x=1 /\\ y>3 /\\ z=6 /\\ w=2} :hskip 1']
 	},
 	assignLaw: {
-		proofOne: ['y>1 -> y>2 :arith', 'y>1 -> (y>2)[x|>x+1] :subst 1', '{y>1} x:=x+1 {y>2} :hassign 2']
+		proofOne: ['y>1 -> y>2 :arith', 'y>1 -> (y>2)[x|>x+1] :subst 1', '{y>1} x:=x+1 {y>2} :hassign 2'],
+		proofTwo: ['x=5 -> x=7 :arith', 'x=5 -> (x=7)[x|>10] :subst 1', '{x=5} x:=10 {x=7} :hassign 2'],
+		proofThree: ['x=2 -> x=3 :arith', 'x=2 -> (x=3)[x|>x*2] :subst 1', '{x=2} x:=x*2 {x=3} :hassign 2'],
+		proofFour: ['x=1/\\y=2 -> x=3/\\y=3 :arith', 'x=1/\\y=2 -> (x=3/\\y=3)[x|>3] :subst 1', '{x=1/\\y=2} x:=3 {x=3/\\y=3} :hassign 2'],
+		proofFive: ['x=0 -> x=y+2 :arith', 'x=0 -> (x=y+2)[x|>y+1] :subst 1', '{x=0} x:=y+1 {x=y+2} :hassign 2'],
+		proofSix: ['x=1/\\y=2 -> y=2 :arith', 'x=1/\\y=2 -> (y=2)[y|>x] :subst 1', '{x=1/\\y=2} y:=x {y=2} :hassign 2'],
+		proofSeven: ['x>0/\\y=2 -> x>0 :arith', 'x>0/\\y=2 -> (x>0)[x|>y-3] :subst 1', '{x>0/\\y=2} x:=y-3 {x>0} :hassign 2']
 	}
-}
+};
 
 export { validProofData, invalidProofData };
