@@ -23,6 +23,8 @@ function handleProofSyntaxCheck({
 	];
 	const errors: ErrorMsg[] = [];
 
+	console.log('before formatting:', proofContent);
+
 	// Format the proof into array of proof lines and check for syntax errors
 	const formattedProofLines = formatProof(proofContent);
 
