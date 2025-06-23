@@ -25,7 +25,7 @@ The tooling was developed in the completion of my thesis for my BEng in Computer
 
 ### Supported Proof Laws and Format
 
-At current, the tool supports validation of Hoare Logic Proofs using the Assignment Law and Skip Law respectively, this is via a 'fitch-style' notation, as used within proof construction in the [Carnap System tooling](https://github.com/Carnap/Carnap). <br><br>
+At current, the tool supports validation of Hoare Logic Proofs using the Assignment Law and Skip Law respectively, this is via a 'fitch-style' notation, as inspired by proof construction within the [Carnap System tooling](https://github.com/Carnap/Carnap). <br><br>
 An example of a proof under this format for verifying a Hoare triple under the Assignment Law is shown below:
 
 ```
