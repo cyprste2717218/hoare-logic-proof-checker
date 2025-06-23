@@ -30,7 +30,7 @@ function doOtherLawChecks(
 			 x=1 -> x+2=3
 			*/
 			const pattern =
-				/^([a-zA-Z](?:=|>|<|>=|<=)\s?\d{1,2}(\s*\/\\\s*[a-zA-Z](?:=|>|<|>=|<=)\s?\d{1,2})*)\s*->\s*([a-zA-Z](?:[*\-+/][a-zA-Z\d])*(?:=|>|<|>=|<=)[a-zA-Z\d](?:[*\-+/][a-zA-Z\d])*(\s*\/\\\s*[a-zA-Z](?:[*\-+/][a-zA-Z\d])*(?:=|>|<|>=|<=)[a-zA-Z\d](?:[*\-+/][a-zA-Z\d])*)*)\s*$/;
+				/^([a-zA-Z]\s*(?:=|>|<|>=|<=)\s*\d{1,2}(\s*\/\\\s*[a-zA-Z]\s*(?:=|>|<|>=|<=)\s*\d{1,2})*)\s*->\s*([a-zA-Z](?:[*\-+/][a-zA-Z\d])*\s*(?:=|>|<|>=|<=)\s*[a-zA-Z\d](?:[*\-+/][a-zA-Z\d])*(\s*\/\\\s*[a-zA-Z](?:[*\-+/][a-zA-Z\d])*\s*(?:=|>|<|>=|<=)\s*[a-zA-Z\d](?:[*\-+/][a-zA-Z\d])*)*)\s*$/;
 			return pattern.test(textLine);
 		}
 
@@ -79,9 +79,10 @@ function doOtherLawChecks(
 					return '';
 				}
 
-				const pattern = /\[(.*?)]$/;
+				const pattern = /\[\s*(.*?)\s*]$/;
 				const match = pattern.exec(text);
-				return match ? match[1] : '';
+				// Remove all whitespace characters from the extracted content
+				return match ? match[1].replace(/\s+/g, '') : '';
 			}
 
 			const extractedSubstExpr: string = extractBetweenSquareBrackets(textLine);
@@ -109,7 +110,7 @@ function doOtherLawChecks(
 					return '';
 				}
 
-				const pattern = /^\((.*?)\)/;
+				const pattern = /^\(\s*(.*?)\s*\)/;
 				const match = pattern.exec(text);
 				return match ? match[1] : '';
 			}

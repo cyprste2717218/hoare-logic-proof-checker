@@ -1,5 +1,5 @@
-import {type ErrorMsg, type LawTypeKeys} from '@/models/misc';
-import {validRegexFormats} from '@/lib/regex-formats';
+import { type ErrorMsg, type LawTypeKeys } from '@/models/misc';
+import { validRegexFormats } from '@/lib/regex-formats';
 import {
 	formatProof,
 	hasFormatErrors,
@@ -36,16 +36,13 @@ function handleProofSyntaxCheck({
 
 	// Check for any syntax errors and return them, or if no errors return formatted proof lines
 	if (syntaxErrors.length > 0) {
-		// If the above yields an error then do the following to-dos:
-		// to-do: pass up error message objects to new state for error msgs in App.tsx
-		// to-do: set currentProofState to 'Invalid - Syntax Error'
 		errors.push(...syntaxErrors);
 		console.log('Proof does not adhere to syntax');
 	} else {
 		console.log('Proof adheres to syntax');
 	}
 
-	return {syntaxErrors: errors, formattedProofLines};
+	return { syntaxErrors: errors, formattedProofLines };
 }
 
-export {handleProofSyntaxCheck};
+export { handleProofSyntaxCheck };

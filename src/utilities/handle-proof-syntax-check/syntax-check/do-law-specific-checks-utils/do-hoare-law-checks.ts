@@ -13,8 +13,8 @@ function doHoareLawChecks(
 
 	function doPreConditionChecks(textLine: string): DiagnosticsType {
 		function extractPreConditionBody(text: string): string | undefined {
-			const match = /{([^{}]+)}/.exec(text);
-			return match?.[1];
+			const match = /{([^{}]*)}/.exec(text);
+			return match?.[1]?.trim();
 		}
 
 		const diagnostics: DiagnosticsType = {
@@ -171,8 +171,8 @@ function doHoareLawChecks(
 		}
 
 		function extractPostConditionBody(text: string): string | undefined {
-			const match = /{([^{}]+)}/.exec(text);
-			return match ? match[1] : undefined;
+			const match = /{([^{}]*)}/.exec(text);
+			return match?.[1]?.trim();
 		}
 
 		const diagnostics: DiagnosticsType = {
@@ -289,4 +289,4 @@ function doHoareLawChecks(
 	};
 }
 
-export {doHoareLawChecks};
+export { doHoareLawChecks };
