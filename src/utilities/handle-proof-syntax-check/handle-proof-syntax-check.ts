@@ -1,5 +1,5 @@
-import { type ErrorMsg, type LawTypeKeys } from '@/models/misc';
-import { validRegexFormats } from '@/lib/regex-formats';
+import {type ErrorMsg, type LawTypeKeys} from '@/models/misc';
+import {validRegexFormats} from '@/lib/regex-formats';
 import {
 	formatProof,
 	hasFormatErrors,
@@ -42,7 +42,7 @@ function handleProofSyntaxCheck({
 		console.log('Proof adheres to syntax');
 	}
 
-	return { syntaxErrors: errors, formattedProofLines };
+	return {syntaxErrors: errors, formattedProofLines};
 }
 
-export { handleProofSyntaxCheck };
+export {handleProofSyntaxCheck};

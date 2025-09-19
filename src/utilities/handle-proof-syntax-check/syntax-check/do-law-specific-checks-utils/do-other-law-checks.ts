@@ -82,7 +82,7 @@ function doOtherLawChecks(
 				const pattern = /\[\s*(.*?)\s*]$/;
 				const match = pattern.exec(text);
 				// Remove all whitespace characters from the extracted content
-				return match ? match[1].replace(/\s+/g, '') : '';
+				return match ? match[1].replaceAll(/\s+/g, '') : '';
 			}
 
 			const extractedSubstExpr: string = extractBetweenSquareBrackets(textLine);

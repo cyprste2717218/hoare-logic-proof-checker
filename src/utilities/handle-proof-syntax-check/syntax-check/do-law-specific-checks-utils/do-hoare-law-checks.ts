@@ -289,4 +289,4 @@ function doHoareLawChecks(
 	};
 }
 
-export { doHoareLawChecks };
+export {doHoareLawChecks};

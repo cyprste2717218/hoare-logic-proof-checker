@@ -11,11 +11,11 @@ function doSupportingArithLawChecks(
 		substitutionPostCondition: string,
 	):
 		| {
-			arithPreCondition: string;
-			arithAssignExpr: string;
-			arithResultDomain: string;
-			substResultDomain: string;
-		}
+				arithPreCondition: string;
+				arithAssignExpr: string;
+				arithResultDomain: string;
+				substResultDomain: string;
+		  }
 		| undefined {
 		function extractFromEqualityOperator(input: string): string {
 			try {
@@ -31,14 +31,13 @@ function doSupportingArithLawChecks(
 		}
 
 		function extractArithLineParts(input: string): [string, string, string] {
-
 			/**
 			 * Removes all whitespace characters from a string and returns the concatenated result.
 			 * @param input - The input string to process
 			 * @returns The input string with all whitespace characters removed
 			 */
 			function removeAllWhitespace(input: string): string {
-				return input.replace(/\s+/g, '');
+				return input.replaceAll(/\s+/g, '');
 			}
 
 			try {
@@ -51,8 +50,7 @@ function doSupportingArithLawChecks(
 				const match = pattern.exec(trimmedInput);
 
 				if (match) {
-
-					match[4] = removeAllWhitespace(match[4])
+					match[4] = removeAllWhitespace(match[4]);
 
 					return [
 						match[1].trim(), // Before ->
@@ -211,4 +209,4 @@ function doSupportingArithLawChecks(
 	}
 }
 
-export { doSupportingArithLawChecks };
+export {doSupportingArithLawChecks};
