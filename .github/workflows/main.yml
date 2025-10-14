@@ -31,8 +31,8 @@ jobs:
       - name: Do NPM Audit
         run: npm audit
 
-      - name: Run tests (unit)
-        run: npm run test:unit
+      - name: Run tests (integration)
+        run: npm run test:it
 
       - name: Build App
         run: npm run build
