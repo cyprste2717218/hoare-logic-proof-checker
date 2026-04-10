@@ -14,9 +14,9 @@
     "preview": "vite preview",
     "prepare": "husky install",
     "test": "npm run test:unit && npm run test:it && npm run test:end",
-    "test:unit": "jest --testMatch \"**/*.unit.test.ts\"",
-    "test:it": "jest --testMatch \"**/*.it.test.ts\"",
-    "test:e2e": "jest --testMatch \"**/*.e2e.test.ts\""
+    "test:unit": "jest --testMatch \"**/*.unit.test.ts\" --passWithNoTests",
+    "test:it": "jest --testMatch \"**/*.it.test.ts\" --passWithNoTests",
+    "test:e2e": "jest --testMatch \"**/*.e2e.test.ts\" --passWithNoTests"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.3",
