@@ -187,6 +187,7 @@ function doHoareLawChecks(
 			console.error(
 				`Error: Attempt to extract string from start of postcondition failed:${startOfPostConditionString}`,
 			);
+			diagnostics.errors.push(checks.postConditionOpenCloseBraces.message);
 			diagnostics.isValid = false;
 			return diagnostics;
 		}
@@ -258,7 +259,19 @@ function doHoareLawChecks(
 		return preConditionDiagnostics;
 	}
 
-	// 2). gather any program body check errors
+	// 2). gather any postcondition check errors
+	const postConditionDiagnostics: DiagnosticsType =
+		doPostConditionChecks(textLine);
+
+	if (
+		postConditionDiagnostics.errors.length > 0 &&
+		!postConditionDiagnostics.isValid
+	) {
+		// Early return if errors present in postcondition checks
+		return postConditionDiagnostics;
+	}
+
+	// 3). gather any program body check errors
 	const programBodyDiagnostics: DiagnosticsType = doProgramBodyChecks(textLine);
 
 	if (
@@ -267,18 +280,6 @@ function doHoareLawChecks(
 	) {
 		// Early return if errors present in program body checks
 		return programBodyDiagnostics;
-	}
-
-	// 3). gather any postcondition check errors
-	const postConditionDiagnostics: DiagnosticsType =
-		doPostConditionChecks(textLine);
-
-	if (
-		postConditionDiagnostics.errors.length > 0 &&
-		!postConditionDiagnostics.isValid
-	) {
-		// Early return if errors present in program body checks
-		return postConditionDiagnostics;
 	}
 
 	// No errors detected on proof line for hoare law call so return unchanged diagnostics object

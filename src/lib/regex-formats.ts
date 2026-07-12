@@ -27,7 +27,7 @@ const validRegexFormats: LawType = {
 const allChecks: AllRegexChecks = {
 	// To-do: allow for optional single whitespace char between constants and operators, i.e. x = 3, y > 4
 	preConditionOpenCloseBraces: {
-		expression: /^{[^{}]*}/,
+		expression: /^{[^{}]*}(?!})/,
 		message:
 			"Precondition does not contain both closing and opening braces, '{}'",
 	},
@@ -38,7 +38,7 @@ const allChecks: AllRegexChecks = {
 			'Precondition body is incorrectly formatted, should be singular/list of expressions of form <expr><operator><expr> delimited by /\\, e.g. x=2 /\\ y>=3',
 	},
 	postConditionOpenCloseBraces: {
-		expression: /^{[^{}]*}.*$/,
+		expression: /^{[^{}]*}[^{}]*$/,
 		message:
 			"Postcondition does not contain both closing and opening braces, '{}'",
 	},
