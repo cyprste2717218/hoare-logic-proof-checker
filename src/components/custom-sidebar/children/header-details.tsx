@@ -6,9 +6,7 @@ import {
 } from '@/components/base/sidebar.js';
 
 type AllowedPages =
-	| 'Hoare Logic Proof Validator'
-	| 'Reference Guide'
-	| 'Settings';
+	'Hoare Logic Proof Validator' | 'Reference Guide' | 'Settings';
 
 export function HeaderDetails({
 	description,

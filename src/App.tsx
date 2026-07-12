@@ -13,9 +13,7 @@ import {
 } from '@/utilities/handle-check-proof-validity/z3-logic/initialise-z3-funcs';
 
 type CurrentPageContentType =
-	| 'Hoare Logic Proof Validator'
-	| 'Reference Guide'
-	| 'Settings';
+	'Hoare Logic Proof Validator' | 'Reference Guide' | 'Settings';
 
 function App() {
 	const [currentPageContent, setCurrentPageContent] =

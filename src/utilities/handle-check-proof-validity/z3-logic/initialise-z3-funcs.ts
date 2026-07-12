@@ -90,7 +90,6 @@ async function getZ3Context() {
 
 		const {Context} = z3Api;
 
-		// @ts-expect-error z3 package doesn't provide typing for these constructs at current v4.14.1
 		z3Context = new Context('main');
 	}
 

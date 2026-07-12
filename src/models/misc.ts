@@ -6,9 +6,7 @@ type CurrentProofStateType =
 	| 'Unchecked - Change Present';
 
 type CurrentPageContentType =
-	| 'Hoare Logic Proof Validator'
-	| 'Reference Guide'
-	| 'Settings';
+	'Hoare Logic Proof Validator' | 'Reference Guide' | 'Settings';
 
 type ErrorMsg = {
 	messages: string[];

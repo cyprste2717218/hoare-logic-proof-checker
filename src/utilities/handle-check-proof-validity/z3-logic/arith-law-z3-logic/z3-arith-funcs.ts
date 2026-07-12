@@ -14,8 +14,7 @@ import {
 
 async function fetchConstraints(
 	fetchedConstraintsProps:
-		| FetchConstraintsPropsType
-		| FetchConstraintsPropsLhsType,
+		FetchConstraintsPropsType | FetchConstraintsPropsLhsType,
 ) {
 	const {constraintProps} = fetchedConstraintsProps;
 

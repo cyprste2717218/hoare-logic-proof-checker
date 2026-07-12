@@ -77,9 +77,7 @@ function retrieveSupportingProofLines({
 	// Extract relevant proof line with hoare or other law call
 
 	let lawCallDetails:
-		| GetHoareLawCallDetailsType
-		| GetOtherLawCallDetailsType
-		| undefined;
+		GetHoareLawCallDetailsType | GetOtherLawCallDetailsType | undefined;
 	let lawName = '';
 	let lineNum = 999; // Default value which shouldnt likely ever be reached
 
@@ -300,9 +298,7 @@ function parseSupportingProofLines({
 	let supportingProofLines: string[] = [];
 	let supportingProofLineNum: number;
 	let lawCallDetails:
-		| GetHoareLawCallDetailsType
-		| GetOtherLawCallDetailsType
-		| undefined;
+		GetHoareLawCallDetailsType | GetOtherLawCallDetailsType | undefined;
 	let lawName = '';
 	let lineNum = '';
 
