@@ -18,7 +18,7 @@ function getRelevantChecks(law: LawTypeKeys): AllRegexChecks {
 			lawChecksList = [
 				'preConditionOpenCloseBraces',
 				'preConditionBody',
-				'programBody',
+				'programBodyHskip',
 				'postConditionOpenCloseBraces',
 				'postConditionBody',
 			];
@@ -26,7 +26,13 @@ function getRelevantChecks(law: LawTypeKeys): AllRegexChecks {
 		}
 
 		case 'hassign': {
-			lawChecksList = [''];
+			lawChecksList = [
+				'preConditionOpenCloseBraces',
+				'preConditionBody',
+				'programBodyHassign',
+				'postConditionOpenCloseBraces',
+				'postConditionBody',
+			];
 			break;
 		}
 
@@ -46,7 +52,7 @@ function getRelevantChecks(law: LawTypeKeys): AllRegexChecks {
 		}
 
 		case 'subst': {
-			lawChecksList = [''];
+			lawChecksList = ['substitution', 'preConditionBody', 'postConditionBody'];
 			break;
 		}
 
@@ -82,12 +88,15 @@ function doLawSpecificChecks(
 
 	// Retrieving detected errors depending on parsing as instantiation of hoare law, e.g. hskip, or other law, e.g. arith, subst
 	if (lawGroup === 'hoareLaws') {
-		const diagnostics: DiagnosticsType = doHoareLawChecks(textLine, checks);
+		const diagnostics: DiagnosticsType = doHoareLawChecks(
+			textLine,
+			law,
+			checks,
+		);
 		return diagnostics;
 	}
 
-	// Note: will likely need to add, checks param to this call as with doHoareLawChecks func
-	const diagnostics: DiagnosticsType = doOtherLawChecks(textLine, law);
+	const diagnostics: DiagnosticsType = doOtherLawChecks(textLine, law, checks);
 	return diagnostics;
 }
 

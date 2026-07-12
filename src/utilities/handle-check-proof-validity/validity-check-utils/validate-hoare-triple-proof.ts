@@ -4,6 +4,7 @@ import type {
 	LawTypeOther,
 	GetHoareLawCallDetailsType,
 	CollectedTripleProofLines,
+	SupportingProofLineDetailsType,
 } from '@/models/misc';
 
 async function validateHoareTripleProof(
@@ -20,16 +21,49 @@ async function validateHoareTripleProof(
 
 	// Determine the supporting proof line number(s) from the proof line with the hoare law call and check appropiateness for the proof type at hand
 
-	const supportingProofLines:
-		| {supportingLineSuffix: string; proofLine: string}
-		| undefined = parseSupportingProofLines(
-		formattedProofContent,
-		hoareLawCallDetails,
-	);
+	const supportingProofLines: SupportingProofLineDetailsType =
+		parseSupportingProofLines({
+			formattedProofContent,
+			hoareLawCallDetails,
+		});
 
 	if (!supportingProofLines) {
 		console.error('No appropiate supporting proof lines detected for proof');
 		return false;
+	}
+
+	// Checking if has further proof line in support of supporting proof line discovered, if so getting details to parse into collectedTripleProofDetails obj
+	const hasFurtherProofLine = supportingProofLines.hasFurtherProofLine;
+
+	let furtherSupportingProofLine: SupportingProofLineDetailsType;
+
+	if (hasFurtherProofLine) {
+		console.log(
+			supportingProofLines.supportingLineSuffix,
+			'has suppporting line',
+		);
+
+		const law = supportingProofLines.supportingLineSuffix;
+		const line = supportingProofLines.proofLine;
+		const lineNum = supportingProofLines.supportingProofLineNum;
+
+		const otherLawCallDetails = {
+			law: law as LawTypeOther,
+			proofLine: line,
+			lineNum,
+		};
+
+		furtherSupportingProofLine = parseSupportingProofLines({
+			formattedProofContent,
+			otherLawCallDetails,
+		});
+
+		if (furtherSupportingProofLine === undefined) {
+			console.error(
+				'No appropiate further supporting proof line detected for proof',
+			);
+			return false;
+		}
 	}
 
 	// Handling proof lines which have been checked to logically follow, to be decomposed into constituent parts for single hoare triple proof
@@ -43,7 +77,18 @@ async function validateHoareTripleProof(
 			lawName: supportingProofLines.supportingLineSuffix as LawTypeOther,
 			line: supportingProofLines.proofLine,
 		},
+		...(furtherSupportingProofLine
+			? {
+					furtherSupportingProofLine: {
+						lawName:
+							furtherSupportingProofLine.supportingLineSuffix as LawTypeOther,
+						line: furtherSupportingProofLine.proofLine,
+					},
+				}
+			: {}),
 	};
+
+	console.log('collectedTripleProofDetails:', collectedTripleProofDetails);
 
 	const checkProofTripleValidity: boolean = await decomposeProofLines(
 		collectedTripleProofDetails,

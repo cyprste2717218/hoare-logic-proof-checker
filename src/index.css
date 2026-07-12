@@ -119,3 +119,17 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes z3-wasm-indeterminate-slide {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(400%);
+  }
+}
+
+.z3-wasm-progress-indeterminate {
+  animation: z3-wasm-indeterminate-slide 1.2s ease-in-out infinite;
+}

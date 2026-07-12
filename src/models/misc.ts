@@ -6,9 +6,7 @@ type CurrentProofStateType =
 	| 'Unchecked - Change Present';
 
 type CurrentPageContentType =
-	| 'Hoare Logic Proof Validator'
-	| 'Reference Guide'
-	| 'Settings';
+	'Hoare Logic Proof Validator' | 'Reference Guide' | 'Settings';
 
 type ErrorMsg = {
 	messages: string[];
@@ -48,11 +46,18 @@ type RegexCheckItem = {
 
 type AllRegexChecks = Record<string, RegexCheckItem>;
 
-type GetHoareLawCallDetailsType = {
-	law: LawTypeHoare;
+type GetLawCallDetailsType = {
 	proofLine: string;
 	lineNum: number;
 };
+
+type GetHoareLawCallDetailsType = {
+	law: LawTypeHoare;
+} & GetLawCallDetailsType;
+
+type GetOtherLawCallDetailsType = {
+	law: LawTypeOther;
+} & GetLawCallDetailsType;
 
 type CollectedTripleProofLines = {
 	hoareLaw: {
@@ -63,7 +68,20 @@ type CollectedTripleProofLines = {
 		lawName: LawTypeOther;
 		line: string;
 	};
+	furtherSupportingProofLine?: {
+		lawName: LawTypeOther;
+		line: string;
+	};
 };
+
+type SupportingProofLineDetailsType =
+	| {
+			proofLine: string;
+			supportingLineSuffix: string;
+			supportingProofLineNum: number;
+			hasFurtherProofLine: boolean;
+	  }
+	| undefined;
 
 export type {
 	CurrentProofStateType,
@@ -77,5 +95,8 @@ export type {
 	RegexCheckItem,
 	AllRegexChecks,
 	GetHoareLawCallDetailsType,
+	GetOtherLawCallDetailsType,
+	GetLawCallDetailsType,
 	CollectedTripleProofLines,
+	SupportingProofLineDetailsType,
 };

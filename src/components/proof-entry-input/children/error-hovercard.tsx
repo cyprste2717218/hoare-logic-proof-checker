@@ -100,7 +100,7 @@ function AllErrorHoverCards({
 
 function ErrorHoverCard({messages, lineNumber}: ErrorHoverCardProps) {
 	const allErrorMessages = messages.map((message) => {
-		return <div key={`error-message-${message}`}>{`-` + message + `\n`}</div>;
+		return <div key={`error-message-${message}`}>{message + `\n`}</div>;
 	});
 
 	return (
@@ -112,7 +112,10 @@ function ErrorHoverCard({messages, lineNumber}: ErrorHoverCardProps) {
 			</HoverCardTrigger>
 			<HoverCardContent>
 				<b>Error:</b> Syntax Error:
+				<br></br>
+				<br></br>
 				{allErrorMessages}
+				<br></br>
 				Line: {lineNumber}
 			</HoverCardContent>
 		</HoverCard>

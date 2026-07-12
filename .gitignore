@@ -14,6 +14,7 @@ dist-ssr
 tsconfig.app.tsbuildinfo
 tsconfig.node.tsbuildinfo
 .vercel
+test-results/
 
 # Editor directories and files
 .vscode/*

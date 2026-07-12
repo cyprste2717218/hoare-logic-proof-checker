@@ -1,13 +1,13 @@
-import {checkArithLawCallValidity} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-logic/check-arith-law-call-validity';
-import {doSkipLawChecks} from '@/utilities/handle-check-proof-validity/z3-logic/hskip-law-logic/do-skip-law-checks';
+import {checkArithLawCallValidity} from '@/utilities/handle-check-proof-validity/z3-logic/arith-law-z3-logic/check-arith-law-call-validity';
+import {doSkipLawChecks} from '@/utilities/handle-check-proof-validity/check-proof-content/hskip-law-logic/do-skip-law-checks';
 import type {CollectedTripleProofLines} from '@/models/misc';
-import type {ProofLawDetails} from '@/models/hoare-law-z3-models';
+import type {ProofSkipLawDetails} from '@/models/hoare-law-z3-models';
 
 async function checkHskipLawProof(
 	collectedTripleProofDetails: CollectedTripleProofLines,
 ): Promise<boolean> {
 	// Check that content in precondition, postcondition, program body in hskip proof line call and statement body of arith proof line call is the same
-	const passedSkipLawChecks: ProofLawDetails | undefined = doSkipLawChecks(
+	const passedSkipLawChecks: ProofSkipLawDetails | undefined = doSkipLawChecks(
 		collectedTripleProofDetails,
 	);
 
@@ -22,6 +22,7 @@ async function checkHskipLawProof(
 	try {
 		const arithLawCheckResult: boolean = await checkArithLawCallValidity(
 			passedSkipLawChecks.arith,
+			'hskip',
 		);
 
 		if (arithLawCheckResult) {

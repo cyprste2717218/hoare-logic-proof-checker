@@ -1,15 +1,20 @@
-import {type AllRegexChecks, type DiagnosticsType} from '@/models/misc';
+import {
+	type LawTypeKeys,
+	type AllRegexChecks,
+	type DiagnosticsType,
+} from '@/models/misc';
 
 function doHoareLawChecks(
 	textLine: string,
+	law: LawTypeKeys,
 	checks: AllRegexChecks,
 ): DiagnosticsType {
 	// Methods for checking different parts of proof line, i.e. pre-condition, program body and post-condition
 
 	function doPreConditionChecks(textLine: string): DiagnosticsType {
 		function extractPreConditionBody(text: string): string | undefined {
-			const match = /{([^{}]+)}/.exec(text);
-			return match?.[1];
+			const match = /{([^{}]*)}/.exec(text);
+			return match?.[1]?.trim();
 		}
 
 		const diagnostics: DiagnosticsType = {
@@ -63,6 +68,70 @@ function doHoareLawChecks(
 	}
 
 	function doProgramBodyChecks(textLine: string): DiagnosticsType {
+		function returnProgramBodySyntaxCheck(
+			law: LawTypeKeys,
+			programBody: string,
+			diagnostics: DiagnosticsType,
+		): DiagnosticsType {
+			function assignProgramBodySyntaxCheck(
+				law: LawTypeKeys,
+				programBody: string,
+			): boolean {
+				switch (law) {
+					case 'hskip': {
+						return checks.programBodyHskip.expression.test(programBody);
+					}
+
+					case 'hassign': {
+						return checks.programBodyHassign.expression.test(programBody);
+					}
+
+					default: {
+						console.log(
+							`no applicable syntax check for program body using hoare law ${law}`,
+						);
+						return false;
+					}
+				}
+			}
+
+			switch (law) {
+				case 'hskip': {
+					if (!assignProgramBodySyntaxCheck(law, programBody)) {
+						console.log('program body does not match expected syntax');
+
+						diagnostics.errors.push(checks.programBodyHskip.message);
+						diagnostics.isValid = false;
+					}
+
+					break;
+				}
+
+				case 'hassign': {
+					if (!assignProgramBodySyntaxCheck(law, programBody)) {
+						console.log('program body does not match expected syntax');
+
+						diagnostics.errors.push(checks.programBodyHassign.message);
+						diagnostics.isValid = false;
+					}
+
+					break;
+				}
+
+				default: {
+					console.log(
+						`no applicable syntax check for program body using hoare law ${law}`,
+					);
+					diagnostics.errors.push(
+						'check of program body syntax failed as law call is currently unsupported',
+					);
+					diagnostics.isValid = false;
+				}
+			}
+
+			return diagnostics;
+		}
+
 		function extractProgramBody(text: string): string | undefined {
 			const match = /{[^{}]*}([^{]*){/.exec(text);
 			return match?.[1].trim();
@@ -90,18 +159,8 @@ function doHoareLawChecks(
 			return diagnostics;
 		}
 
-		if (!checks.programBody.expression.test(programBody)) {
-			console.log('program body does not match expected syntax');
-
-			diagnostics.errors.push(checks.programBody.message);
-			diagnostics.isValid = false;
-
-			return diagnostics;
-		}
-
-		console.log('program body matches expected syntax');
-
-		return diagnostics;
+		// Check syntax of program body based on hoare law call type (differing syntax requirements for different hoare law calls, i.e. hassign versus hskip)
+		return returnProgramBodySyntaxCheck(law, programBody, diagnostics);
 	}
 
 	function doPostConditionChecks(textLine: string): DiagnosticsType {
@@ -112,8 +171,8 @@ function doHoareLawChecks(
 		}
 
 		function extractPostConditionBody(text: string): string | undefined {
-			const match = /{([^{}]+)}/.exec(text);
-			return match ? match[1] : undefined;
+			const match = /{([^{}]*)}/.exec(text);
+			return match?.[1]?.trim();
 		}
 
 		const diagnostics: DiagnosticsType = {
@@ -128,6 +187,7 @@ function doHoareLawChecks(
 			console.error(
 				`Error: Attempt to extract string from start of postcondition failed:${startOfPostConditionString}`,
 			);
+			diagnostics.errors.push(checks.postConditionOpenCloseBraces.message);
 			diagnostics.isValid = false;
 			return diagnostics;
 		}
@@ -199,7 +259,19 @@ function doHoareLawChecks(
 		return preConditionDiagnostics;
 	}
 
-	// 2). gather any program body check errors
+	// 2). gather any postcondition check errors
+	const postConditionDiagnostics: DiagnosticsType =
+		doPostConditionChecks(textLine);
+
+	if (
+		postConditionDiagnostics.errors.length > 0 &&
+		!postConditionDiagnostics.isValid
+	) {
+		// Early return if errors present in postcondition checks
+		return postConditionDiagnostics;
+	}
+
+	// 3). gather any program body check errors
 	const programBodyDiagnostics: DiagnosticsType = doProgramBodyChecks(textLine);
 
 	if (
@@ -208,18 +280,6 @@ function doHoareLawChecks(
 	) {
 		// Early return if errors present in program body checks
 		return programBodyDiagnostics;
-	}
-
-	// 3). gather any postcondition check errors
-	const postConditionDiagnostics: DiagnosticsType =
-		doPostConditionChecks(textLine);
-
-	if (
-		postConditionDiagnostics.errors.length > 0 &&
-		!postConditionDiagnostics.isValid
-	) {
-		// Early return if errors present in program body checks
-		return postConditionDiagnostics;
 	}
 
 	// No errors detected on proof line for hoare law call so return unchanged diagnostics object

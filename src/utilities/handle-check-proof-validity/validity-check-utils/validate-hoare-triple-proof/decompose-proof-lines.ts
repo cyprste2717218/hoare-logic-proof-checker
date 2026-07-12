@@ -1,4 +1,7 @@
-import {checkHskipLawProof} from '@/utilities/handle-check-proof-validity/z3-logic/hoare-law-z3-solver-funcs';
+import {
+	checkHskipLawProof,
+	checkHassignLawProof,
+} from '@/utilities/handle-check-proof-validity/check-proof-content/check-law-proof-content';
 import type {CollectedTripleProofLines} from '@/models/misc';
 
 async function decomposeProofLines(
@@ -19,6 +22,18 @@ async function decomposeProofLines(
 			);
 
 			return checkHskipProofOutcome;
+		}
+
+		if (passedHoareLawName === 'hassign') {
+			console.log(
+				'gets to here in performLawSpecificSteps:',
+				passedHoareLawName,
+			);
+			const checkHassignProofOutcome: boolean = await checkHassignLawProof(
+				collectedTripleProofDetails,
+			);
+
+			return checkHassignProofOutcome;
 		}
 
 		// Return false if passedHoareLawName in proof doesnt match up against ones in the conditional above

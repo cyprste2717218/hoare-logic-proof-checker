@@ -11,6 +11,8 @@ type CommonPropsType = {
 	And: any;
 	Not: any;
 	value: number;
+	tracker: any;
+	realProgramVarName: string;
 };
 
 type GetConstraintPropsType = {
@@ -19,6 +21,7 @@ type GetConstraintPropsType = {
 
 type AddVariableConstraintPropsType = {
 	variableName: 'x' | 'y' | 'z';
+	realProgramVarName: string;
 	Int: any;
 	solver: any;
 } & CommonPropsType;
@@ -69,7 +72,10 @@ async function addVariableConstraint(
 	async function addVariableConstraintX(
 		addVariableConstraintProps: CommonPropsType,
 	): Promise<any> {
+		const {tracker, realProgramVarName} = addVariableConstraintProps;
+
 		const x = Int.const('x');
+		tracker.addVariable(realProgramVarName, x, 'Int');
 
 		const addVariableConstraintPropsX: GetConstraintPropsType = {
 			passedVarName: x,
@@ -82,7 +88,9 @@ async function addVariableConstraint(
 	async function addVariableConstraintY(
 		addVariableConstraintProps: CommonPropsType,
 	): Promise<any> {
+		const {tracker, realProgramVarName} = addVariableConstraintProps;
 		const y = Int.const('y');
+		tracker.addVariable(realProgramVarName, y, 'Int');
 
 		const addVariableConstraintPropsY: GetConstraintPropsType = {
 			passedVarName: y,
@@ -95,7 +103,9 @@ async function addVariableConstraint(
 	async function addVariableConstraintZ(
 		addVariableConstraintProps: CommonPropsType,
 	): Promise<any> {
+		const {tracker, realProgramVarName} = addVariableConstraintProps;
 		const z = Int.const('z');
+		tracker.addVariable(realProgramVarName, z, 'Int');
 
 		const addVariableConstraintPropsZ: GetConstraintPropsType = {
 			passedVarName: z,
@@ -105,9 +115,25 @@ async function addVariableConstraint(
 		return constraint;
 	}
 
-	const {variableName, operator, value, Int, And, Not, solver} =
-		addVariableConstraintProps;
-	const paramProps: CommonPropsType = {operator, And, Not, value};
+	const {
+		variableName,
+		realProgramVarName,
+		operator,
+		value,
+		Int,
+		And,
+		Not,
+		solver,
+		tracker,
+	} = addVariableConstraintProps;
+	const paramProps: CommonPropsType = {
+		operator,
+		And,
+		Not,
+		value,
+		tracker,
+		realProgramVarName,
+	};
 	let addConstraint;
 
 	// Handle Z3 constant variable to create

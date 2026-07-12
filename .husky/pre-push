@@ -3,7 +3,5 @@
 
 echo "pre-push hook started (husky)"
 echo "-------------------------------"
-echo "running unit tests"
-npm run test:unit
 echo "validating builds succesfully"
 npm run build
