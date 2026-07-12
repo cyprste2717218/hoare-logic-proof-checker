@@ -19,7 +19,7 @@ async function readStreamToChunks(
 			break;
 		}
 
-		const value = chunk.value as Uint8Array;
+		const value = chunk.value!;
 		chunks.push(value);
 		onChunk(value.byteLength);
 	}
@@ -49,7 +49,7 @@ export async function preloadZ3Wasm(
 	wasmUrl: string,
 	onProgress?: (loaded: number, total: number | undefined) => void,
 ): Promise<PreloadZ3WasmResult> {
-	const response = await fetch(wasmUrl, { credentials: 'same-origin' });
+	const response = await fetch(wasmUrl, {credentials: 'same-origin'});
 	if (!response.ok) {
 		throw new Error(
 			`Failed to fetch WASM (${response.status} ${response.statusText})`,
@@ -68,7 +68,7 @@ export async function preloadZ3Wasm(
 		onProgress?.(0, undefined);
 		const arrayBuffer = await response.arrayBuffer();
 		onProgress?.(arrayBuffer.byteLength, arrayBuffer.byteLength);
-		return { arrayBuffer, mode: 'indeterminate' };
+		return {arrayBuffer, mode: 'indeterminate'};
 	}
 
 	if (total === undefined) {
